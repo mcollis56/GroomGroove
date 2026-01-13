@@ -11,6 +11,7 @@ function getDemoDogDetail(demoId: string): DogDetail | null {
       breed: 'Golden Retriever',
       weight: 65,
       notes: 'Sweet girl, loves treats during grooming',
+      photo_url: null,
       grooming_preferences: {
         clipping_length: '#4 blade all over',
         nail_tool: 'grinder',
@@ -35,6 +36,7 @@ function getDemoDogDetail(demoId: string): DogDetail | null {
       breed: 'German Shepherd',
       weight: 85,
       notes: 'Working on building trust with grooming process',
+      photo_url: null,
       grooming_preferences: {
         clipping_length: 'Minimal trimming, neaten only',
         nail_tool: 'clipper',
@@ -60,6 +62,7 @@ function getDemoDogDetail(demoId: string): DogDetail | null {
       breed: 'Husky',
       weight: 55,
       notes: 'Beautiful coat, very friendly',
+      photo_url: null,
       grooming_preferences: {
         clipping_length: 'Never clip - brush out only',
         nail_tool: 'grinder',
@@ -85,6 +88,7 @@ function getDemoDogDetail(demoId: string): DogDetail | null {
       breed: 'Poodle',
       weight: 45,
       notes: 'First time client - getting to know her preferences',
+      photo_url: null,
       grooming_preferences: {
         clipping_length: 'To be determined after first visit',
         coat_notes: 'Curly coat, no shedding'
@@ -104,6 +108,7 @@ function getDemoDogDetail(demoId: string): DogDetail | null {
       breed: 'Bulldog',
       weight: 50,
       notes: 'Sweetest boy, just sensitive about his feet',
+      photo_url: null,
       grooming_preferences: {
         nail_tool: 'clipper',
         nail_clipper_size: 'small',
@@ -146,6 +151,7 @@ export interface DogDetail {
   breed: string | null
   weight: number | null
   notes: string | null
+  photo_url: string | null
   grooming_preferences: GroomingPreferences
   created_at: string
   customer: {
@@ -185,6 +191,7 @@ export async function getDogDetail(dogId: string): Promise<DogDetail | null> {
       breed,
       weight,
       notes,
+      photo_url,
       grooming_preferences,
       created_at,
       customer:customers(id, name, phone, email)

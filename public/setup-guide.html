@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GroomGroove Setup Guide</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #1f2937;
+      background: #f9fafb;
+    }
+
+    .page {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 60px;
+      min-height: 100vh;
+      page-break-after: always;
+    }
+
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      min-height: 100vh;
+    }
+
+    .logo {
+      font-size: 80px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 48px;
+      background: linear-gradient(135deg, #f43f5e, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      font-size: 24px;
+      color: #6b7280;
+      margin-bottom: 40px;
+    }
+
+    .version {
+      font-size: 14px;
+      color: #9ca3af;
+    }
+
+    h2 {
+      font-size: 28px;
+      color: #111827;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid #f43f5e;
+    }
+
+    h3 {
+      font-size: 20px;
+      color: #374151;
+      margin: 30px 0 15px 0;
+    }
+
+    .step {
+      margin-bottom: 40px;
+    }
+
+    .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #f43f5e, #ec4899);
+      color: white;
+      border-radius: 50%;
+      font-weight: bold;
+      font-size: 18px;
+      margin-right: 15px;
+    }
+
+    .step-title {
+      display: inline;
+      font-size: 22px;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .step-content {
+      margin-left: 55px;
+      margin-top: 15px;
+    }
+
+    .screenshot {
+      background: #f3f4f6;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    .screenshot-placeholder {
+      background: linear-gradient(135deg, #fecdd3, #fbcfe8);
+      border-radius: 8px;
+      padding: 60px 40px;
+      color: #be123c;
+      font-weight: 500;
+    }
+
+    .screenshot img {
+      max-width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .screenshot-caption {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #6b7280;
+      font-style: italic;
+    }
+
+    ol, ul {
+      margin-left: 20px;
+      margin-bottom: 15px;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    .highlight {
+      background: #fef3c7;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .button-example {
+      display: inline-block;
+      background: linear-gradient(135deg, #f43f5e, #ec4899);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .button-green {
+      background: #16a34a;
+    }
+
+    .tip {
+      background: #ecfdf5;
+      border-left: 4px solid #10b981;
+      padding: 15px 20px;
+      margin: 20px 0;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .tip-title {
+      font-weight: 600;
+      color: #059669;
+      margin-bottom: 5px;
+    }
+
+    .warning {
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 15px 20px;
+      margin: 20px 0;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .warning-title {
+      font-weight: 600;
+      color: #d97706;
+      margin-bottom: 5px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    th {
+      background: #f9fafb;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .nav-icon {
+      font-size: 20px;
+      margin-right: 10px;
+    }
+
+    .workflow-box {
+      background: #f0f9ff;
+      border: 2px solid #0ea5e9;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+
+    .workflow-title {
+      font-weight: 600;
+      color: #0369a1;
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    .keyboard {
+      display: inline-block;
+      background: #1f2937;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 13px;
+      margin: 0 2px;
+    }
+
+    @media print {
+      .page {
+        padding: 40px;
+        box-shadow: none;
+      }
+
+      .screenshot-placeholder {
+        border: 2px dashed #d1d5db;
+        background: #f9fafb;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cover Page -->
+  <div class="page cover">
+    <div class="logo">🐾</div>
+    <h1>GroomGroove</h1>
+    <p class="subtitle">Setup & User Guide</p>
+    <p class="version">Version 1.0 - January 2026</p>
+  </div>
+
+  <!-- Page 2: Getting Started -->
+  <div class="page">
+    <h2>Getting Started</h2>
+
+    <div class="step">
+      <span class="step-number">1</span>
+      <span class="step-title">Open the App</span>
+      <div class="step-content">
+        <p>Open your web browser (Safari, Chrome, or Edge) and go to:</p>
+        <div class="screenshot">
+          <div class="screenshot-placeholder">
+            <strong>http://localhost:3000</strong>
+          </div>
+          <p class="screenshot-caption">Type this address in your browser's address bar</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-number">2</span>
+      <span class="step-title">Create Your Account</span>
+      <div class="step-content">
+        <p>You'll see the login screen. Click <span class="highlight">Sign up</span> to create your account.</p>
+        <div class="screenshot">
+          <div class="screenshot-placeholder">
+            📧 Email: your@email.com<br><br>
+            🔒 Password: ••••••••<br><br>
+            <span class="button-example">Sign up</span>
+          </div>
+          <p class="screenshot-caption">Enter your email and create a password (at least 6 characters)</p>
+        </div>
+        <div class="tip">
+          <div class="tip-title">💡 Tip</div>
+          <p>Use a password you'll remember! Write it down somewhere safe.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-number">3</span>
+      <span class="step-title">Welcome to Dashboard</span>
+      <div class="step-content">
+        <p>After signing up, you'll see your Dashboard - your home base for the day!</p>
+        <div class="screenshot">
+          <div class="screenshot-placeholder">
+            <strong>Dashboard</strong><br><br>
+            📊 Today's Stats | 📅 Today's Appointments | ⚡ Quick Actions
+          </div>
+          <p class="screenshot-caption">The Dashboard shows everything happening today</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page 3: Adding Clients -->
+  <div class="page">
+    <h2>Adding Your First Client</h2>
+
+    <div class="step">
+      <span class="step-number">1</span>
+      <span class="step-title">Go to Clients</span>
+      <div class="step-content">
+        <p>Click <span class="highlight">Clients</span> in the left sidebar.</p>
+        <div class="screenshot">
+          <div class="screenshot-placeholder">
+            <table style="width: auto; margin: 0 auto;">
+              <tr><td>🏠 Dashboard</td></tr>
+              <tr><td style="background: #ffe4e6; border-radius: 8px;"><strong>👥 Clients</strong> ← Click here</td></tr>
+              <tr><td>📅 Calendar</td></tr>
+              <tr><td>🔔 Notifications</td></tr>
+            </table>
+          </div>
+          <p class="screenshot-caption">The sidebar is always on the left</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-number">2</span>
+      <span class="step-title">Click "Add New Client"</span>
+      <div class="step-content">
+        <p>Click the <span class="button-example">Add New Client</span> button in the top right.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-number">3</span>
+      <span class="step-title">Fill in Client Details</span>
+      <div class="step-content">
+        <div class="screenshot">
+          <div class="screenshot-placeholder">
+            <strong>Add New Client</strong><br><br>
+            First Name: <span class="highlight">Sarah</span><br>
+            Surname: <span class="highlight">Johnson</span><br>
+            Email: <span class="highlight">sarah@email.com</span><br>
+            Phone: <span class="highlight">0412 345 678</span><br><br>
+            <span class="button-example">Create Client</span>
+          </div>
+          <p class="screenshot-caption">Enter the client's contact information</p>
+        </div>
+        <div class="tip">
+          <div class="tip-title">💡 Tip</div>
+          <p>The phone number is important for SMS reminders! Make sure it's correct.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page 4: Adding Dogs -->
+  <div class="page">
+    <h2>Adding a Dog</h2>
+
+    <p>After creating a client, you can add their dog(s) to the system.</p>
+
+    <div class="step">
+      <span class="step-number">1</span>
+      <span class="step-title">Click on a Client</span>
+      <div class="step-content">
+        <p>In the Clients list, click on a client's row to open their details panel.</p>
+        <div class="screenshot">
+          <div class="screenshot-placeholder">
+            <table style="width: 100%;">
+              <tr style="background: #fef2f2;">
+                <td><strong>Johnson</strong></td>
+                <td>Sarah</td>
+                <td>0412 345 678</td>
+                <td>← Click anywhere on this row</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-number">2</span>
+      <span class="step-title">View Client Panel</span>
+      <div class="step-content">
+        <p>A panel slides out from the right showing client details and quick actions.</p>
+        <div class="screenshot">
+          <div class="screenshot-placeholder">
+            <strong>Client Overview</strong><br><br>
+            Johnson, Sarah<br>
+            📱 0412 345 678<br>
+            📧 sarah@email.com<br><br>
+            <strong>Dogs (0)</strong><br>
+            No dogs yet<br><br>
+            <strong>Quick Actions</strong><br>
+            💬 Send Message<br>
+            📅 Book Appointment<br>
+            🐕 View Dog
+          </div>
+          <p class="screenshot-caption">The client panel shows everything about this client</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="warning">
+      <div class="warning-title">⚠️ Note</div>
+      <p>Dogs are currently added when creating appointments. Select the client, then add dog details in the appointment form.</p>
+    </div>
+  </div>
+
+  <!-- Page 5: Booking Appointments -->
+  <div class="page">
+    <h2>Booking an Appointment</h2>
+
+    <div class="step">
+      <span class="step-number">1</span>
+      <span class="step-title">Go to Calendar</span>
+      <div class="step-content">
+        <p>Click <span class="highlight">Calendar</span> in the sidebar, then click <span class="button-example">New Appointment</span>.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-number">2</span>
+      <span class="step-title">Fill in Appointment Details</span>
+      <div class="step-content">
+        <div class="screenshot">
+          <div class="screenshot-placeholder">
+            <strong>New Appointment</strong><br><br>
+            Client: <span class="highlight">Sarah Johnson ▼</span><br><br>
+            Dog: <span class="highlight">Milo ▼</span><br><br>
+            Date: <span class="highlight">20 Jan 2026</span><br><br>
+            Time: <span class="highlight">10:00 AM ▼</span><br><br>
+            Services:<br>
+            ☑️ Full Groom - $85<br>
+            ☐ Bath & Brush - $45<br>
+            ☐ Nail Trim - $25<br><br>
+            <span class="button-example">Create Appointment</span>
+          </div>
+          <p class="screenshot-caption">Select client, dog, time, and services</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-number">3</span>
+      <span class="step-title">Appointment Created!</span>
+      <div class="step-content">
+        <p>The appointment now appears on:</p>
+        <ul>
+          <li>📅 <strong>Calendar</strong> - on that date</li>
+          <li>🏠 <strong>Dashboard</strong> - if it's today</li>
+          <li>🔔 <strong>Notifications</strong> - for SMS reminder tracking</li>
+        </ul>
+        <div class="tip">
+          <div class="tip-title">💡 Automatic Reminders</div>
+          <p>The system will automatically send an SMS reminder 1 hour before the appointment!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page 6: Completing Appointments -->
+  <div class="page">
+    <h2>Completing an Appointment (Checkout)</h2>
+
+    <p>When a client arrives and you finish grooming their dog:</p>
+
+    <div class="step">
+      <span class="step-number">1</span>
+      <span class="step-title">Find the Appointment</span>
+      <div class="step-content">
+        <p>Go to <span class="highlight">Dashboard</span> and find the appointment in "Today's Appointments".</p>
+        <div class="screenshot">
+          <div class="screenshot-placeholder">
+            <strong>Today's Appointments</strong><br><br>
+            <table style="width: 100%;">
+              <tr>
+                <td>🕐 10:00</td>
+                <td><strong>Milo</strong><br>Sarah Johnson</td>
+                <td><span class="button-example button-green">✓ Complete</span></td>
+              </tr>
+            </table>
+          </div>
+          <p class="screenshot-caption">Click the green "Complete" button</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-number">2</span>
+      <span class="step-title">Review Services</span>
+      <div class="step-content">
+        <p>Check the services and total are correct, then click <span class="button-example button-green">Mark Service Complete</span>.</p>
+        <div class="screenshot">
+          <div class="screenshot-placeholder">
+            <strong>Review Services</strong><br><br>
+            Full Groom .................. $85.00<br>
+            ─────────────────────<br>
+            <strong>Total ...................... $85.00</strong><br><br>
+            <span class="button-example button-green">✓ Mark Service Complete</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-number">3</span>
+      <span class="step-title">Take Payment</span>
+      <div class="step-content">
+        <p>Select payment method and optionally schedule the next appointment.</p>
+        <div class="screenshot">
+          <div class="screenshot-placeholder">
+            <strong>Payment</strong><br><br>
+            💳 Card &nbsp;&nbsp;&nbsp; 💵 Cash<br><br>
+            ☑️ Schedule Next Appointment<br>
+            Return in: <span class="highlight">6 weeks ▼</span><br><br>
+            <span class="button-example">Complete Payment - $85.00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-number">4</span>
+      <span class="step-title">Print Receipt</span>
+      <div class="step-content">
+        <p>A receipt is generated. You can print it or email it to the client.</p>
+        <div class="screenshot">
+          <div class="screenshot-placeholder">
+            ✅ <strong>Payment Complete!</strong><br>
+            Receipt #GG-20260120-001<br><br>
+            🖨️ Print Receipt &nbsp;&nbsp; 📧 Email Receipt
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page 7: Daily Workflow -->
+  <div class="page">
+    <h2>Your Daily Workflow</h2>
+
+    <div class="workflow-box">
+      <div class="workflow-title">☀️ Morning</div>
+      <ol>
+        <li>Open GroomGroove and check the <strong>Dashboard</strong></li>
+        <li>Review today's appointments</li>
+        <li>Note any special concerns (anxious dogs, first visits)</li>
+      </ol>
+    </div>
+
+    <div class="workflow-box">
+      <div class="workflow-title">🐕 During the Day</div>
+      <ol>
+        <li>Client arrives → their appointment shows on Dashboard</li>
+        <li>Groom the dog</li>
+        <li>Click <strong>"Complete"</strong> button</li>
+        <li>Review services → Take payment → Print receipt</li>
+        <li>Schedule their next appointment</li>
+      </ol>
+    </div>
+
+    <div class="workflow-box">
+      <div class="workflow-title">🔔 Automatic Reminders</div>
+      <ul>
+        <li>SMS reminders are sent <strong>1 hour before</strong> each appointment</li>
+        <li>No action needed from you - it's automatic!</li>
+        <li>Check <strong>Notifications</strong> page to see reminder status</li>
+      </ul>
+    </div>
+
+    <div class="workflow-box">
+      <div class="workflow-title">🌙 End of Day</div>
+      <ol>
+        <li>Check all appointments are marked complete</li>
+        <li>Review tomorrow's schedule on Calendar</li>
+        <li>Log out (click your name → Logout)</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- Page 8: Navigation Reference -->
+  <div class="page">
+    <h2>Navigation Reference</h2>
+
+    <table>
+      <tr>
+        <th>Icon</th>
+        <th>Page</th>
+        <th>What it does</th>
+      </tr>
+      <tr>
+        <td class="nav-icon">🏠</td>
+        <td><strong>Dashboard</strong></td>
+        <td>Today's overview - appointments, stats, quick actions</td>
+      </tr>
+      <tr>
+        <td class="nav-icon">👥</td>
+        <td><strong>Clients</strong></td>
+        <td>View and manage all clients and their dogs</td>
+      </tr>
+      <tr>
+        <td class="nav-icon">📅</td>
+        <td><strong>Calendar</strong></td>
+        <td>View appointments by date, book new appointments</td>
+      </tr>
+      <tr>
+        <td class="nav-icon">🔔</td>
+        <td><strong>Notifications</strong></td>
+        <td>See SMS reminder status for today</td>
+      </tr>
+      <tr>
+        <td class="nav-icon">⏰</td>
+        <td><strong>History</strong></td>
+        <td>View past completed appointments</td>
+      </tr>
+      <tr>
+        <td class="nav-icon">⚙️</td>
+        <td><strong>Settings</strong></td>
+        <td>App settings and preferences</td>
+      </tr>
+    </table>
+
+    <h3>Keyboard Shortcuts (Power Users)</h3>
+    <p>Hold <span class="keyboard">Cmd</span> + <span class="keyboard">Option</span> (Mac) or <span class="keyboard">Ctrl</span> + <span class="keyboard">Alt</span> (Windows) and press:</p>
+
+    <table>
+      <tr>
+        <th>Key</th>
+        <th>Goes to</th>
+      </tr>
+      <tr><td><span class="keyboard">1</span></td><td>Dashboard</td></tr>
+      <tr><td><span class="keyboard">2</span></td><td>Clients</td></tr>
+      <tr><td><span class="keyboard">3</span></td><td>Calendar</td></tr>
+      <tr><td><span class="keyboard">4</span></td><td>Notifications</td></tr>
+      <tr><td><span class="keyboard">5</span></td><td>History</td></tr>
+      <tr><td><span class="keyboard">N</span></td><td>New Appointment</td></tr>
+    </table>
+  </div>
+
+  <!-- Page 9: Troubleshooting -->
+  <div class="page">
+    <h2>Troubleshooting</h2>
+
+    <h3>🔄 "Page not loading" or stuck</h3>
+    <ul>
+      <li>Refresh the page: <span class="keyboard">Cmd</span> + <span class="keyboard">R</span></li>
+      <li>Try a hard refresh: <span class="keyboard">Cmd</span> + <span class="keyboard">Shift</span> + <span class="keyboard">R</span></li>
+      <li>Check the terminal is still running</li>
+    </ul>
+
+    <h3>🔐 "Can't log in"</h3>
+    <ul>
+      <li>Make sure your password is at least 6 characters</li>
+      <li>Check you're using the right email</li>
+      <li>Try signing up again if needed</li>
+    </ul>
+
+    <h3>📅 "Appointment not showing"</h3>
+    <ul>
+      <li>Check you selected the correct date on the calendar</li>
+      <li>Refresh the page</li>
+      <li>Check the appointment wasn't cancelled</li>
+    </ul>
+
+    <h3>📱 "SMS not sending"</h3>
+    <ul>
+      <li>Check the client has a phone number</li>
+      <li>Check SMS consent is enabled for the client</li>
+      <li>Reminders are sent 1 hour before - check the timing</li>
+    </ul>
+
+    <div class="tip">
+      <div class="tip-title">💡 Still having issues?</div>
+      <p>Contact support or restart the app by closing and reopening the terminal, then running <code>npm run dev</code> again.</p>
+    </div>
+  </div>
+
+  <!-- Back Cover -->
+  <div class="page cover">
+    <div class="logo">🐾</div>
+    <h1>GroomGroove</h1>
+    <p class="subtitle">Happy Grooming!</p>
+    <br><br>
+    <p style="color: #9ca3af;">Made with ❤️ for dog groomers</p>
+  </div>
+
+</body>
+</html>

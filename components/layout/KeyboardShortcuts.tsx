@@ -6,12 +6,13 @@ import { useRouter } from 'next/navigation'
 const shortcuts: Record<string, string> = {
   '1': '/',              // Dashboard
   '2': '/clients',       // Clients
-  '3': '/calendar',      // Calendar
-  '4': '/notifications', // Notifications
-  '5': '/history',       // History
-  '6': '/settings',      // Settings
+  '3': '/dogs',          // Dogs
+  '4': '/calendar',      // Calendar
+  '5': '/notifications', // Notifications
+  '6': '/history',       // History
+  '7': '/settings',      // Settings
   'n': '/calendar/new',  // New appointment
-  'r': '/notifications', // Send reminders
+  'd': '/dogs',          // Dogs shortcut
 }
 
 export function KeyboardShortcuts() {
