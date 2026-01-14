@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { CheckCircle, Clock, XCircle } from 'lucide-react'
@@ -8,6 +9,7 @@ interface HistoryAppointment {
   dogId: string | null
   dogName: string
   dogBreed: string | null
+  dogPhotoUrl: string | null
   ownerName: string
   services: string[]
   notes: string | null
@@ -71,7 +73,21 @@ export function HistoryPageClient({ appointments }: HistoryPageClientProps) {
               key={appt.id}
               className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl"
             >
-              <StatusIcon status={appt.status} />
+              {/* Dog Photo */}
+              {appt.dogPhotoUrl ? (
+                <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+                  <Image
+                    src={appt.dogPhotoUrl}
+                    alt={appt.dogName}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-xl">🐕</span>
+                </div>
+              )}
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   {appt.dogId ? (

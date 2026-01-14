@@ -2,10 +2,13 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
-import { Mail, Phone, Calendar, Dog, MessageSquare, History, X } from 'lucide-react'
+import { Modal } from '@/components/ui/Modal'
+import { Mail, Phone, Calendar, Dog, MessageSquare, History, X, Trash2 } from 'lucide-react'
+import { deleteClient } from '@/lib/actions/clients'
 
 interface ClientDog {
   id: string
@@ -49,7 +52,25 @@ function StatusBadge({ status }: { status: 'active' | 'vip' | 'inactive' }) {
 }
 
 function ClientDetailPanel({ client, onClose }: { client: Client; onClose: () => void }) {
+  const router = useRouter()
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+
+  const handleDeleteClient = async () => {
+    setDeleting(true)
+    const result = await deleteClient(client.id)
+    
+    if (result.success) {
+      router.refresh()
+      onClose()
+    } else {
+      alert(result.error || 'Failed to delete client')
+      setDeleting(false)
+    }
+  }
+
   return (
+    <>
     <div className="fixed inset-y-0 right-0 w-96 bg-white shadow-xl border-l border-gray-200 z-50 overflow-y-auto">
       <div className="p-6">
         <div className="flex items-center justify-between mb-6">
@@ -153,9 +174,62 @@ function ClientDetailPanel({ client, onClose }: { client: Client; onClose: () =>
               )}
             </div>
           </div>
+
+          {/* Delete Section */}
+          <div className="pt-4 border-t border-gray-200">
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+              onClick={() => setShowDeleteModal(true)}
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete Client
+            </Button>
+          </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        title="Delete Client?"
+        size="sm"
+      >
+        <div className="p-6">
+          <p className="text-gray-700 mb-4">
+            Are you sure you want to delete <span className="font-semibold">{client.firstName} {client.surname}</span>? 
+            This will also delete:
+          </p>
+          <ul className="list-disc list-inside text-sm text-gray-600 mb-4 space-y-1">
+            <li>All {client.dogs.length} dog(s)</li>
+            <li>All grooming history and appointments</li>
+            <li>All associated records</li>
+          </ul>
+          <p className="text-sm text-red-600 mb-6">
+            This action cannot be undone.
+          </p>
+          <div className="flex justify-end gap-3">
+            <Button
+              variant="ghost"
+              onClick={() => setShowDeleteModal(false)}
+              disabled={deleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleDeleteClient}
+              disabled={deleting}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {deleting ? 'Deleting...' : 'Delete Client'}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
+    </>
   )
 }
 

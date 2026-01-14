@@ -9,7 +9,7 @@ interface AppointmentHistory {
   notes: string | null
   status: string
   customer: { name: string } | null
-  dog: { id: string; name: string; breed: string } | null
+  dog: { id: string; name: string; breed: string; photo_url: string | null } | null
 }
 
 function formatDate(isoString: string): string {
@@ -42,7 +42,7 @@ export default async function HistoryPage() {
       notes,
       status,
       customer:customers(name),
-      dog:dogs(id, name, breed)
+      dog:dogs(id, name, breed, photo_url)
     `)
     .order('scheduled_at', { ascending: false })
 
@@ -70,6 +70,7 @@ export default async function HistoryPage() {
     dogId: appt.dog?.id || null,
     dogName: appt.dog?.name || 'Unknown Dog',
     dogBreed: appt.dog?.breed || null,
+    dogPhotoUrl: appt.dog?.photo_url || null,
     ownerName: appt.customer?.name || 'Unknown Client',
     services: appt.services || [],
     notes: appt.notes,

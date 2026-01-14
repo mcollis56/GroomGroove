@@ -3,12 +3,13 @@
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Calendar, FileText, Dog, User, Camera, X, Loader2 } from 'lucide-react'
+import { Calendar, FileText, Dog, User, Camera, X, Loader2, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Modal } from '@/components/ui/Modal'
-import { addGroomingNote, updateGroomingPreferences, type GroomingPreferences } from '@/lib/actions/dogs'
+import { addGroomingNote, updateGroomingPreferences, deleteDog, type GroomingPreferences } from '@/lib/actions/dogs'
 import { uploadDogPhoto, deleteDogPhoto } from '@/lib/actions/photos'
+import { useRouter } from 'next/navigation'
 
 interface DogQuickActionsProps {
   dogId: string
@@ -449,11 +450,14 @@ export function DogPhoto({ dogId, dogName, photoUrl, isDemo }: DogPhotoProps) {
 }
 
 export function DogQuickActions({ dogId, dogName, customerPhone, photoUrl, groomingPreferences = {}, isDemo }: DogQuickActionsProps) {
+  const router = useRouter()
   const [showNoteModal, setShowNoteModal] = useState(false)
   const [showPreferencesModal, setShowPreferencesModal] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [note, setNote] = useState('')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [currentPhoto, setCurrentPhoto] = useState(photoUrl)
   const [uploading, setUploading] = useState(false)
   const [preferences, setPreferences] = useState<GroomingPreferences>(groomingPreferences)
@@ -564,6 +568,24 @@ export function DogQuickActions({ dogId, dogName, customerPhone, photoUrl, groom
     setPreferences(groomingPreferences)
   }
 
+  const handleDeleteDog = async () => {
+    if (isDemo) {
+      // In demo mode, just navigate away
+      router.push('/dogs')
+      return
+    }
+
+    setDeleting(true)
+    const result = await deleteDog(dogId)
+    
+    if (result.success) {
+      router.push('/dogs')
+    } else {
+      alert(result.error || 'Failed to delete dog')
+      setDeleting(false)
+    }
+  }
+
   return (
     <>
       <Card>
@@ -601,6 +623,16 @@ export function DogQuickActions({ dogId, dogName, customerPhone, photoUrl, groom
               <Dog className="w-4 h-4 mr-2" />
               Update Preferences
             </Button>
+            <div className="pt-3 border-t border-gray-200">
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+                onClick={() => setShowDeleteModal(true)}
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete Dog
+              </Button>
+            </div>
             <input
               ref={photoInputRef}
               type="file"
@@ -775,6 +807,41 @@ export function DogQuickActions({ dogId, dogName, customerPhone, photoUrl, groom
               disabled={saving || saved}
             >
               {saved ? 'Saved!' : saving ? 'Saving...' : 'Save Preferences'}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        title="Delete Dog?"
+        size="sm"
+      >
+        <div className="p-6">
+          <p className="text-gray-700 mb-4">
+            Are you sure you want to delete <span className="font-semibold">{dogName}</span>? 
+            This will also delete all associated grooming history and appointments.
+          </p>
+          <p className="text-sm text-red-600 mb-6">
+            This action cannot be undone.
+          </p>
+          <div className="flex justify-end gap-3">
+            <Button
+              variant="ghost"
+              onClick={() => setShowDeleteModal(false)}
+              disabled={deleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleDeleteDog}
+              disabled={deleting}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {deleting ? 'Deleting...' : 'Delete Dog'}
             </Button>
           </div>
         </div>

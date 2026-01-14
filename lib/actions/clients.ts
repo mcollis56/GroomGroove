@@ -72,6 +72,29 @@ export async function createClient_action(
 }
 
 /**
+ * Delete a client (and their dogs/appointments)
+ */
+export async function deleteClient(clientId: string): Promise<{ success: boolean; error?: string }> {
+  const supabase = await createClient()
+
+  // Delete the client (dogs and appointments should cascade delete if FK is set up with ON DELETE CASCADE)
+  const { error } = await supabase
+    .from('customers')
+    .delete()
+    .eq('id', clientId)
+
+  if (error) {
+    console.error('[Clients] Delete failed:', error)
+    return { success: false, error: error.message }
+  }
+
+  // Revalidate the clients page
+  revalidatePath('/clients')
+
+  return { success: true }
+}
+
+/**
  * Get all clients with their dogs for the clients list page
  */
 export async function getAllClients() {

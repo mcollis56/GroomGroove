@@ -300,6 +300,26 @@ export async function addGroomingNote(
 }
 
 /**
+ * Delete a dog (and optionally their appointments)
+ */
+export async function deleteDog(dogId: string): Promise<{ success: boolean; error?: string }> {
+  const supabase = await createClient()
+
+  // Delete the dog (appointments should cascade delete if FK is set up with ON DELETE CASCADE)
+  const { error } = await supabase
+    .from('dogs')
+    .delete()
+    .eq('id', dogId)
+
+  if (error) {
+    console.error('[Dogs] Delete failed:', error)
+    return { success: false, error: error.message }
+  }
+
+  return { success: true }
+}
+
+/**
  * Get all dogs for the dogs list page (server component)
  */
 export async function getAllDogs() {
