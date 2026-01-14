@@ -43,7 +43,10 @@ export async function uploadDogPhoto(
 
   if (uploadError) {
     console.error('[Photos] Upload failed:', uploadError)
-    return { success: false, error: 'Failed to upload photo. Please try again.' }
+    return { 
+      success: false, 
+      error: `Failed to upload photo: ${uploadError.message || 'Please try again.'}` 
+    }
   }
 
   // Get public URL

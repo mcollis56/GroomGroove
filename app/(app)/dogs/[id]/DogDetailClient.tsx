@@ -7,7 +7,7 @@ import { Calendar, FileText, Dog, User, Camera, X, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Modal } from '@/components/ui/Modal'
-import { addGroomingNote } from '@/lib/actions/dogs'
+import { addGroomingNote, updateGroomingPreferences, type GroomingPreferences } from '@/lib/actions/dogs'
 import { uploadDogPhoto, deleteDogPhoto } from '@/lib/actions/photos'
 
 interface DogQuickActionsProps {
@@ -15,7 +15,298 @@ interface DogQuickActionsProps {
   dogName: string
   customerPhone: string | null
   photoUrl: string | null
+  groomingPreferences?: GroomingPreferences
   isDemo?: boolean
+}
+
+// Editable Grooming Preferences Panel
+interface EditableGroomingPreferencesProps {
+  dogId: string
+  initialPreferences: GroomingPreferences
+  isDemo?: boolean
+}
+
+export function EditableGroomingPreferences({ dogId, initialPreferences, isDemo }: EditableGroomingPreferencesProps) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [preferences, setPreferences] = useState<GroomingPreferences>(initialPreferences)
+  const [saving, setSaving] = useState(false)
+
+  const handleSave = async () => {
+    setSaving(true)
+
+    if (isDemo) {
+      await new Promise(resolve => setTimeout(resolve, 500))
+      setIsEditing(false)
+      setSaving(false)
+      return
+    }
+
+    const result = await updateGroomingPreferences(dogId, preferences)
+    if (result.success) {
+      setIsEditing(false)
+      window.location.reload()
+    }
+
+    setSaving(false)
+  }
+
+  const handleCancel = () => {
+    setPreferences(initialPreferences)
+    setIsEditing(false)
+  }
+
+  return (
+    <Card>
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-semibold text-gray-900">Grooming Preferences</h3>
+          {isEditing && (
+            <div className="flex gap-2">
+              <Button variant="ghost" size="sm" onClick={handleCancel} disabled={saving}>
+                Cancel
+              </Button>
+              <Button variant="primary" size="sm" onClick={handleSave} disabled={saving}>
+                {saving ? 'Saving...' : 'Save'}
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {isEditing ? (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Clipping Length
+              </label>
+              <input
+                type="text"
+                value={preferences.clipping_length || ''}
+                onChange={(e) => setPreferences({ ...preferences, clipping_length: e.target.value })}
+                placeholder="e.g. #4 blade all over"
+                className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Clipping Notes
+              </label>
+              <textarea
+                value={preferences.clipping_notes || ''}
+                onChange={(e) => setPreferences({ ...preferences, clipping_notes: e.target.value })}
+                placeholder="e.g. Shorter on belly..."
+                className="w-full h-16 p-2 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent text-sm"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Nail Tool
+                </label>
+                <select
+                  value={preferences.nail_tool || ''}
+                  onChange={(e) => setPreferences({ ...preferences, nail_tool: e.target.value as 'clipper' | 'grinder' })}
+                  className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent text-sm"
+                >
+                  <option value="">Select</option>
+                  <option value="clipper">Clipper</option>
+                  <option value="grinder">Grinder</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Clipper Size
+                </label>
+                <select
+                  value={preferences.nail_clipper_size || ''}
+                  onChange={(e) => setPreferences({ ...preferences, nail_clipper_size: e.target.value as 'small' | 'medium' | 'large' })}
+                  className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent text-sm"
+                >
+                  <option value="">Select</option>
+                  <option value="small">Small</option>
+                  <option value="medium">Medium</option>
+                  <option value="large">Large</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Coat Notes
+              </label>
+              <textarea
+                value={preferences.coat_notes || ''}
+                onChange={(e) => setPreferences({ ...preferences, coat_notes: e.target.value })}
+                placeholder="e.g. Heavy shedder..."
+                className="w-full h-16 p-2 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Behavior Notes
+              </label>
+              <textarea
+                value={preferences.behavior_notes || ''}
+                onChange={(e) => setPreferences({ ...preferences, behavior_notes: e.target.value })}
+                placeholder="e.g. Anxious around dryers..."
+                className="w-full h-16 p-2 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Special Instructions
+              </label>
+              <textarea
+                value={preferences.special_instructions || ''}
+                onChange={(e) => setPreferences({ ...preferences, special_instructions: e.target.value })}
+                placeholder="e.g. Use calming spray..."
+                className="w-full h-16 p-2 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent text-sm"
+              />
+            </div>
+          </div>
+        ) : (
+          <div 
+            onClick={() => setIsEditing(true)}
+            className="space-y-4 cursor-pointer hover:bg-gray-50 -mx-2 -mb-2 p-2 rounded-lg transition-colors"
+          >
+            {preferences.clipping_length && (
+              <div>
+                <p className="text-sm text-gray-500">Clipping Length</p>
+                <p className="text-gray-900">{preferences.clipping_length}</p>
+              </div>
+            )}
+            {preferences.clipping_notes && (
+              <div>
+                <p className="text-sm text-gray-500">Clipping Notes</p>
+                <p className="text-gray-900">{preferences.clipping_notes}</p>
+              </div>
+            )}
+            {preferences.nail_tool && (
+              <div>
+                <p className="text-sm text-gray-500">Nail Tool</p>
+                <p className="text-gray-900 capitalize">{preferences.nail_tool}</p>
+              </div>
+            )}
+            {preferences.nail_clipper_size && (
+              <div>
+                <p className="text-sm text-gray-500">Nail Clipper Size</p>
+                <p className="text-gray-900 capitalize">{preferences.nail_clipper_size}</p>
+              </div>
+            )}
+            {preferences.coat_notes && (
+              <div>
+                <p className="text-sm text-gray-500">Coat Notes</p>
+                <p className="text-gray-900">{preferences.coat_notes}</p>
+              </div>
+            )}
+            {preferences.behavior_notes && (
+              <div>
+                <p className="text-sm text-gray-500">Behavior Notes</p>
+                <p className="text-gray-900">{preferences.behavior_notes}</p>
+              </div>
+            )}
+            {preferences.special_instructions && (
+              <div>
+                <p className="text-sm text-gray-500">Special Instructions</p>
+                <p className="text-gray-900">{preferences.special_instructions}</p>
+              </div>
+            )}
+            {Object.keys(preferences).length === 0 && (
+              <p className="text-gray-500 italic">No grooming preferences recorded yet. Tap to add.</p>
+            )}
+            <p className="text-xs text-gray-400 mt-4 flex items-center gap-1">
+              <FileText className="w-3 h-3" />
+              Tap anywhere to edit
+            </p>
+          </div>
+        )}
+      </div>
+    </Card>
+  )
+}
+
+// Editable General Notes Panel
+interface EditableGeneralNotesProps {
+  dogId: string
+  dogName: string
+  initialNotes: string | null
+  isDemo?: boolean
+}
+
+export function EditableGeneralNotes({ dogId, dogName, initialNotes, isDemo }: EditableGeneralNotesProps) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [notes, setNotes] = useState(initialNotes || '')
+  const [saving, setSaving] = useState(false)
+
+  const handleSave = async () => {
+    setSaving(true)
+
+    if (isDemo) {
+      await new Promise(resolve => setTimeout(resolve, 500))
+      setIsEditing(false)
+      setSaving(false)
+      return
+    }
+
+    const result = await addGroomingNote(dogId, notes)
+    if (result.success) {
+      setIsEditing(false)
+      window.location.reload()
+    }
+
+    setSaving(false)
+  }
+
+  const handleCancel = () => {
+    setNotes(initialNotes || '')
+    setIsEditing(false)
+  }
+
+  return (
+    <Card>
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-semibold text-gray-900">Notes</h3>
+          {isEditing && (
+            <div className="flex gap-2">
+              <Button variant="ghost" size="sm" onClick={handleCancel} disabled={saving}>
+                Cancel
+              </Button>
+              <Button variant="primary" size="sm" onClick={handleSave} disabled={saving}>
+                {saving ? 'Saving...' : 'Save'}
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {isEditing ? (
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder={`Add notes about ${dogName}...`}
+            className="w-full h-32 p-3 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+          />
+        ) : (
+          <div
+            onClick={() => setIsEditing(true)}
+            className="cursor-pointer hover:bg-gray-50 -mx-2 -mb-2 p-2 rounded-lg transition-colors"
+          >
+            <p className="text-gray-700 whitespace-pre-wrap mb-3">
+              {notes || <span className="text-gray-500 italic">No notes yet. Tap to add.</span>}
+            </p>
+            <p className="text-xs text-gray-400 flex items-center gap-1">
+              <FileText className="w-3 h-3" />
+              Tap anywhere to edit
+            </p>
+          </div>
+        )}
+      </div>
+    </Card>
+  )
 }
 
 // Dog Photo Component
@@ -157,13 +448,15 @@ export function DogPhoto({ dogId, dogName, photoUrl, isDemo }: DogPhotoProps) {
   )
 }
 
-export function DogQuickActions({ dogId, dogName, customerPhone, photoUrl, isDemo }: DogQuickActionsProps) {
+export function DogQuickActions({ dogId, dogName, customerPhone, photoUrl, groomingPreferences = {}, isDemo }: DogQuickActionsProps) {
   const [showNoteModal, setShowNoteModal] = useState(false)
+  const [showPreferencesModal, setShowPreferencesModal] = useState(false)
   const [note, setNote] = useState('')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [currentPhoto, setCurrentPhoto] = useState(photoUrl)
   const [uploading, setUploading] = useState(false)
+  const [preferences, setPreferences] = useState<GroomingPreferences>(groomingPreferences)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const photoInputRef = useRef<HTMLInputElement>(null)
 
@@ -239,6 +532,38 @@ export function DogQuickActions({ dogId, dogName, customerPhone, photoUrl, isDem
     setNote('')
   }
 
+  const handleSavePreferences = async () => {
+    setSaving(true)
+
+    if (isDemo) {
+      // Demo mode - just show success without persisting
+      await new Promise(resolve => setTimeout(resolve, 500))
+      setSaved(true)
+      setTimeout(() => {
+        setShowPreferencesModal(false)
+        setSaved(false)
+      }, 1000)
+    } else {
+      const result = await updateGroomingPreferences(dogId, preferences)
+      if (result.success) {
+        setSaved(true)
+        setTimeout(() => {
+          setShowPreferencesModal(false)
+          setSaved(false)
+          // Reload page to show updated preferences
+          window.location.reload()
+        }, 1000)
+      }
+    }
+
+    setSaving(false)
+  }
+
+  const handleCancelPreferences = () => {
+    setShowPreferencesModal(false)
+    setPreferences(groomingPreferences)
+  }
+
   return (
     <>
       <Card>
@@ -268,7 +593,11 @@ export function DogQuickActions({ dogId, dogName, customerPhone, photoUrl, isDem
               <Camera className="w-4 h-4 mr-2" />
               {uploading ? 'Uploading...' : currentPhoto ? 'Change Photo' : 'Add Photo'}
             </Button>
-            <Button variant="secondary" className="w-full justify-start">
+            <Button 
+              variant="secondary" 
+              className="w-full justify-start"
+              onClick={() => setShowPreferencesModal(true)}
+            >
               <Dog className="w-4 h-4 mr-2" />
               Update Preferences
             </Button>
@@ -279,14 +608,6 @@ export function DogQuickActions({ dogId, dogName, customerPhone, photoUrl, isDem
               onChange={handlePhotoSelect}
               className="hidden"
             />
-            {customerPhone && (
-              <a href={`tel:${customerPhone}`} className="block">
-                <Button variant="secondary" className="w-full justify-start">
-                  <User className="w-4 h-4 mr-2" />
-                  Call Owner
-                </Button>
-              </a>
-            )}
           </div>
         </div>
       </Card>
@@ -321,6 +642,139 @@ export function DogQuickActions({ dogId, dogName, customerPhone, photoUrl, isDem
               disabled={!note.trim() || saving || saved}
             >
               {saved ? 'Saved!' : saving ? 'Saving...' : 'Save Note'}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Update Grooming Preferences Modal */}
+      <Modal
+        isOpen={showPreferencesModal}
+        onClose={handleCancelPreferences}
+        title={`Grooming Preferences for ${dogName}`}
+        size="lg"
+      >
+        <div className="p-6 space-y-6">
+          {/* Clipping */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Clipping Length
+            </label>
+            <input
+              type="text"
+              value={preferences.clipping_length || ''}
+              onChange={(e) => setPreferences({ ...preferences, clipping_length: e.target.value })}
+              placeholder="e.g. #4 blade all over, 1/2 inch, etc."
+              className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+              disabled={saving || saved}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Clipping Notes
+            </label>
+            <textarea
+              value={preferences.clipping_notes || ''}
+              onChange={(e) => setPreferences({ ...preferences, clipping_notes: e.target.value })}
+              placeholder="e.g. Shorter on belly, leave tail fluffy..."
+              className="w-full h-20 p-3 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+              disabled={saving || saved}
+            />
+          </div>
+
+          {/* Nails */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Nail Tool
+              </label>
+              <select
+                value={preferences.nail_tool || ''}
+                onChange={(e) => setPreferences({ ...preferences, nail_tool: e.target.value as 'clipper' | 'grinder' })}
+                className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                disabled={saving || saved}
+              >
+                <option value="">Select tool</option>
+                <option value="clipper">Clipper</option>
+                <option value="grinder">Grinder</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Clipper Size (if applicable)
+              </label>
+              <select
+                value={preferences.nail_clipper_size || ''}
+                onChange={(e) => setPreferences({ ...preferences, nail_clipper_size: e.target.value as 'small' | 'medium' | 'large' })}
+                className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                disabled={saving || saved}
+              >
+                <option value="">Select size</option>
+                <option value="small">Small</option>
+                <option value="medium">Medium</option>
+                <option value="large">Large</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Coat Notes */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Coat Notes
+            </label>
+            <textarea
+              value={preferences.coat_notes || ''}
+              onChange={(e) => setPreferences({ ...preferences, coat_notes: e.target.value })}
+              placeholder="e.g. Heavy shedder, matting behind ears, sensitive skin..."
+              className="w-full h-20 p-3 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+              disabled={saving || saved}
+            />
+          </div>
+
+          {/* Behavior Notes */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Behavior Notes
+            </label>
+            <textarea
+              value={preferences.behavior_notes || ''}
+              onChange={(e) => setPreferences({ ...preferences, behavior_notes: e.target.value })}
+              placeholder="e.g. Anxious around dryers, doesn't like paws touched..."
+              className="w-full h-20 p-3 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+              disabled={saving || saved}
+            />
+          </div>
+
+          {/* Special Instructions */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Special Instructions
+            </label>
+            <textarea
+              value={preferences.special_instructions || ''}
+              onChange={(e) => setPreferences({ ...preferences, special_instructions: e.target.value })}
+              placeholder="e.g. Use calming spray, take frequent breaks..."
+              className="w-full h-20 p-3 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+              disabled={saving || saved}
+            />
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t">
+            <Button
+              variant="ghost"
+              onClick={handleCancelPreferences}
+              disabled={saving}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleSavePreferences}
+              disabled={saving || saved}
+            >
+              {saved ? 'Saved!' : saving ? 'Saving...' : 'Save Preferences'}
             </Button>
           </div>
         </div>

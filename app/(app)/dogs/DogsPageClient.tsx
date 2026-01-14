@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
@@ -13,6 +14,7 @@ interface DogWithOwner {
   breed: string | null
   weight: number | null
   notes: string | null
+  photo_url: string | null
   created_at: string
   grooming_preferences: GroomingPreferences
   customer: { id: string; name: string; phone: string | null } | null
@@ -76,8 +78,17 @@ export function DogsPageClient({ dogs }: DogsPageClientProps) {
             <Link key={dog.id} href={`/dogs/${dog.id}`}>
               <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Dog className="w-6 h-6 text-blue-600" />
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden relative">
+                    {dog.photo_url ? (
+                      <Image
+                        src={dog.photo_url}
+                        alt={dog.name}
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <Dog className="w-6 h-6 text-blue-600" />
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">

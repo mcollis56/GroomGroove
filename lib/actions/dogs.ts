@@ -313,6 +313,7 @@ export async function getAllDogs() {
       breed,
       weight,
       notes,
+      photo_url,
       grooming_preferences,
       created_at,
       customer:customers(id, name, phone)

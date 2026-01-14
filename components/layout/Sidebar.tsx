@@ -1,16 +1,17 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { Home, Users, Dog, Calendar, Bell, Clock, Settings, Image } from 'lucide-react'
+import { Home, Users, Dog, Calendar, Bell, Clock, Settings, Image as ImageIcon } from 'lucide-react'
 
 const navItems = [
   { href: '/', label: 'Dashboard', icon: Home },
   { href: '/clients', label: 'Clients', icon: Users },
   { href: '/dogs', label: 'Dogs', icon: Dog },
   { href: '/calendar', label: 'Calendar', icon: Calendar },
-  { href: '/photos', label: 'Photos', icon: Image },
+  { href: '/photos', label: 'Photos', icon: ImageIcon },
   { href: '/notifications', label: 'Notifications', icon: Bell },
   { href: '/history', label: 'History', icon: Clock },
   { href: '/settings', label: 'Settings', icon: Settings },
@@ -22,11 +23,15 @@ export function Sidebar() {
   return (
     <aside className="w-64 bg-white border-r border-gray-200 min-h-screen flex flex-col">
       <div className="p-6 border-b border-gray-100">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="text-2xl">🐾</span>
-          <span className="text-xl font-bold bg-gradient-to-r from-rose-500 to-pink-500 bg-clip-text text-transparent">
-            GroomGroove
-          </span>
+        <Link href="/" className="flex items-center justify-center">
+          <Image
+            src="/oh-my-dawg-logo.png"
+            alt="Oh My Dawg! Grooming"
+            width={180}
+            height={120}
+            priority
+            className="object-contain"
+          />
         </Link>
       </div>
 

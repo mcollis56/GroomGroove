@@ -49,9 +49,6 @@ export function Modal({ isOpen, onClose, title, children, size = 'lg' }: ModalPr
       // Store currently focused element
       previousActiveElement.current = document.activeElement as HTMLElement
 
-      // Focus the modal
-      modalRef.current?.focus()
-
       // Lock body scroll
       document.body.style.overflow = 'hidden'
 

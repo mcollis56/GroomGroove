@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GroomGroove Quick Start Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #2d3748;
+            line-height: 1.6;
+        }
+        
+        .page {
+            width: 210mm;
+            height: 297mm;
+            padding: 40px 50px;
+            page-break-after: always;
+            background: white;
+            position: relative;
+        }
+        
+        .page:last-child {
+            page-break-after: auto;
+        }
+        
+        /* Header Styles */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #f43f5e;
+        }
+        
+        .logo {
+            font-size: 36px;
+            font-weight: bold;
+            color: #f43f5e;
+            margin-bottom: 10px;
+        }
+        
+        .tagline {
+            font-size: 14px;
+            color: #64748b;
+            font-style: italic;
+        }
+        
+        h1 {
+            font-size: 32px;
+            color: #1e293b;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        h2 {
+            font-size: 24px;
+            color: #f43f5e;
+            margin: 30px 0 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        h3 {
+            font-size: 18px;
+            color: #475569;
+            margin: 20px 0 10px;
+            font-weight: 600;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #475569;
+        }
+        
+        .intro {
+            background: linear-gradient(135deg, #fce7f3 0%, #dbeafe 100%);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border-left: 5px solid #f43f5e;
+        }
+        
+        .step {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #f43f5e;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .screenshot-placeholder {
+            border: 2px dashed #cbd5e1;
+            background: #f1f5f9;
+            padding: 60px 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 20px 0;
+            color: #64748b;
+            font-style: italic;
+        }
+        
+        .screenshot-note {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        
+        .highlight-box {
+            background: #dcfce7;
+            border: 2px solid #22c55e;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .tip {
+            background: #e0f2fe;
+            border-left: 4px solid #0ea5e9;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .tip strong {
+            color: #0369a1;
+        }
+        
+        ul {
+            margin: 15px 0 15px 25px;
+        }
+        
+        li {
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #475569;
+        }
+        
+        .icon {
+            font-size: 24px;
+            vertical-align: middle;
+        }
+        
+        .footer {
+            position: absolute;
+            bottom: 30px;
+            left: 50px;
+            right: 50px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 12px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .page-number {
+            font-weight: bold;
+            color: #f43f5e;
+        }
+        
+        @media print {
+            .page {
+                margin: 0;
+                border: none;
+                border-radius: 0;
+                box-shadow: none;
+                page-break-after: always;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PAGE 1: Welcome & Setup -->
+    <div class="page">
+        <div class="header">
+            <div class="logo">🐕 GroomGroove</div>
+            <div class="tagline">Making dog grooming simple & joyful</div>
+        </div>
+        
+        <h1>👋 Welcome to the Groove!</h1>
+        
+        <div class="intro">
+            <p><strong>You're about to experience grooming management that just works.</strong></p>
+            <p>This guide will get you up and running in under 5 minutes. No complicated setup, no training videos – just simple, speedy tools that help you focus on what you do best: making dogs look fabulous.</p>
+        </div>
+        
+        <h2>📱 CRITICAL FIRST STEP: Add to Home Screen</h2>
+        <p>GroomGroove works best as a full-screen app on your iPad. Here's how to set it up:</p>
+        
+        <div class="step">
+            <p><span class="step-number">1</span> Open Safari and go to: <strong>https://groom-groove.vercel.app</strong></p>
+        </div>
+        
+        <div class="step">
+            <p><span class="step-number">2</span> Tap the <strong>Share button</strong> (square with an arrow pointing up) at the top of Safari</p>
+        </div>
+        
+        <div class="screenshot-placeholder">
+            📸 <strong>INSERT SCREENSHOT HERE</strong><br>
+            Safari toolbar with Share icon<br>
+            <span style="color: #ef4444; font-weight: bold;">→ Draw a RED CIRCLE around the Share button</span>
+        </div>
+        
+        <div class="step">
+            <p><span class="step-number">3</span> Scroll down and tap <strong>"Add to Home Screen"</strong></p>
+        </div>
+        
+        <div class="screenshot-placeholder">
+            📸 <strong>INSERT SCREENSHOT HERE</strong><br>
+            Share menu with "Add to Home Screen" option<br>
+            <span style="color: #ef4444; font-weight: bold;">→ Draw a RED CIRCLE around "Add to Home Screen"</span>
+        </div>
+        
+        <div class="step">
+            <p><span class="step-number">4</span> Tap <strong>"Add"</strong> in the top right</p>
+        </div>
+        
+        <div class="highlight-box">
+            <p><strong>✨ Done!</strong> You'll now see the GroomGroove icon on your home screen. Tap it to launch the app in full-screen mode – it'll feel just like a native app.</p>
+        </div>
+        
+        <div class="tip">
+            <p><strong>💡 Pro Tip:</strong> Pin the app to your iPad's dock for instant access throughout your day!</p>
+        </div>
+        
+        <div class="footer">
+            <span class="page-number">Page 1 of 4</span> | GroomGroove Quick Start Guide
+        </div>
+    </div>
+
+    <!-- PAGE 2: The Command Center (Dashboard) -->
+    <div class="page">
+        <div class="header">
+            <div class="logo">🐕 GroomGroove</div>
+            <div class="tagline">Your Daily Command Center</div>
+        </div>
+        
+        <h1>🏠 The Command Center (Dashboard)</h1>
+        
+        <p>When you open GroomGroove, you land on the <strong>Dashboard</strong> – your mission control for the day. Everything you need is right here.</p>
+        
+        <div class="screenshot-placeholder" style="height: 300px;">
+            📸 <strong>INSERT FULL DASHBOARD SCREENSHOT HERE</strong><br>
+            Show the complete dashboard view<br><br>
+            <span style="color: #ef4444; font-weight: bold;">→ Draw RED CIRCLES around:</span><br>
+            <span style="color: #ef4444;">1. "New Appointment" button (Top Right)</span><br>
+            <span style="color: #ef4444;">2. "Active Dogs" counter card</span>
+        </div>
+        
+        <h2>⚡ Quick Actions Card</h2>
+        <p>The fastest way to get things done:</p>
+        <ul>
+            <li><strong>New Appointment:</strong> Book a grooming slot in seconds</li>
+            <li><strong>Check In Dog:</strong> Mark arrival and start the timer</li>
+            <li><strong>Add New Dog:</strong> Register a new furry client</li>
+        </ul>
+        
+        <h2>📅 Today's Schedule</h2>
+        <p>See all your appointments at a glance:</p>
+        <ul>
+            <li><strong>Green badges:</strong> Dogs checked in and ready</li>
+            <li><strong>Blue badges:</strong> Upcoming appointments</li>
+            <li><strong>Gray badges:</strong> Completed grooming sessions</li>
+        </ul>
+        
+        <div class="tip">
+            <p><strong>💡 Speed Hack:</strong> Tap any appointment card to instantly see dog details, send SMS reminders, or start checkout.</p>
+        </div>
+        
+        <h2>📊 Today at a Glance</h2>
+        <p>Your daily numbers, front and center:</p>
+        <ul>
+            <li><strong>Active Dogs:</strong> Currently in your salon</li>
+            <li><strong>Today's Revenue:</strong> Real-time earnings tracker</li>
+            <li><strong>Appointments:</strong> Total bookings for the day</li>
+        </ul>
+        
+        <div class="highlight-box">
+            <p><strong>✨ Navigation:</strong> Use the sidebar on the left to jump to Clients, Calendar, Photos, or History. The Dashboard is always one tap away via the home icon.</p>
+        </div>
+        
+        <div class="footer">
+            <span class="page-number">Page 2 of 4</span> | GroomGroove Quick Start Guide
+        </div>
+    </div>
+
+    <!-- PAGE 3: Adding a Client & Dog -->
+    <div class="page">
+        <div class="header">
+            <div class="logo">🐕 GroomGroove</div>
+            <div class="tagline">Building Your Client Base</div>
+        </div>
+        
+        <h1>👥 Adding a Client & Dog</h1>
+        
+        <p>Before you can book appointments, you need clients and dogs in the system. Here's the quick workflow:</p>
+        
+        <h2>Step 1: Add a New Client</h2>
+        
+        <div class="step">
+            <p><span class="step-number">1</span> Go to <strong>Clients</strong> in the sidebar</p>
+        </div>
+        
+        <div class="step">
+            <p><span class="step-number">2</span> Tap <strong>"Add New Client"</strong></p>
+        </div>
+        
+        <div class="step">
+            <p><span class="step-number">3</span> Fill in the essentials:</p>
+            <ul>
+                <li><strong>First Name & Surname</strong></li>
+                <li><strong>Email:</strong> For receipts and confirmations</li>
+                <li><strong>Phone:</strong> For SMS reminders (critical!)</li>
+            </ul>
+        </div>
+        
+        <div class="step">
+            <p><span class="step-number">4</span> Tap <strong>"Create Client"</strong></p>
+        </div>
+        
+        <h2>✂️ Step 2: Add Their Dog</h2>
+        
+        <div class="step">
+            <p><span class="step-number">1</span> From the client's page, tap <strong>"Add Dog"</strong></p>
+        </div>
+        
+        <div class="step">
+            <p><span class="step-number">2</span> Fill in the dog details:</p>
+            <ul>
+                <li><strong>Name:</strong> e.g., "Milo"</li>
+                <li><strong>Breed:</strong> e.g., "Golden Retriever"</li>
+                <li><strong>Weight:</strong> Helps with handling</li>
+                <li><strong>Age:</strong> Good to know for temperament</li>
+            </ul>
+        </div>
+        
+        <div class="screenshot-placeholder" style="height: 280px;">
+            📸 <strong>INSERT DOG FORM SCREENSHOT HERE</strong><br>
+            Show the "Add Dog" form with Grooming Specs section visible<br><br>
+            <span style="color: #ef4444; font-weight: bold;">→ Draw RED CIRCLES around:</span><br>
+            <span style="color: #ef4444;">1. "Blade Size" dropdown</span><br>
+            <span style="color: #ef4444;">2. "Temperament" star rating</span>
+        </div>
+        
+        <h2>🎯 Critical: Grooming Specs</h2>
+        
+        <p>This is where GroomGroove shines. Set these once, and you'll never forget a preference again:</p>
+        
+        <ul>
+            <li><strong>Blade Size:</strong> Their preferred clipper blade (e.g., #7, #10)</li>
+            <li><strong>Shampoo Type:</strong> Hypoallergenic, whitening, etc.</li>
+            <li><strong>Special Instructions:</strong> "Nervous with dryer" or "Hates nail trimming"</li>
+            <li><strong>Temperament:</strong> Rate from 1–5 stars (helps you prepare mentally!)</li>
+        </ul>
+        
+        <div class="tip">
+            <p><strong>💡 Pro Tip:</strong> Add a photo of the dog! It helps you recognize them instantly when they arrive – plus, it builds a beautiful gallery in the Photos section.</p>
+        </div>
+        
+        <div class="footer">
+            <span class="page-number">Page 3 of 4</span> | GroomGroove Quick Start Guide
+        </div>
+    </div>
+
+    <!-- PAGE 4: The Daily Flow -->
+    <div class="page">
+        <div class="header">
+            <div class="logo">🐕 GroomGroove</div>
+            <div class="tagline">Your Daily Workflow</div>
+        </div>
+        
+        <h1>🔄 The Daily Flow</h1>
+        
+        <p>Here's how a typical appointment moves through your day:</p>
+        
+        <h2>📅 1. Book the Appointment</h2>
+        
+        <div class="step">
+            <p><span class="step-number">1</span> From Dashboard or Calendar, tap <strong>"New Appointment"</strong></p>
+        </div>
+        
+        <div class="step">
+            <p><span class="step-number">2</span> Select:</p>
+            <ul>
+                <li>Client & Dog (from dropdown)</li>
+                <li>Date & Time slot</li>
+                <li>Services (Full Groom, Bath & Brush, Nail Trim, etc.)</li>
+            </ul>
+        </div>
+        
+        <div class="step">
+            <p><span class="step-number">3</span> Tap <strong>"Create Appointment"</strong></p>
+        </div>
+        
+        <div class="highlight-box">
+            <p><strong>✨ Automatic Magic:</strong> The owner receives an SMS reminder 1 hour before the appointment. You don't lift a finger!</p>
+        </div>
+        
+        <h2>🐾 2. Dog Arrives</h2>
+        
+        <div class="step">
+            <p>When the dog arrives, tap their appointment card on the Dashboard and hit <strong>"Check In"</strong>. This starts the timer and moves them to "Active."</p>
+        </div>
+        
+        <h2>✂️ 3. Groom the Dog</h2>
+        
+        <div class="step">
+            <p>Do your thing! All the grooming specs you saved earlier are visible in the appointment details – blade size, temperament, special notes.</p>
+        </div>
+        
+        <div class="screenshot-placeholder" style="height: 200px;">
+            📸 <strong>INSERT APPOINTMENT DETAIL SCREENSHOT HERE</strong><br>
+            Show the appointment card with dog details and actions<br><br>
+            <span style="color: #ef4444; font-weight: bold;">→ Draw a RED CIRCLE around the "Send SMS" or "Notify Owner" button</span>
+        </div>
+        
+        <h2>💳 4. Checkout & Payment</h2>
+        
+        <div class="step">
+            <p><span class="step-number">1</span> Tap the appointment card, then tap <strong>"Complete"</strong></p>
+        </div>
+        
+        <div class="step">
+            <p><span class="step-number">2</span> Review the services and total</p>
+        </div>
+        
+        <div class="step">
+            <p><span class="step-number">3</span> Select payment method: <strong>Card or Cash</strong></p>
+        </div>
+        
+        <div class="step">
+            <p><span class="step-number">4</span> Tap <strong>"Notify Owner"</strong> to send an SMS: "Fluffy is ready for pickup!" 📱</p>
+        </div>
+        
+        <div class="step">
+            <p><span class="step-number">5</span> Complete payment and print/email the receipt</p>
+        </div>
+        
+        <div class="tip">
+            <p><strong>💡 Speed Hack:</strong> Book the next appointment during checkout – you'll never lose a repeat customer!</p>
+        </div>
+        
+        <h2>🎉 You're Ready!</h2>
+        
+        <p>That's it! You now know the full GroomGroove workflow:</p>
+        <ul>
+            <li>✅ Dashboard = Your command center</li>
+            <li>✅ Add clients & dogs with grooming specs</li>
+            <li>✅ Book appointments</li>
+            <li>✅ Check in → Groom → Notify → Checkout</li>
+        </ul>
+        
+        <div class="highlight-box">
+            <p><strong>Need Help?</strong> Questions? Feature requests? Email us at <strong>support@groomgroove.com</strong> or check our FAQ at <strong>groomgroove.com/help</strong></p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 40px; padding: 30px; background: linear-gradient(135deg, #fce7f3 0%, #dbeafe 100%); border-radius: 12px;">
+            <h2 style="color: #f43f5e; margin-bottom: 10px;">Welcome to the Groove! 🎉</h2>
+            <p style="font-size: 16px; color: #475569; margin: 0;">Let's make grooming simple, speedy, and joyful.</p>
+        </div>
+        
+        <div class="footer">
+            <span class="page-number">Page 4 of 4</span> | GroomGroove Quick Start Guide | © 2026 GroomGroove
+        </div>
+    </div>
+
+</body>
+</html>

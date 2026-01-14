@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -36,7 +37,16 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">GroomGroove</h1>
+          <div className="flex justify-center mb-4">
+            <Image
+              src="/oh-my-dawg-logo.png"
+              alt="Oh My Dawg! Grooming"
+              width={200}
+              height={140}
+              priority
+              className="object-contain"
+            />
+          </div>
           <p className="text-lg text-gray-600">Sign in to your account</p>
         </div>
 

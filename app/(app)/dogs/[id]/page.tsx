@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/Badge'
 import { ArrowLeft, Calendar, Clock, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 import { getDogDetail } from '@/lib/actions/dogs'
-import { DogQuickActions, DogPhoto } from './DogDetailClient'
+import { DogQuickActions, DogPhoto, EditableGroomingPreferences, EditableGeneralNotes } from './DogDetailClient'
 
 interface DogDetailPageProps {
   params: Promise<{ id: string }>
@@ -112,57 +112,20 @@ export default async function DogDetailPage({ params }: DogDetailPageProps) {
             </div>
           </Card>
 
-          {/* Grooming Preferences */}
-          <Card>
-            <div className="p-6">
-              <h3 className="font-semibold text-gray-900 mb-4">Grooming Preferences</h3>
-              <div className="space-y-4">
-                {dog.grooming_preferences.clipping_length && (
-                  <div>
-                    <p className="text-sm text-gray-500">Clipping Length</p>
-                    <p className="text-gray-900">{dog.grooming_preferences.clipping_length}</p>
-                  </div>
-                )}
-                {dog.grooming_preferences.nail_tool && (
-                  <div>
-                    <p className="text-sm text-gray-500">Nail Tool</p>
-                    <p className="text-gray-900 capitalize">{dog.grooming_preferences.nail_tool}</p>
-                  </div>
-                )}
-                {dog.grooming_preferences.coat_notes && (
-                  <div>
-                    <p className="text-sm text-gray-500">Coat Notes</p>
-                    <p className="text-gray-900">{dog.grooming_preferences.coat_notes}</p>
-                  </div>
-                )}
-                {dog.grooming_preferences.behavior_notes && (
-                  <div>
-                    <p className="text-sm text-gray-500">Behavior Notes</p>
-                    <p className="text-gray-900">{dog.grooming_preferences.behavior_notes}</p>
-                  </div>
-                )}
-                {dog.grooming_preferences.special_instructions && (
-                  <div>
-                    <p className="text-sm text-gray-500">Special Instructions</p>
-                    <p className="text-gray-900">{dog.grooming_preferences.special_instructions}</p>
-                  </div>
-                )}
-                {Object.keys(dog.grooming_preferences).length === 0 && (
-                  <p className="text-gray-500 italic">No grooming preferences recorded yet</p>
-                )}
-              </div>
-            </div>
-          </Card>
+          {/* Grooming Preferences - Editable */}
+          <EditableGroomingPreferences
+            dogId={dog.id}
+            initialPreferences={dog.grooming_preferences}
+            isDemo={dog.id.startsWith('demo-dog-')}
+          />
 
-          {/* General Notes */}
-          {dog.notes && (
-            <Card>
-              <div className="p-6">
-                <h3 className="font-semibold text-gray-900 mb-4">Notes</h3>
-                <p className="text-gray-700">{dog.notes}</p>
-              </div>
-            </Card>
-          )}
+          {/* General Notes - Editable */}
+          <EditableGeneralNotes
+            dogId={dog.id}
+            dogName={dog.name}
+            initialNotes={dog.notes}
+            isDemo={dog.id.startsWith('demo-dog-')}
+          />
 
           {/* Grooming History */}
           <Card>
@@ -226,6 +189,7 @@ export default async function DogDetailPage({ params }: DogDetailPageProps) {
             dogName={dog.name}
             customerPhone={dog.customer?.phone || null}
             photoUrl={dog.photo_url}
+            groomingPreferences={dog.grooming_preferences}
             isDemo={dog.id.startsWith('demo-dog-')}
           />
         </div>
