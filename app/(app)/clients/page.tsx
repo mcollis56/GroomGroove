@@ -15,19 +15,19 @@ export default async function ClientsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Clients</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Humans</h1>
           <p className="text-gray-500">Manage pet parents and their dogs.</p>
         </div>
         <Button href="/clients/new">
           <Plus className="w-4 h-4 mr-2" />
-          Add New Client
+          Add New Human
         </Button>
       </div>
 
       {/* Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <StatCard
-          title="Total Clients"
+          title="Total Humans"
           value={totalClients}
           icon={Users}
           color="blue"
@@ -46,11 +46,11 @@ export default async function ClientsPage() {
       ) : (
         <Card className="p-12 text-center">
           <Users className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-          <h3 className="font-medium text-gray-900 mb-2">No clients yet</h3>
-          <p className="text-gray-500 mb-4">Add your first client to get started.</p>
+          <h3 className="font-medium text-gray-900 mb-2">No humans yet</h3>
+          <p className="text-gray-500 mb-4">Add your first human to get started.</p>
           <Button href="/clients/new">
             <Plus className="w-4 h-4 mr-2" />
-            Add New Client
+            Add New Human
           </Button>
         </Card>
       )}

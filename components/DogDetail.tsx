@@ -71,7 +71,7 @@ export default function DogDetail({ dog, onClose }: { dog: Dog; onClose: () => v
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {dog.clipper_blade_size && (
               <div>
-                <label className="text-xs font-semibold text-pink-700 uppercase tracking-wide">Clipper Blade Size</label>
+                <label className="text-xs font-semibold text-pink-700 uppercase tracking-wide">Blade Size</label>
                 <p className="text-gray-900 text-2xl font-bold mt-1 text-pink-600">{dog.clipper_blade_size}</p>
               </div>
             )}

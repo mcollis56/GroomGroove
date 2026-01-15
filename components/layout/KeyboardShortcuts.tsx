@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 
 const shortcuts: Record<string, string> = {
   '1': '/',              // Dashboard
-  '2': '/clients',       // Clients
+  '2': '/clients',       // Humans
   '3': '/dogs',          // Dogs
   '4': '/calendar',      // Calendar
   '5': '/notifications', // Notifications

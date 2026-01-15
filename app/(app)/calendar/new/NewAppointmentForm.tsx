@@ -127,9 +127,9 @@ export function NewAppointmentForm({ customers, dogs }: NewAppointmentFormProps)
       {hasNoData ? (
         <Card className="p-8 text-center">
           <User className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-          <h3 className="font-medium text-gray-900 mb-2">No clients yet</h3>
-          <p className="text-gray-500 mb-4">Add a client before scheduling appointments.</p>
-          <Button href="/clients/new">Add New Client</Button>
+          <h3 className="font-medium text-gray-900 mb-2">No humans yet</h3>
+          <p className="text-gray-500 mb-4">Add a human before scheduling appointments.</p>
+          <Button href="/clients/new">Add New Human</Button>
         </Card>
       ) : (
         <Card>
@@ -138,7 +138,7 @@ export function NewAppointmentForm({ customers, dogs }: NewAppointmentFormProps)
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   <User className="w-4 h-4 inline mr-1" />
-                  Client
+                  Human
                 </label>
                 <select
                   name="customer"
@@ -147,7 +147,7 @@ export function NewAppointmentForm({ customers, dogs }: NewAppointmentFormProps)
                   onChange={(e) => setSelectedCustomerId(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-300"
                 >
-                  <option value="">Select client...</option>
+                  <option value="">Select human...</option>
                   {customers.map((customer) => (
                     <option key={customer.id} value={customer.id}>
                       {customer.name}
@@ -174,7 +174,7 @@ export function NewAppointmentForm({ customers, dogs }: NewAppointmentFormProps)
                   ))}
                 </select>
                 {selectedCustomerId && filteredDogs.length === 0 && (
-                  <p className="text-sm text-amber-600 mt-1">No dogs for this client. Add one first.</p>
+                  <p className="text-sm text-amber-600 mt-1">No dogs for this human. Add one first.</p>
                 )}
               </div>
 

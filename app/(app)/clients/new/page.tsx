@@ -51,7 +51,7 @@ export default function CreateClientPage() {
     if (result.success) {
       router.push('/clients')
     } else {
-      setError(result.error || 'Failed to create client')
+      setError(result.error || 'Failed to create human')
       setIsSubmitting(false)
     }
   }
@@ -63,11 +63,11 @@ export default function CreateClientPage() {
           <Link href="/clients">
             <Button variant="ghost" size="sm">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Clients
+              Back to Humans
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Add New Client</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Add New Human</h1>
             <p className="text-gray-500">Add a new pet parent and their dogs</p>
           </div>
         </div>
@@ -88,7 +88,7 @@ export default function CreateClientPage() {
               <div className="p-6">
                 <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <User className="w-5 h-5" />
-                  Client Information
+                  Human Information
                 </h3>
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -245,10 +245,10 @@ export default function CreateClientPage() {
           <div className="space-y-6">
             <Card>
               <div className="p-6">
-                <h3 className="font-semibold text-gray-900 mb-4">Save Client</h3>
+                <h3 className="font-semibold text-gray-900 mb-4">Save Human</h3>
                 <div className="space-y-3">
                   <Button type="submit" className="w-full" disabled={isSubmitting}>
-                    {isSubmitting ? 'Creating...' : 'Create Client'}
+                    {isSubmitting ? 'Creating...' : 'Create Human'}
                   </Button>
                   <Link href="/clients" className="block">
                     <Button type="button" variant="secondary" className="w-full">

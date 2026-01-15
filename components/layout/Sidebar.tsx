@@ -8,7 +8,7 @@ import { Home, Users, Dog, Calendar, Bell, Clock, Settings, Image as ImageIcon }
 
 const navItems = [
   { href: '/', label: 'Dashboard', icon: Home },
-  { href: '/clients', label: 'Clients', icon: Users },
+  { href: '/clients', label: 'Humans', icon: Users },
   { href: '/dogs', label: 'Dogs', icon: Dog },
   { href: '/calendar', label: 'Calendar', icon: Calendar },
   { href: '/photos', label: 'Photos', icon: ImageIcon },

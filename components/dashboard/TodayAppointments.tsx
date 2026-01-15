@@ -1,118 +1,123 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
-import { Badge } from '@/components/ui/Badge'
-import { Button } from '@/components/ui/Button'
-import { Clock, AlertTriangle, Sparkles, Scissors, CheckCircle } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
+import { format } from "date-fns";
 
-interface DisplayAppointment {
-  id: string
-  time: string
-  dogName: string
-  breed: string
-  ownerName: string
-  service: string
-  flags: string[]
-  status: 'confirmed' | 'in-progress' | 'pending' | 'completed'
-  dogId: string | null
-}
+// --- Internal Component for the Row ---
+function AppointmentRow({ appointment }: { appointment: any }) {
+  const router = useRouter();
+  const supabase = createClient();
+  const [status, setStatus] = useState(appointment.status);
+  const [isLoading, setIsLoading] = useState(false);
 
-interface TodayAppointmentsProps {
-  appointments: DisplayAppointment[]
-}
+  const handleStatusUpdate = async (newStatus: string) => {
+    if (isLoading) return;
+    setIsLoading(true);
+    
+    // 1. Optimistic Update (Instant Color Change)
+    setStatus(newStatus);
 
-const statusStyles: Record<string, string> = {
-  confirmed: 'bg-green-100 text-green-700',
-  'in-progress': 'bg-blue-100 text-blue-700',
-  pending: 'bg-amber-100 text-amber-700',
-  completed: 'bg-gray-100 text-gray-500',
-}
+    try {
+      // 2. Update Database
+      const { error } = await supabase
+        .from("appointments")
+        .update({ status: newStatus })
+        .eq("id", appointment.id);
 
-const flagIcons: Record<string, { icon: typeof AlertTriangle; label: string; variant: 'warning' | 'info' | 'default' }> = {
-  'anxious': { icon: AlertTriangle, label: 'Anxious', variant: 'warning' },
-  'first-visit': { icon: Sparkles, label: 'First Visit', variant: 'info' },
-  'nail-sensitive': { icon: Scissors, label: 'Nail Sensitive', variant: 'warning' },
-  'heavy-shedder': { icon: Scissors, label: 'Heavy Shedder', variant: 'default' },
-}
+      if (error) throw error;
 
-export function TodayAppointments({ appointments }: TodayAppointmentsProps) {
+      // 3. Handle Navigation if Finishing
+      if (newStatus === 'completed') {
+         router.push(`/checkout/${appointment.id}`);
+      } else {
+         router.refresh(); 
+      }
+    } catch (error) {
+      alert("Update failed.");
+      setStatus(appointment.status); // Revert on error
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Button Logic
+  let buttonUI;
+  if (status === 'pending' || status === 'confirmed') {
+    buttonUI = (
+      <button
+        type="button"
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleStatusUpdate('in_progress'); }}
+        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg"
+      >
+        {isLoading ? "..." : "Start Grooming"}
+      </button>
+    );
+  } else if (status === 'in_progress') {
+    buttonUI = (
+      <button
+        type="button"
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleStatusUpdate('completed'); }}
+        className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium rounded-lg animate-pulse"
+      >
+        {isLoading ? "..." : "Finish & Pay"}
+      </button>
+    );
+  } else {
+    buttonUI = (
+      <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold border border-green-200">
+        COMPLETED
+      </span>
+    );
+  }
+
+  // --- Render Row ---
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Today&apos;s Appointments</CardTitle>
-        <span className="text-sm text-gray-500">{appointments.length} scheduled</span>
-      </CardHeader>
-      <CardContent>
-        {appointments.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            <Clock className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-            <p className="font-medium">No appointments today</p>
-            <p className="text-sm mt-1">Schedule a new appointment to get started</p>
-          </div>
-        ) : (
-        <div className="space-y-3">
-          {appointments.map((apt) => (
-            <div
-              key={apt.id}
-              className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl"
-            >
-              <div className="flex items-center gap-2 w-20 text-sm text-gray-500">
-                <Clock className="w-4 h-4" />
-                {apt.time}
-              </div>
-
-              <Link
-                href={apt.dogId ? `/dogs/${apt.dogId}` : '#'}
-                className="flex-1 min-w-0 hover:bg-gray-100 rounded-lg p-1 -m-1 transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-gray-900">{apt.dogName}</span>
-                  <span className="text-sm text-gray-500">({apt.breed})</span>
-                </div>
-                <p className="text-sm text-gray-500">{apt.ownerName}</p>
-                <p className="text-xs text-gray-400 truncate">{apt.service}</p>
-              </Link>
-
-              <div className="flex items-center gap-2">
-                {apt.flags.map((flag) => {
-                  const flagInfo = flagIcons[flag]
-                  if (!flagInfo) return null
-                  return (
-                    <Badge key={flag} variant={flagInfo.variant}>
-                      {flagInfo.label}
-                    </Badge>
-                  )
-                })}
-              </div>
-
-              <span className={cn(
-                'px-3 py-1 rounded-full text-xs font-medium capitalize',
-                statusStyles[apt.status] || statusStyles.pending
-              )}>
-                {apt.status.replace('-', ' ')}
-              </span>
-
-              {/* Complete/Checkout button - only show for non-completed appointments */}
-              {apt.status !== 'completed' ? (
-                <Link href={`/checkout/${apt.id}`} onClick={(e) => e.stopPropagation()}>
-                  <Button
-                    size="sm"
-                    className="bg-green-600 hover:bg-green-700 text-white"
-                  >
-                    <CheckCircle className="w-4 h-4 mr-1" />
-                    Complete
-                  </Button>
-                </Link>
-              ) : (
-                <span className="text-xs text-gray-400 px-3">Done</span>
-              )}
-            </div>
-          ))}
+    <div className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-xl mb-3 shadow-sm">
+      <div className="flex items-center gap-4">
+        <div className="text-gray-500 font-medium w-16">
+          {format(new Date(appointment.scheduled_at), "h:mm a")}
         </div>
-        )}
-      </CardContent>
-    </Card>
-  )
+        <div>
+          <h3 className="font-bold text-gray-900">{appointment.dog?.name || "Unknown Dog"}</h3>
+          <p className="text-sm text-gray-500">{appointment.customer?.name || "Unknown Owner"}</p>
+          {/* Tags */}
+          <div className="flex gap-2 mt-1">
+             {appointment.dog?.grooming_preferences?.behavior_notes && (
+               <span className="text-xs px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded-full">
+                 {appointment.dog.grooming_preferences.behavior_notes}
+               </span>
+             )}
+          </div>
+        </div>
+      </div>
+      <div>{buttonUI}</div>
+    </div>
+  );
+}
+
+// --- Main List Component ---
+export default function TodayAppointments({ appointments }: { appointments: any[] }) {
+  if (!appointments || appointments.length === 0) {
+    return (
+      <div className="p-8 text-center bg-gray-50 rounded-xl border border-dashed border-gray-300">
+        <p className="text-gray-500">No appointments scheduled for today.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-6">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-bold text-gray-900">Today's Appointments</h2>
+        <span className="text-sm text-gray-500">{appointments.length} scheduled</span>
+      </div>
+      <div className="space-y-2">
+        {appointments.map((appt) => (
+          <AppointmentRow key={appt.id} appointment={appt} />
+        ))}
+      </div>
+    </div>
+  );
 }

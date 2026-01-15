@@ -212,11 +212,11 @@ export function DogDetailModal({ dogId, isOpen, onClose }: DogDetailModalProps) 
           </div>
 
           <div className="space-y-4">
-            {/* Clipping Length */}
+            {/* Clipper Blade Size */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Clipping Length
+                  Clipper Blade Size
                 </label>
                 <select
                   value={preferences.clipping_length || ''}
@@ -224,11 +224,13 @@ export function DogDetailModal({ dogId, isOpen, onClose }: DogDetailModalProps) 
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300"
                 >
                   <option value="">Not specified</option>
-                  <option value="3mm">3mm - Short</option>
-                  <option value="5mm">5mm - Medium</option>
-                  <option value="7mm">7mm - Standard</option>
-                  <option value="10mm">10mm - Long</option>
-                  <option value="13mm">13mm - Very Long</option>
+                  <option value="#3 (13mm) - Longer Body">#3 (13mm) - Longer Body</option>
+                  <option value="#4 (10mm) - Winter Trim">#4 (10mm) - Winter Trim</option>
+                  <option value="#5 (6mm) - Short Puppy Cut">#5 (6mm) - Short Puppy Cut</option>
+                  <option value="#7 (3mm) - Summer Cut / Matted">#7 (3mm) - Summer Cut / Matted</option>
+                  <option value="#10 (1.8mm) - Sanitary / Paws">#10 (1.8mm) - Sanitary / Paws</option>
+                  <option value="#15 (1.2mm) - Pads">#15 (1.2mm) - Pads</option>
+                  <option value="#30 (0.5mm) - Under Comb">#30 (0.5mm) - Under Comb</option>
                   <option value="custom">Custom (see notes)</option>
                 </select>
               </div>

@@ -1,16 +1,50 @@
-import { TodayAppointments } from '@/components/dashboard/TodayAppointments'
+'use client'
+
+import { useState, useMemo } from 'react'
+import TodayAppointments from '@/components/dashboard/TodayAppointments'
 import { TodayAtAGlance } from '@/components/dashboard/TodayAtAGlance'
 import { TodaysWatchlist } from '@/components/dashboard/TodaysWatchlist'
 import { QuickActions } from '@/components/dashboard/QuickActions'
 import { getTodayDashboardData } from '@/lib/actions/dashboard'
+import { use } from 'react'
 
-export default async function DashboardPage() {
-  const dashboardData = await getTodayDashboardData()
+// Get browser timezone offset in minutes
+const getTimezoneOffset = () => {
+  if (typeof window === 'undefined') return undefined
+  return new Date().getTimezoneOffset()
+}
 
-  // Transform appointments for TodayAppointments component
-  const appointmentsForDisplay = dashboardData.appointments
-    .filter(a => a.status !== 'cancelled')
-    .map(a => ({
+// Wrap the async call in a promise that can be used with React.use
+const dashboardDataPromise = getTodayDashboardData(getTimezoneOffset())
+
+export default function DashboardPage() {
+  const dashboardData = use(dashboardDataPromise)
+  const [activeFilter, setActiveFilter] = useState<string | null>(null)
+
+  // Transform appointments for TodayAppointments component with filtering
+  const appointmentsForDisplay = useMemo(() => {
+    let filteredAppointments = dashboardData.appointments.filter(a => a.status !== 'cancelled')
+    
+    // Apply filters based on activeFilter
+    if (activeFilter === 'special-handling') {
+      filteredAppointments = filteredAppointments.filter(a => {
+        const prefs = a.dog?.grooming_preferences
+        return prefs?.behavior_notes && (
+          prefs.behavior_notes.toLowerCase().includes('anxious') ||
+          prefs.behavior_notes.toLowerCase().includes('nervous') ||
+          prefs.behavior_notes.toLowerCase().includes('nail') ||
+          prefs.behavior_notes.toLowerCase().includes('paw') ||
+          prefs.behavior_notes.toLowerCase().includes('shed')
+        )
+      })
+    } else if (activeFilter === 'appointments-remaining') {
+      filteredAppointments = filteredAppointments.filter(a => a.status !== 'completed')
+    } else if (activeFilter === 'first-time-dogs') {
+      filteredAppointments = filteredAppointments.filter(a => a.is_first_visit)
+    }
+    // "last-appointment" filter not needed - it's informational only
+
+    return filteredAppointments.map(a => ({
       id: a.id,
       time: formatTime(a.scheduled_at),
       dogName: a.dog?.name || 'Unknown',
@@ -21,12 +55,24 @@ export default async function DashboardPage() {
       flags: getFlags(a),
       dogId: a.dogId
     }))
+  }, [dashboardData.appointments, activeFilter])
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-500">Welcome back! Here&apos;s what&apos;s happening today.</p>
+        <p className="text-gray-500">Welcome back! Here's what's happening today.</p>
+        {activeFilter && (
+          <div className="mt-2 text-sm text-blue-600">
+            Filtering by: <span className="font-medium">{activeFilter.replace('-', ' ')}</span>
+            <button 
+              onClick={() => setActiveFilter(null)}
+              className="ml-2 text-gray-500 hover:text-gray-700"
+            >
+              ✕ Clear filter
+            </button>
+          </div>
+        )}
       </div>
 
       {/* MAIN LAYOUT - iPad-first 2-column grid (768px+) */}
@@ -35,7 +81,11 @@ export default async function DashboardPage() {
         {/* LEFT COLUMN (8 cols) - Main Operations */}
         <div className="md:col-span-8 space-y-6">
           {/* 1. At a Glance (High Impact) */}
-          <TodayAtAGlance data={dashboardData.glance} />
+          <TodayAtAGlance 
+            data={dashboardData.glance} 
+            activeFilter={activeFilter}
+            onFilterChange={setActiveFilter}
+          />
 
           {/* 2. Today's Schedule */}
           <TodayAppointments appointments={appointmentsForDisplay} />

@@ -136,21 +136,20 @@ export default function AddDogForm({ onDogAdded }: { onDogAdded?: (dog: Dog) => 
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Clipper Blade Size</label>
+            <label className="block text-sm font-medium text-gray-700">Blade Size</label>
             <select
               className="mt-1 block w-full rounded-lg border-2 border-pink-200 p-3 text-gray-900 shadow-sm focus:border-pink-400 focus:ring-pink-400 min-h-[44px]"
               value={formData.clipper_blade_size}
               onChange={(e) => setFormData({ ...formData, clipper_blade_size: e.target.value })}
             >
-              <option value="">Select size</option>
-              <option value="#10">#10</option>
-              <option value="#7F">#7F</option>
-              <option value="#5F">#5F</option>
-              <option value="#4F">#4F</option>
-              <option value="#3F">#3F</option>
-              <option value="#2F">#2F</option>
-              <option value="#1">#1</option>
-              <option value="#0">#0</option>
+              <option value="">Select blade size</option>
+              <option value="#3">#3 (13mm) - Longer Body</option>
+              <option value="#4">#4 (10mm) - Winter Trim</option>
+              <option value="#5">#5 (6mm) - Short Puppy Cut</option>
+              <option value="#7">#7 (3mm) - Summer Cut / Matted</option>
+              <option value="#10">#10 (1.8mm) - Sanitary / Paws</option>
+              <option value="#15">#15 (1.2mm) - Pads</option>
+              <option value="#30">#30 (0.5mm) - Under Comb</option>
             </select>
           </div>
           <div>

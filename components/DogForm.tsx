@@ -21,7 +21,15 @@ export default function DogForm({ onSuccess }: { onSuccess?: () => void }) {
     behavioral_notes: ''
   })
 
-  const CLIPPER_SIZES = ['#10', '#7F', '#5F', '#4F', '#3F', '#2F', '#1', '#0']
+  const BLADE_SIZES = [
+    { value: '#3', label: '#3 (13mm) - Longer Body' },
+    { value: '#4', label: '#4 (10mm) - Winter Trim' },
+    { value: '#5', label: '#5 (6mm) - Short Puppy Cut' },
+    { value: '#7', label: '#7 (3mm) - Summer Cut / Matted' },
+    { value: '#10', label: '#10 (1.8mm) - Sanitary / Paws' },
+    { value: '#15', label: '#15 (1.2mm) - Pads' },
+    { value: '#30', label: '#30 (0.5mm) - Under Comb' },
+  ]
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -59,7 +67,7 @@ export default function DogForm({ onSuccess }: { onSuccess?: () => void }) {
 
   return (
     <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm border border-gray-100 max-w-4xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6 text-gray-900">Add New Client & Dog</h2>
+      <h2 className="text-2xl font-bold mb-6 text-gray-900">Add New Human & Dog</h2>
       
       {message && (
         <div className={`p-4 mb-6 rounded-lg text-lg font-medium ${message.includes('Error') ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`}>
@@ -135,14 +143,14 @@ export default function DogForm({ onSuccess }: { onSuccess?: () => void }) {
           <h3 className="text-xl font-bold text-amber-900 flex items-center gap-2">✂️ Grooming Specifics</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className={labelClass}>Clipper Blade Size *</label>
+              <label className={labelClass}>Blade Size *</label>
               <select 
                 className={`${inputClass} bg-white`}
                 value={formData.clipper_blade_size}
                 onChange={e => setFormData({...formData, clipper_blade_size: e.target.value})}
               >
-                {CLIPPER_SIZES.map(size => (
-                  <option key={size} value={size}>{size}</option>
+                {BLADE_SIZES.map(({ value, label }) => (
+                  <option key={value} value={value}>{label}</option>
                 ))}
               </select>
             </div>
@@ -185,10 +193,9 @@ export default function DogForm({ onSuccess }: { onSuccess?: () => void }) {
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xl py-5 rounded-xl shadow-lg transform transition active:scale-[0.98] flex items-center justify-center gap-3"
         >
           {loading ? <Loader2 className="animate-spin h-6 w-6" /> : <Save className="h-6 w-6" />}
-          Save New Client
+          Save New Human
         </button>
       </form>
     </div>
   )
 }
-

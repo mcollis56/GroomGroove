@@ -51,7 +51,7 @@ export default function ReportsPage() {
           color="rose"
         />
         <StatCard
-          title="Active Clients"
+          title="Active Humans"
           value={42}
           icon={Users}
           color="amber"
@@ -121,7 +121,7 @@ export default function ReportsPage() {
           </div>
           <div className="text-center p-4 bg-gray-50 rounded-lg">
             <p className="text-2xl font-bold text-gray-900">23</p>
-            <p className="text-sm text-gray-500">New Clients</p>
+            <p className="text-sm text-gray-500">New Humans</p>
           </div>
           <div className="text-center p-4 bg-gray-50 rounded-lg">
             <p className="text-2xl font-bold text-gray-900">1.2h</p>

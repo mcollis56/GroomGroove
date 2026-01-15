@@ -63,7 +63,7 @@ export function DogsPageClient({ dogs }: DogsPageClientProps) {
           <p className="text-2xl font-bold text-gray-900">{totalDogs}</p>
         </Card>
         <Card>
-          <p className="text-sm text-gray-500">Active Clients</p>
+          <p className="text-sm text-gray-500">Active Humans</p>
           <p className="text-2xl font-bold text-blue-600">{activeClients}</p>
         </Card>
         <Card>
@@ -128,7 +128,7 @@ export function DogsPageClient({ dogs }: DogsPageClientProps) {
           <div className="text-center py-12 text-gray-500">
             <Dog className="w-12 h-12 mx-auto mb-4 text-gray-300" />
             <p className="text-lg">No dogs registered yet</p>
-            <p className="text-sm mt-1">Add your first furry client to get started</p>
+            <p className="text-sm mt-1">Add your first furry friend to get started</p>
             <Button href="/dogs/new" className="mt-4 bg-blue-600 hover:bg-blue-700">
               <Plus className="w-4 h-4 mr-2" />
               Add Dog

@@ -74,7 +74,7 @@ function ClientDetailPanel({ client, onClose }: { client: Client; onClose: () =>
     <div className="fixed inset-y-0 right-0 w-96 bg-white shadow-xl border-l border-gray-200 z-50 overflow-y-auto">
       <div className="p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-gray-900">Client Overview</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Human Overview</h2>
           <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded">
             <X className="w-5 h-5 text-gray-500" />
           </button>
@@ -183,7 +183,7 @@ function ClientDetailPanel({ client, onClose }: { client: Client; onClose: () =>
               onClick={() => setShowDeleteModal(true)}
             >
               <Trash2 className="w-4 h-4 mr-2" />
-              Delete Client
+              Delete Human
             </Button>
           </div>
         </div>
@@ -193,7 +193,7 @@ function ClientDetailPanel({ client, onClose }: { client: Client; onClose: () =>
       <Modal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
-        title="Delete Client?"
+        title="Delete Human?"
         size="sm"
       >
         <div className="p-6">
@@ -223,7 +223,7 @@ function ClientDetailPanel({ client, onClose }: { client: Client; onClose: () =>
               disabled={deleting}
               className="bg-red-600 hover:bg-red-700"
             >
-              {deleting ? 'Deleting...' : 'Delete Client'}
+              {deleting ? 'Deleting...' : 'Delete Human'}
             </Button>
           </div>
         </div>

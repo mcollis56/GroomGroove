@@ -299,6 +299,30 @@ export async function getAppointmentForCheckout(appointmentId: string) {
 }
 
 /**
+ * Mark appointment as in progress
+ */
+export async function markAppointmentInProgress(
+  appointmentId: string
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from('appointments')
+    .update({
+      status: 'in_progress',
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', appointmentId)
+
+  if (error) {
+    console.error('[Appointments] Mark in-progress failed:', error)
+    return { success: false, error: error.message }
+  }
+
+  return { success: true }
+}
+
+/**
  * Mark appointment as completed
  */
 export async function markAppointmentCompleted(
@@ -316,6 +340,32 @@ export async function markAppointmentCompleted(
 
   if (error) {
     console.error('[Appointments] Mark completed failed:', error)
+    return { success: false, error: error.message }
+  }
+
+  return { success: true }
+}
+
+/**
+ * Confirm appointment (update status from pending_confirmation to confirmed)
+ */
+export async function confirmAppointment(
+  appointmentId: string
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from('appointments')
+    .update({
+      status: 'confirmed',
+      confirmed_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', appointmentId)
+    .eq('status', 'pending_confirmation') // Only allow confirming pending appointments
+
+  if (error) {
+    console.error('[Appointments] Confirm failed:', error)
     return { success: false, error: error.message }
   }
 

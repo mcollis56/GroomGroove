@@ -2,91 +2,6 @@
 
 import { createClient } from '@/utils/supabase/server'
 
-// Demo data for development - makes dashboard usable for demos/screenshots
-function getDemoData(): DashboardData {
-  const now = new Date()
-  const todayAt = (hour: number, minute: number) => {
-    const d = new Date(now)
-    d.setHours(hour, minute, 0, 0)
-    return d.toISOString()
-  }
-
-  const demoAppointments: DashboardAppointment[] = [
-    {
-      id: 'demo-1',
-      scheduled_at: todayAt(9, 0),
-      services: ['Full Groom'],
-      notes: null,
-      status: 'completed',
-      dog: { id: 'demo-dog-1', name: 'Bella', breed: 'Golden Retriever', grooming_preferences: null },
-      customer: { id: 'demo-cust-1', name: 'Sarah Johnson' },
-      is_first_visit: false,
-      dogId: 'demo-dog-1'
-    },
-    {
-      id: 'demo-2',
-      scheduled_at: todayAt(10, 30),
-      services: ['Bath & Brush', 'Nail Trim'],
-      notes: 'Use gentle shampoo',
-      status: 'in_progress',
-      dog: { id: 'demo-dog-2', name: 'Max', breed: 'German Shepherd', grooming_preferences: { behavior_notes: 'Can be anxious around dryers' } },
-      customer: { id: 'demo-cust-2', name: 'Mike Chen' },
-      is_first_visit: false,
-      dogId: 'demo-dog-2'
-    },
-    {
-      id: 'demo-3',
-      scheduled_at: todayAt(13, 0),
-      services: ['De-shedding Treatment'],
-      notes: null,
-      status: 'confirmed',
-      dog: { id: 'demo-dog-3', name: 'Luna', breed: 'Husky', grooming_preferences: { behavior_notes: 'Heavy shedder, extra time needed' } },
-      customer: { id: 'demo-cust-3', name: 'Lisa Park' },
-      is_first_visit: false,
-      dogId: 'demo-dog-3'
-    },
-    {
-      id: 'demo-4',
-      scheduled_at: todayAt(14, 30),
-      services: ['Full Groom', 'Teeth Cleaning'],
-      notes: null,
-      status: 'confirmed',
-      dog: { id: 'demo-dog-4', name: 'Daisy', breed: 'Poodle', grooming_preferences: null },
-      customer: { id: 'demo-cust-4', name: 'Emma Wilson' },
-      is_first_visit: true,
-      dogId: 'demo-dog-4'
-    },
-    {
-      id: 'demo-5',
-      scheduled_at: todayAt(16, 0),
-      services: ['Nail Trim'],
-      notes: 'Sensitive paws',
-      status: 'pending',
-      dog: { id: 'demo-dog-5', name: 'Rocky', breed: 'Bulldog', grooming_preferences: { behavior_notes: 'Nail sensitive, go slow', special_instructions: 'Use smallest clipper' } },
-      customer: { id: 'demo-cust-5', name: 'James Brown' },
-      is_first_visit: false,
-      dogId: 'demo-dog-5'
-    }
-  ]
-
-  const watchlist: WatchlistItem[] = [
-    { dogName: 'Max', reason: 'Anxious', time: '10:30 AM', appointmentId: 'demo-2', dogId: 'demo-dog-2' },
-    { dogName: 'Daisy', reason: 'First visit', time: '2:30 PM', appointmentId: 'demo-4', dogId: 'demo-dog-4' },
-    { dogName: 'Rocky', reason: 'Nail sensitive, Special handling', time: '4:00 PM', appointmentId: 'demo-5', dogId: 'demo-dog-5' }
-  ]
-
-  return {
-    appointments: demoAppointments,
-    glance: {
-      remainingAppointments: 3,
-      specialHandlingCount: 3,
-      firstTimeVisits: 1,
-      finalAppointmentTime: '4:00 PM'
-    },
-    watchlist,
-    totalDogs: 12
-  }
-}
 
 export interface DashboardAppointment {
   id: string
@@ -136,12 +51,24 @@ export interface DashboardData {
 
 /**
  * Get all dashboard data for today
+ * @param timezoneOffset Optional timezone offset in minutes (e.g., -300 for EST, 660 for Australia/Sydney)
  */
-export async function getTodayDashboardData(): Promise<DashboardData> {
+export async function getTodayDashboardData(timezoneOffset?: number): Promise<DashboardData> {
   const supabase = await createClient()
 
-  // Get today's date range
-  const today = new Date()
+  // Get today's date range adjusted for timezone
+  const now = new Date()
+  
+  // If timezoneOffset is provided, adjust the date
+  let today = now
+  if (timezoneOffset !== undefined) {
+    // Convert server local time to user's local time
+    // timezoneOffset is user's getTimezoneOffset() (UTC - local)
+    // To convert server time to user time: userTime = serverUTC - userTimezoneOffset
+    const serverUTC = now.getTime() + (now.getTimezoneOffset() * 60000)
+    today = new Date(serverUTC - (timezoneOffset * 60000))
+  }
+  
   const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate())
   const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1)
 
@@ -203,8 +130,7 @@ export async function getTodayDashboardData(): Promise<DashboardData> {
     }
   }
 
-  // Process appointments
-  const now = new Date()
+  // Process appointments - use the adjusted 'today' for comparison
   const processedAppointments: DashboardAppointment[] = (appointments || []).map(appt => {
     const dog = Array.isArray(appt.dog) ? appt.dog[0] : appt.dog
     const customer = Array.isArray(appt.customer) ? appt.customer[0] : appt.customer
@@ -226,7 +152,7 @@ export async function getTodayDashboardData(): Promise<DashboardData> {
 
   // Calculate "Today at a Glance" stats
   const remainingAppointments = processedAppointments.filter(
-    a => a.status !== 'completed' && a.status !== 'cancelled' && new Date(a.scheduled_at) >= now
+    a => a.status !== 'completed' && a.status !== 'cancelled' && new Date(a.scheduled_at) >= today
   ).length
 
   const specialHandlingCount = processedAppointments.filter(a => {
@@ -283,11 +209,6 @@ export async function getTodayDashboardData(): Promise<DashboardData> {
       }
     })
     .sort((a, b) => a.time.localeCompare(b.time))
-
-  // If no appointments today in development, use demo data for demos/screenshots
-  if (processedAppointments.length === 0 && process.env.NODE_ENV === 'development') {
-    return getDemoData()
-  }
 
   return {
     appointments: processedAppointments,
