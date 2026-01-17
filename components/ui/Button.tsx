@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 import Link from 'next/link'
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'ghost'
+  variant?: 'primary' | 'secondary' | 'ghost' | 'outline'
   size?: 'sm' | 'md' | 'lg'
   href?: string
   children: React.ReactNode
@@ -16,6 +16,7 @@ const variantStyles = {
   primary: 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm hover:shadow',
   secondary: 'bg-gray-100 text-gray-700 hover:bg-gray-200',
   ghost: 'text-gray-600 hover:text-gray-900 hover:bg-gray-100',
+  outline: 'bg-transparent border border-gray-300 text-gray-700 hover:bg-gray-50',
 }
 
 const sizeStyles = {
