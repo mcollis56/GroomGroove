@@ -1,39 +1,44 @@
-import { NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
-import { stripe } from '@/lib/stripe/client';
+import { createClient } from "@supabase/supabase-js";
+import { NextResponse } from "next/server";
+import Stripe from "stripe";
+import { cookies } from "next/headers";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: "2025-02-24.acacia",
+});
 
 export async function POST(req: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const cookieStore = await cookies();
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return cookieStore.getAll() },
+          setAll(cookiesToSet) {
+            try {
+               cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
+            } catch {}
+          },
+        },
+      }
+    );
+
+    const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      return new NextResponse('Unauthorized', { status: 401 });
+      return new NextResponse("Unauthorized", { status: 401 });
     }
 
     const { priceId } = await req.json();
 
-    // Get or create Stripe customer for the user
-    const { getOrCreateStripeCustomer } = await import('@/lib/stripe/client');
-    const customerId = await getOrCreateStripeCustomer(user.id, user.email);
-
     const session = await stripe.checkout.sessions.create({
-      mode: 'subscription',
-      payment_method_types: ['card'],
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
-      customer: customerId,
+      mode: "subscription",
+      payment_method_types: ["card"],
+      line_items: [{ price: priceId, quantity: 1 }],
       customer_email: user.email,
-      // CRITICAL: This allows us to match the payment to the user in the webhook
-      metadata: {
-        userId: user.id,
-      },
+      metadata: { userId: user.id },
       client_reference_id: user.id,
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?payment=success`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing?payment=cancelled`,
@@ -41,8 +46,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ sessionId: session.id, url: session.url });
   } catch (error: any) {
-    console.error('Stripe Checkout Error:', error);
-    return new NextResponse('Internal Error', { status: 500 });
+    console.error("Stripe Checkout Error:", error);
+    return new NextResponse("Internal Error: " + error.message, { status: 500 });
   }
-}
 }
