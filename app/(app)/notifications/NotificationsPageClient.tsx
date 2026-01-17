@@ -6,7 +6,8 @@ import { getDogDetail } from '@/lib/actions/dogs'
 import { Card } from '@/components/ui/Card'
 import { Modal } from '@/components/ui/Modal'
 import { Bell, Clock, CheckCircle, MessageSquare, AlertCircle, X, Dog as DogIcon, User, Phone, FileText, Tag } from 'lucide-react'
-import { format, formatDistanceToNow } from 'date-fns'
+import { format, formatDistanceToNow, isValid } from 'date-fns'
+import { safeParseDate } from '@/lib/utils/date'
 
 interface Appointment {
   id: string
@@ -135,7 +136,8 @@ export function NotificationsPageClient({
 
   // Filter appointments based on selected filter
   const filteredAppointments = optimisticAppointments.filter(apt => {
-    const aptTime = new Date(apt.scheduledAt)
+    const aptTime = safeParseDate(apt.scheduledAt)
+    if (!aptTime) return false
     
     switch (filter) {
       case 'today':
@@ -287,7 +289,8 @@ export function NotificationsPageClient({
         ) : (
           <div className="space-y-3">
             {filteredAppointments.map((apt) => {
-              const aptTime = new Date(apt.scheduledAt)
+              const aptTime = safeParseDate(apt.scheduledAt)
+              if (!aptTime || !isValid(aptTime)) return null
               const isPast = aptTime < now
               const isCompleted = apt.status === 'completed'
 
@@ -436,7 +439,7 @@ export function NotificationsPageClient({
                   </div>
                 </div>
                 <p className="text-xs text-gray-400">
-                  {formatDistanceToNow(new Date(activity.createdAt), { addSuffix: true })}
+                  {safeParseDate(activity.createdAt) ? formatDistanceToNow(safeParseDate(activity.createdAt)!, { addSuffix: true }) : 'Unknown time'}
                 </p>
               </div>
             ))}
@@ -601,7 +604,7 @@ export function NotificationsPageClient({
               {/* Additional Info */}
               <div className="pt-4 border-t border-gray-200">
                 <p className="text-sm text-gray-500">
-                  Dog added on {format(new Date(selectedDog.created_at), 'MMMM d, yyyy')}
+                  Dog added on {safeParseDate(selectedDog.created_at) ? format(safeParseDate(selectedDog.created_at)!, 'MMMM d, yyyy') : 'Unknown date'}
                 </p>
                 <p className="text-sm text-gray-500">
                   {selectedDog.history.length} past appointments

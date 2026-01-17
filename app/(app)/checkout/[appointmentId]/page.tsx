@@ -8,6 +8,7 @@ import { ArrowLeft, Check, Printer, Mail, Calendar, MessageSquare, AlertCircle }
 import Link from 'next/link'
 import { completeCheckout } from '@/lib/actions/checkout'
 import { getAppointmentForCheckout, markAppointmentCompleted } from '@/lib/actions/appointments'
+import { safeParseDate } from '@/lib/utils/date'
 
 // Service prices in cents - centralized pricing
 const SERVICE_PRICES: Record<string, number> = {
@@ -173,15 +174,17 @@ export default function CheckoutPage() {
       let nextAppointment: { scheduledAt: string; services: string[] } | undefined
 
       if (scheduleNext && nextDate && nextTime) {
-        const nextScheduledAt = new Date(`${nextDate}T${nextTime}:00`).toISOString()
-        nextAppointment = {
-          scheduledAt: nextScheduledAt,
-          services: appointment.services || [],
+        const parsedNextDate = safeParseDate(`${nextDate}T${nextTime}:00`)
+        if (parsedNextDate) {
+          nextAppointment = {
+            scheduledAt: parsedNextDate.toISOString(),
+            services: appointment.services || [],
+          }
+          // Reminder 1 week before
+          const reminder = new Date(parsedNextDate)
+          reminder.setDate(reminder.getDate() - 7)
+          reminderDate = reminder.toISOString().split('T')[0]
         }
-        // Reminder 1 week before
-        const reminder = new Date(nextDate)
-        reminder.setDate(reminder.getDate() - 7)
-        reminderDate = reminder.toISOString().split('T')[0]
       }
 
       const result = await completeCheckout({
@@ -553,12 +556,12 @@ export default function CheckoutPage() {
                     <span className="font-medium">Next Appointment</span>
                   </div>
                   <p className="text-sm mt-1">
-                    {new Date(nextDate + 'T00:00:00').toLocaleDateString('en-US', {
+                    {(safeParseDate(nextDate + 'T12:00:00'))?.toLocaleDateString('en-US', {
                       weekday: 'long',
                       month: 'long',
                       day: 'numeric',
                       year: 'numeric'
-                    })} at {formatTime12h(nextTime)}
+                    }) ?? 'Invalid date'} at {formatTime12h(nextTime)}
                   </p>
                   <p className="text-xs text-gray-500 mt-1">
                     Confirmation SMS will be sent. Reminder 1 week before.

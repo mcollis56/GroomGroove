@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import TodayAppointments from "@/components/dashboard/TodayAppointments";
 import Link from "next/link";
 import { Plus, Calendar, MessageSquare, Clock } from "lucide-react";
+import { formatTime } from "@/lib/utils/date";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -49,7 +50,7 @@ export default async function DashboardPage() {
                 <p className="text-lg opacity-90">{nextJob.customer?.name} • {nextJob.service_type || "Full Groom"}</p>
              </div>
              <div className="text-right">
-                <p className="text-3xl font-bold">{new Date(nextJob.scheduled_at).toLocaleTimeString([], {hour: 'numeric', minute:'2-digit'})}</p>
+                <p className="text-3xl font-bold">{formatTime(nextJob.scheduled_at)}</p>
              </div>
           </div>
         </div>

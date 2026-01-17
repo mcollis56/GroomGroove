@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Plus, Check, Clock, Dog as DogIcon, User, Calendar as CalendarIcon, X } from 'lucide-react'
 import CalendarGrid from './CalendarGrid'
+import { formatTime as safeFormatTime, safeParseDate } from '@/lib/utils/date'
 
 interface Appointment {
   id: string
@@ -26,16 +27,12 @@ interface Dog {
 }
 
 function formatTime(isoString: string): string {
-  const date = new Date(isoString)
-  return date.toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true
-  })
+  return safeFormatTime(isoString)
 }
 
 function formatDateForDisplay(dateStr: string): string {
-  const date = new Date(dateStr + 'T00:00:00')
+  const date = safeParseDate(dateStr + 'T12:00:00')
+  if (!date) return 'Invalid Date'
   return date.toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',

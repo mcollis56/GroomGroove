@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { Card } from '@/components/ui/Card'
 import { HistoryPageClient } from './HistoryPageClient'
+import { formatTime as safeFormatTime, formatDate as safeFormatDate } from '@/lib/utils/date'
 
 interface AppointmentHistory {
   id: string
@@ -13,20 +14,11 @@ interface AppointmentHistory {
 }
 
 function formatDate(isoString: string): string {
-  return new Date(isoString).toLocaleDateString('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  })
+  return safeFormatDate(isoString)
 }
 
 function formatTime(isoString: string): string {
-  return new Date(isoString).toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true
-  })
+  return safeFormatTime(isoString)
 }
 
 export default async function HistoryPage() {
