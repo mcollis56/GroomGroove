@@ -36,16 +36,15 @@ export async function POST(request: NextRequest) {
         },
       ],
       mode: 'subscription',
-      success_url: successUrl || `${request.nextUrl.origin}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: cancelUrl || `${request.nextUrl.origin}/pricing`,
-      subscription_data: {
-        metadata: {
-          userId: user.id,
-        },
-      },
+      payment_method_types: ['card'],
+      customer_email: user.email,
+      // CRITICAL: This allows us to match the payment to the user in the webhook
       metadata: {
         userId: user.id,
       },
+      client_reference_id: user.id,
+      success_url: successUrl || `${request.nextUrl.origin}/dashboard?payment=success`,
+      cancel_url: cancelUrl || `${request.nextUrl.origin}/pricing?payment=cancelled`,
     });
 
     return NextResponse.json({ sessionId: session.id, url: session.url });
