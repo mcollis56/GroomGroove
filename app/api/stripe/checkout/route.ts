@@ -1,4 +1,5 @@
-import { createClient } from "@supabase/supabase-js";
+cat <<EOF > app/api/stripe/checkout/route.ts
+import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { cookies } from "next/headers";
@@ -10,7 +11,9 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 export async function POST(req: Request) {
   try {
     const cookieStore = await cookies();
-    const supabase = createClient(
+    
+    // Use createServerClient for server-side auth
+    const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
@@ -40,8 +43,8 @@ export async function POST(req: Request) {
       customer_email: user.email,
       metadata: { userId: user.id },
       client_reference_id: user.id,
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?payment=success`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing?payment=cancelled`,
+      success_url: \`\${process.env.NEXT_PUBLIC_APP_URL}/dashboard?payment=success\`,
+      cancel_url: \`\${process.env.NEXT_PUBLIC_APP_URL}/pricing?payment=cancelled\`,
     });
 
     return NextResponse.json({ sessionId: session.id, url: session.url });
@@ -50,3 +53,4 @@ export async function POST(req: Request) {
     return new NextResponse("Internal Error: " + error.message, { status: 500 });
   }
 }
+EOF
