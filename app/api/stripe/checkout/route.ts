@@ -1,8 +1,7 @@
-cat <<EOF > app/api/stripe/checkout/route.ts
 import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { cookies } from "next/headers";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-02-24.acacia",
@@ -11,31 +10,34 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 export async function POST(req: Request) {
   try {
     const cookieStore = await cookies();
-    
-    // Use createServerClient for server-side auth
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
-          getAll() { return cookieStore.getAll() },
+          getAll() {
+            return cookieStore.getAll();
+          },
           setAll(cookiesToSet) {
             try {
-               cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              );
             } catch {}
           },
         },
       }
     );
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
     const { priceId } = await req.json();
-
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       payment_method_types: ["card"],
@@ -45,7 +47,7 @@ export async function POST(req: Request) {
       client_reference_id: user.id,
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?payment=success`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing?payment=cancelled`,
-    };
+    });
 
     return NextResponse.json({ sessionId: session.id, url: session.url });
   } catch (error: any) {
@@ -53,4 +55,3 @@ export async function POST(req: Request) {
     return new NextResponse("Internal Error: " + error.message, { status: 500 });
   }
 }
-EOF
