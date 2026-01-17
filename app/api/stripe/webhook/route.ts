@@ -3,21 +3,22 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 
-// Initialize Supabase Admin Client (Service Role)
-// We need this to bypass RLS and update subscription status
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
-// Initialize Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-02-24.acacia",
-});
-
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+// Initialize Stripe (lazy init inside function is safer for builds too)
+// But we can keep it here if env var exists.
+// Let's move EVERYTHING inside to be bulletproof.
 
 export async function POST(req: Request) {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: "2025-02-24.acacia",
+  });
+  
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
   const body = await req.text();
   const signature = (await headers()).get("Stripe-Signature") as string;
 
@@ -44,7 +45,6 @@ export async function POST(req: Request) {
       console.log(`Payment success for user ${userId}`);
 
       // Update Supabase
-      // 1. Try updating 'subscriptions' table if it exists
       const { error } = await supabaseAdmin
         .from("subscriptions")
         .upsert({
@@ -60,7 +60,7 @@ export async function POST(req: Request) {
         console.error("Subscription table update failed:", error);
       }
       
-      // 2. ALWAYS update user metadata as a reliable fallback
+      // Fallback metadata update
       await supabaseAdmin.auth.admin.updateUserById(userId, {
         user_metadata: { is_pro: true, stripe_sub_id: subId }
       });
