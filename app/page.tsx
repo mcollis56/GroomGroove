@@ -257,6 +257,7 @@ export default async function LandingPage() {
               © 2026 Groom Groove. All rights reserved.
            </div>
         </footer>
+      </main>
     </div>
-      )
+  )
 }
