@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Plus, Dog } from 'lucide-react'
 import type { GroomingPreferences } from '@/lib/actions/dogs'
+import { safeParseDate } from '@/lib/utils/date'
 
 interface DogWithOwner {
   id: string
@@ -28,7 +29,9 @@ interface DogsPageClientProps {
 
 function formatDate(isoString: string | null): string {
   if (!isoString) return 'No visits yet'
-  return new Date(isoString).toLocaleDateString('en-US', {
+  const date = safeParseDate(isoString)
+  if (!date) return 'No visits yet'
+  return date.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric'
@@ -39,7 +42,8 @@ export function DogsPageClient({ dogs }: DogsPageClientProps) {
   const totalDogs = dogs.length
   const activeClients = dogs.filter(d => d.appointment_count > 0).length
   const newThisMonth = dogs.filter(d => {
-    const created = new Date(d.created_at)
+    const created = safeParseDate(d.created_at)
+    if (!created) return false
     const now = new Date()
     return created.getMonth() === now.getMonth() && created.getFullYear() === now.getFullYear()
   }).length

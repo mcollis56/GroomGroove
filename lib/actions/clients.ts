@@ -2,6 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { safeParseDate } from '@/lib/utils/date'
 
 interface DogInput {
   name: string
@@ -155,7 +156,7 @@ export async function getAllClients() {
       phone: customer.phone || '',
       dogs: customer.dogs || [],
       lastVisit: lastVisitMap[customer.id]
-        ? new Date(lastVisitMap[customer.id]).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+        ? (safeParseDate(lastVisitMap[customer.id])?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) ?? null)
         : null,
       concerns: dogConcerns.length > 50 ? dogConcerns.slice(0, 47) + '...' : dogConcerns || null,
       status: 'active' as const, // Default to active for now

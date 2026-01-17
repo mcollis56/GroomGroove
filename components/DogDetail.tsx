@@ -1,6 +1,7 @@
 'use client'
 
 import { Dog } from '@/app/types'
+import { safeParseDate } from '@/lib/utils/date'
 
 export default function DogDetail({ dog, onClose }: { dog: Dog; onClose: () => void }) {
   return (
@@ -105,7 +106,7 @@ export default function DogDetail({ dog, onClose }: { dog: Dog; onClose: () => v
         )}
 
         <div className="text-xs text-gray-400 text-center pt-4">
-          Added: {new Date(dog.created_at).toLocaleDateString()}
+          Added: {safeParseDate(dog.created_at)?.toLocaleDateString() ?? 'N/A'}
         </div>
       </div>
     </div>

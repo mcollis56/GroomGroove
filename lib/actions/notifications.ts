@@ -3,6 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { sendReminderSMS } from '@/lib/sms/send'
 import { revalidatePath } from 'next/cache'
+import { safeParseDate } from '@/lib/utils/date'
 
 export interface TodayAppointment {
   id: string
@@ -70,7 +71,7 @@ export async function getTodaysAppointments(): Promise<TodayAppointment[]> {
   return appointments.map(appt => {
     const customer = Array.isArray(appt.customer) ? appt.customer[0] : appt.customer
     const dog = Array.isArray(appt.dog) ? appt.dog[0] : appt.dog
-    const appointmentTime = new Date(appt.scheduled_at)
+    const appointmentTime = safeParseDate(appt.scheduled_at)
 
     return {
       id: appt.id,
@@ -82,7 +83,7 @@ export async function getTodaysAppointments(): Promise<TodayAppointment[]> {
       status: appt.status,
       reminderSent: sentSet.has(appt.id),
       hasConsent: customer?.sms_consent || false,
-      isPast: appointmentTime < now,
+      isPast: appointmentTime ? appointmentTime < now : false,
     }
   })
 }
@@ -117,7 +118,10 @@ export async function getTodayStats(): Promise<{
 
   const now = new Date()
   const remindersSent = appointments.filter(a => a.reminderSent).length
-  const upcoming = appointments.filter(a => new Date(a.scheduledAt) > now && a.status !== 'completed').length
+  const upcoming = appointments.filter(a => {
+    const aptTime = safeParseDate(a.scheduledAt)
+    return aptTime && aptTime > now && a.status !== 'completed'
+  }).length
   const completed = appointments.filter(a => a.status === 'completed').length
 
   return {

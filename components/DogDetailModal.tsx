@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Modal } from '@/components/ui/Modal'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Dog, User, Calendar, Scissors, AlertCircle, Save, Clock, CheckCircle } from 'lucide-react'
 import { getDogDetail, updateGroomingPreferences, type DogDetail, type GroomingPreferences } from '@/lib/actions/dogs'
+import { safeParseDate } from '@/lib/utils/date'
 
 interface DogDetailModalProps {
   dogId: string | null
@@ -13,11 +14,6 @@ interface DogDetailModalProps {
   onClose: () => void
 }
 
-/**
- * Dog Detail Modal
- * Shows dog overview, editable grooming preferences, and grooming history.
- * Designed for groomers to quickly access all relevant info before/during a session.
- */
 export function DogDetailModal({ dogId, isOpen, onClose }: DogDetailModalProps) {
   const [dog, setDog] = useState<DogDetail | null>(null)
   const [loading, setLoading] = useState(false)
@@ -28,14 +24,7 @@ export function DogDetailModal({ dogId, isOpen, onClose }: DogDetailModalProps) 
   // Editable preferences state
   const [preferences, setPreferences] = useState<GroomingPreferences>({})
 
-  // Load dog data when modal opens
-  useEffect(() => {
-    if (isOpen && dogId) {
-      loadDogDetail()
-    }
-  }, [isOpen, dogId])
-
-  async function loadDogDetail() {
+  const loadDogDetail = useCallback(async () => {
     if (!dogId) return
 
     setLoading(true)
@@ -56,7 +45,14 @@ export function DogDetailModal({ dogId, isOpen, onClose }: DogDetailModalProps) 
     } finally {
       setLoading(false)
     }
-  }
+  }, [dogId])
+
+  // Load dog data when modal opens
+  useEffect(() => {
+    if (isOpen && dogId) {
+      loadDogDetail()
+    }
+  }, [isOpen, dogId, loadDogDetail])
 
   async function handleSavePreferences() {
     if (!dogId) return
@@ -92,7 +88,9 @@ export function DogDetailModal({ dogId, isOpen, onClose }: DogDetailModalProps) 
   }
 
   function formatDate(isoString: string): string {
-    return new Date(isoString).toLocaleDateString('en-US', {
+    const date = safeParseDate(isoString)
+    if (!date) return 'N/A'
+    return date.toLocaleDateString('en-US', {
       weekday: 'short',
       month: 'short',
       day: 'numeric',
@@ -101,14 +99,15 @@ export function DogDetailModal({ dogId, isOpen, onClose }: DogDetailModalProps) 
   }
 
   function formatTime(isoString: string): string {
-    return new Date(isoString).toLocaleTimeString('en-US', {
+    const date = safeParseDate(isoString)
+    if (!date) return 'N/A'
+    return date.toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true
     })
   }
 
-  // Loading state
   if (loading) {
     return (
       <Modal isOpen={isOpen} onClose={onClose} title="Dog Details" size="xl">
@@ -119,7 +118,6 @@ export function DogDetailModal({ dogId, isOpen, onClose }: DogDetailModalProps) 
     )
   }
 
-  // Error state
   if (error && !dog) {
     return (
       <Modal isOpen={isOpen} onClose={onClose} title="Dog Details" size="xl">
@@ -137,7 +135,6 @@ export function DogDetailModal({ dogId, isOpen, onClose }: DogDetailModalProps) 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={`${dog.name}'s Profile`} size="xl">
       <div className="px-6 py-4 space-y-6">
-        {/* Error Banner */}
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
@@ -145,7 +142,6 @@ export function DogDetailModal({ dogId, isOpen, onClose }: DogDetailModalProps) 
           </div>
         )}
 
-        {/* Success Banner */}
         {saveSuccess && (
           <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center gap-2">
             <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
@@ -153,7 +149,6 @@ export function DogDetailModal({ dogId, isOpen, onClose }: DogDetailModalProps) 
           </div>
         )}
 
-        {/* ===== SECTION A: Dog Overview ===== */}
         <section className="bg-gray-50 rounded-xl p-4">
           <div className="flex items-start gap-4">
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -193,7 +188,6 @@ export function DogDetailModal({ dogId, isOpen, onClose }: DogDetailModalProps) 
           </div>
         </section>
 
-        {/* ===== SECTION B: Grooming Preferences (Editable) ===== */}
         <section>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
@@ -212,7 +206,6 @@ export function DogDetailModal({ dogId, isOpen, onClose }: DogDetailModalProps) 
           </div>
 
           <div className="space-y-4">
-            {/* Clipper Blade Size */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -249,7 +242,6 @@ export function DogDetailModal({ dogId, isOpen, onClose }: DogDetailModalProps) 
               </div>
             </div>
 
-            {/* Nail Trimming */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -283,7 +275,6 @@ export function DogDetailModal({ dogId, isOpen, onClose }: DogDetailModalProps) 
               </div>
             </div>
 
-            {/* Coat Handling Notes */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Coat Handling Notes
@@ -297,7 +288,6 @@ export function DogDetailModal({ dogId, isOpen, onClose }: DogDetailModalProps) 
               />
             </div>
 
-            {/* Behavior Notes */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Behavior Notes
@@ -311,7 +301,6 @@ export function DogDetailModal({ dogId, isOpen, onClose }: DogDetailModalProps) 
               />
             </div>
 
-            {/* Special Instructions */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Special Instructions
@@ -327,7 +316,6 @@ export function DogDetailModal({ dogId, isOpen, onClose }: DogDetailModalProps) 
           </div>
         </section>
 
-        {/* ===== SECTION C: Grooming History (Read-Only) ===== */}
         <section>
           <div className="flex items-center gap-2 mb-4">
             <Clock className="w-5 h-5 text-gray-600" />

@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
+import { safeParseDate } from '@/lib/utils/date'
 
 
 export interface DashboardAppointment {
@@ -152,7 +153,10 @@ export async function getTodayDashboardData(timezoneOffset?: number): Promise<Da
 
   // Calculate "Today at a Glance" stats
   const remainingAppointments = processedAppointments.filter(
-    a => a.status !== 'completed' && a.status !== 'cancelled' && new Date(a.scheduled_at) >= today
+    a => {
+      const aptDate = safeParseDate(a.scheduled_at)
+      return a.status !== 'completed' && a.status !== 'cancelled' && aptDate && aptDate >= today
+    }
   ).length
 
   const specialHandlingCount = processedAppointments.filter(a => {
@@ -224,7 +228,9 @@ export async function getTodayDashboardData(timezoneOffset?: number): Promise<Da
 }
 
 function formatTime(isoString: string): string {
-  return new Date(isoString).toLocaleTimeString('en-US', {
+  const date = safeParseDate(isoString)
+  if (!date) return 'N/A'
+  return date.toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true

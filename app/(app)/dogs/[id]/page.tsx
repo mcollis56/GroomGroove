@@ -6,13 +6,16 @@ import { ArrowLeft, Calendar, Clock, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 import { getDogDetail } from '@/lib/actions/dogs'
 import { DogQuickActions, DogPhoto, EditableGroomingPreferences, EditableGeneralNotes } from './DogDetailClient'
+import { safeParseDate } from '@/lib/utils/date'
 
 interface DogDetailPageProps {
   params: Promise<{ id: string }>
 }
 
 function formatDate(isoString: string): string {
-  return new Date(isoString).toLocaleDateString('en-US', {
+  const date = safeParseDate(isoString)
+  if (!date) return 'N/A'
+  return date.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric'
@@ -20,7 +23,9 @@ function formatDate(isoString: string): string {
 }
 
 function formatTime(isoString: string): string {
-  return new Date(isoString).toLocaleTimeString('en-US', {
+  const date = safeParseDate(isoString)
+  if (!date) return 'N/A'
+  return date.toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true
