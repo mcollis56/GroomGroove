@@ -1,3 +1,4 @@
+cat <<EOF > utils/supabase/middleware.ts
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
@@ -33,36 +34,26 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
 
-  // PROTECTED ROUTES LOGIC
-  // If user is NOT logged in and tries to access dashboard/* or settings/*, redirect to /login
-  if (
-    !user &&
-    !request.nextUrl.pathname.startsWith('/login') &&
-    !request.nextUrl.pathname.startsWith('/auth') &&
-    !request.nextUrl.pathname.startsWith('/signup') &&
-    request.nextUrl.pathname !== '/' // Allow landing page
-  ) {
-    // If it's an API route, just return 401 instead of redirect
-    if (request.nextUrl.pathname.startsWith('/api')) {
-       // Allow Stripe webhooks through!
-       if (request.nextUrl.pathname.startsWith('/api/stripe/webhook')) {
-           return response
-       }
-       return new NextResponse('Unauthorized', { status: 401 })
-    }
-    
-    // Redirect unauthenticated users to login
+  // DEFINITION OF PUBLIC PATHS
+  const isPublicPath = 
+    request.nextUrl.pathname === '/' || // Landing Page
+    request.nextUrl.pathname.startsWith('/login') ||
+    request.nextUrl.pathname.startsWith('/signup') ||
+    request.nextUrl.pathname.startsWith('/auth') ||
+    request.nextUrl.pathname.startsWith('/pricing') || // Allow pricing to be seen
+    request.nextUrl.pathname.startsWith('/features');
+
+  if (!user && !isPublicPath) {
+    // User is NOT logged in and trying to access a protected route -> Redirect
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
   }
 
-  // OPTIONAL: If user IS logged in and visits root '/', redirect to dashboard?
-  // Uncomment if you prefer that behavior:
+  // OPTIONAL: Redirect logged-in users away from Landing Page to Dashboard?
+  // If you want them to see the landing page, keep this COMMENTED OUT.
   /*
   if (user && request.nextUrl.pathname === '/') {
     const url = request.nextUrl.clone()
@@ -73,3 +64,4 @@ export async function updateSession(request: NextRequest) {
 
   return response
 }
+EOF

@@ -1,23 +1,16 @@
+cat <<EOF > middleware.ts
 import { type NextRequest } from 'next/server'
 import { updateSession } from '@/utils/supabase/middleware'
 
 export async function middleware(request: NextRequest) {
-  // updateSession handles auth protection
-  // It should allow access to public routes like '/'
+  // Pass the request to Supabase to update the session
   return await updateSession(request)
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - images/ (public images)
-     * - api/ (API routes - handled separately or inside updateSession)
-     * Feel free to modify this pattern to include more paths.
-     */
+    // Exclude static assets, images, and API routes from middleware processing
     '/((?!_next/static|_next/image|favicon.ico|images/|api/).*)',
   ],
 }
+EOF
