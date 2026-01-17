@@ -269,7 +269,7 @@ export function NotificationsPageClient({
       <Card>
         <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
           <Clock className="w-5 h-5 text-blue-600" />
-          Today's Schedule {filter !== 'today' && `(${filteredAppointments.length} ${filter} appointments)`}
+          Today&apos;s Schedule {filter !== 'today' && `(${filteredAppointments.length} ${filter} appointments)`}
         </h3>
 
         {optimisticAppointments.length === 0 ? (
@@ -472,7 +472,7 @@ export function NotificationsPageClient({
               <div className="flex items-center justify-between mb-2">
                 <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                   <DogIcon className="w-5 h-5 text-blue-600" />
-                  {selectedDog.name}'s Details
+                  {selectedDog.name}&apos;s Details
                 </h2>
                 <button
                   onClick={closeDrawer}

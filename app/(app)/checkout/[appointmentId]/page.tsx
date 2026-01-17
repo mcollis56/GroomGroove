@@ -98,12 +98,7 @@ export default function CheckoutPage() {
           return
         }
 
-        // Check if appointment is in progress (required for checkout)
-        if (data.status !== 'in_progress') {
-          setError('Appointment must be marked as "in progress" before checkout')
-          setLoading(false)
-          return
-        }
+  
 
         setAppointment(data)
         setNextDate(getDefaultNextDate(reminderWeeks))

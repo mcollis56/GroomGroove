@@ -165,3 +165,34 @@ export async function getDogsWithPhotos(): Promise<{
     customer_name: Array.isArray(dog.customer) ? dog.customer[0]?.name : (dog.customer as { name: string } | null)?.name || null
   }))
 }
+
+/**
+ * Get ALL dogs for the upload dropdown (includes dogs without photos)
+ */
+export async function getAllDogsForUpload(): Promise<{
+  id: string
+  name: string
+  customer_name: string | null
+}[]> {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('dogs')
+    .select(`
+      id,
+      name,
+      customer:customers(name)
+    `)
+    .order('name', { ascending: true })
+
+  if (error) {
+    console.error('[Photos] Fetch all dogs failed:', error)
+    return []
+  }
+
+  return (data || []).map(dog => ({
+    id: dog.id,
+    name: dog.name,
+    customer_name: Array.isArray(dog.customer) ? dog.customer[0]?.name : (dog.customer as { name: string } | null)?.name || null
+  }))
+}

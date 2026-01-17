@@ -32,7 +32,7 @@ const createStripeClient = () => {
   }
 
   return new Stripe(stripeSecretKey, {
-    apiVersion: '2025-12-15.clover',
+    apiVersion: '2024-12-18.acacia' as const as any,
     typescript: true,
   });
 };

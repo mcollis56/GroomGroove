@@ -3,38 +3,38 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
+import { Check, Clock, Play, XCircle } from "lucide-react";
 
-// --- Internal Component for the Row ---
+// --- Internal Row Component ---
 function AppointmentRow({ appointment }: { appointment: any }) {
   const router = useRouter();
   const supabase = createClient();
   const [status, setStatus] = useState(appointment.status);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Safe Date Formatting
+  const dateObj = new Date(appointment.scheduled_at);
+  const timeString = isValid(dateObj) ? format(dateObj, "h:mm a") : "Time N/A";
+
   const handleStatusUpdate = async (newStatus: string) => {
     if (isLoading) return;
     setIsLoading(true);
     
-    // 1. Optimistic Update (Instant Color Change)
+    // Optimistic Update
     setStatus(newStatus);
 
     try {
-      // 2. Update Database
       const { error } = await supabase
         .from("appointments")
         .update({ status: newStatus })
         .eq("id", appointment.id);
 
       if (error) throw error;
-
-      // 3. Handle Navigation if Finishing
-      if (newStatus === 'completed') {
-         router.push(`/checkout/${appointment.id}`);
-      } else {
-         router.refresh(); 
-      }
+      
+      router.refresh(); // Refresh to update the "Next Up" banner
     } catch (error) {
+      console.error(error);
       alert("Update failed.");
       setStatus(appointment.status); // Revert on error
     } finally {
@@ -42,82 +42,76 @@ function AppointmentRow({ appointment }: { appointment: any }) {
     }
   };
 
-  // Button Logic
-  let buttonUI;
-  if (status === 'pending' || status === 'confirmed') {
-    buttonUI = (
-      <button
-        type="button"
-        onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleStatusUpdate('in_progress'); }}
-        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg"
-      >
-        {isLoading ? "..." : "Start Grooming"}
-      </button>
-    );
-  } else if (status === 'in_progress') {
-    buttonUI = (
-      <button
-        type="button"
-        onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleStatusUpdate('completed'); }}
-        className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium rounded-lg animate-pulse"
-      >
-        {isLoading ? "..." : "Finish & Pay"}
-      </button>
-    );
-  } else {
-    buttonUI = (
-      <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold border border-green-200">
-        COMPLETED
-      </span>
-    );
-  }
+  // Status Colors & Icons
+  const getStatusColor = (s: string) => {
+    switch(s) {
+      case 'confirmed': return 'bg-blue-100 text-blue-700 border-blue-200';
+      case 'in_progress': return 'bg-orange-100 text-orange-700 border-orange-200';
+      case 'completed': return 'bg-green-100 text-green-700 border-green-200';
+      case 'cancelled': return 'bg-red-50 text-red-500 border-red-100';
+      default: return 'bg-gray-100 text-gray-600 border-gray-200';
+    }
+  };
 
-  // --- Render Row ---
   return (
-    <div className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-xl mb-3 shadow-sm">
-      <div className="flex items-center gap-4">
-        <div className="text-gray-500 font-medium w-16">
-          {format(new Date(appointment.scheduled_at), "h:mm a")}
+    <div className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-xl mb-3 shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex items-center gap-6">
+        {/* TIME */}
+        <div className="text-gray-900 font-bold text-lg w-20 text-center bg-gray-50 p-2 rounded-lg border border-gray-200">
+          {timeString}
         </div>
+
+        {/* DETAILS */}
         <div>
-          <h3 className="font-bold text-gray-900">{appointment.dog?.name || "Unknown Dog"}</h3>
-          <p className="text-sm text-gray-500">{appointment.customer?.name || "Unknown Owner"}</p>
-          {/* Tags */}
+          <h3 className="font-bold text-gray-900 text-lg">{appointment.dog?.name || "Unknown Dog"}</h3>
+          <p className="text-sm text-gray-500">{appointment.customer?.name || "Unknown Owner"} • {appointment.service_type || "Grooming"}</p>
+          
+          {/* BEHAVIOR TAGS */}
           <div className="flex gap-2 mt-1">
              {appointment.dog?.grooming_preferences?.behavior_notes && (
-               <span className="text-xs px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded-full">
-                 {appointment.dog.grooming_preferences.behavior_notes}
+               <span className="text-xs px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded-full font-medium">
+                 ⚠️ {appointment.dog.grooming_preferences.behavior_notes}
                </span>
              )}
           </div>
         </div>
       </div>
-      <div>{buttonUI}</div>
+
+      {/* STATUS DROPDOWN */}
+      <div className="relative">
+        <select
+          value={status}
+          onChange={(e) => handleStatusUpdate(e.target.value)}
+          disabled={isLoading}
+          className={`appearance-none pl-4 pr-10 py-2 rounded-lg font-bold text-sm border-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-purple-500 ${getStatusColor(status)}`}
+        >
+          <option value="pending">Pending</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="in_progress">✂️ Grooming</option>
+          <option value="completed">✅ Done</option>
+          <option value="cancelled">❌ Cancel</option>
+        </select>
+        
+        {/* Chevron Icon Override */}
+        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-current opacity-50">
+          <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+        </div>
+      </div>
     </div>
   );
 }
 
-// --- Main List Component ---
+// --- Main List ---
 export default function TodayAppointments({ appointments }: { appointments: any[] }) {
   if (!appointments || appointments.length === 0) {
-    return (
-      <div className="p-8 text-center bg-gray-50 rounded-xl border border-dashed border-gray-300">
-        <p className="text-gray-500">No appointments scheduled for today.</p>
-      </div>
-    );
+    return <div className="text-gray-500 italic">No active appointments.</div>;
   }
 
   return (
-    <div className="mt-6">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-bold text-gray-900">Today's Appointments</h2>
-        <span className="text-sm text-gray-500">{appointments.length} scheduled</span>
-      </div>
-      <div className="space-y-2">
-        {appointments.map((appt) => (
-          <AppointmentRow key={appt.id} appointment={appt} />
-        ))}
-      </div>
+    <div className="space-y-1">
+      {appointments.map((appt) => (
+        <AppointmentRow key={appt.id} appointment={appt} />
+      ))}
     </div>
   );
 }

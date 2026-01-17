@@ -1,11 +1,15 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Card } from '@/components/ui/Card'
-import { getDogsWithPhotos } from '@/lib/actions/photos'
+import { getDogsWithPhotos, getAllDogsForUpload } from '@/lib/actions/photos'
 import { Camera } from 'lucide-react'
+import PhotoUploader from '@/components/PhotoUploader'
 
 export default async function PhotosPage() {
-  const dogsWithPhotos = await getDogsWithPhotos()
+  const [dogsWithPhotos, allDogs] = await Promise.all([
+    getDogsWithPhotos(),
+    getAllDogsForUpload()
+  ])
 
   return (
     <div className="space-y-6">
@@ -18,6 +22,9 @@ export default async function PhotosPage() {
           {dogsWithPhotos.length} {dogsWithPhotos.length === 1 ? 'photo' : 'photos'}
         </div>
       </div>
+
+      {/* Photo Uploader */}
+      <PhotoUploader dogs={allDogs} />
 
       {dogsWithPhotos.length > 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">

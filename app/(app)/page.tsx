@@ -1,152 +1,87 @@
-'use client'
+import { createClient } from "@/utils/supabase/server";
+import { redirect } from "next/navigation";
+import TodayAppointments from "@/components/dashboard/TodayAppointments";
+import Link from "next/link";
+import { Plus, Calendar, MessageSquare, Clock } from "lucide-react";
 
-import { useState, useMemo } from 'react'
-import TodayAppointments from '@/components/dashboard/TodayAppointments'
-import { TodayAtAGlance } from '@/components/dashboard/TodayAtAGlance'
-import { TodaysWatchlist } from '@/components/dashboard/TodaysWatchlist'
-import { QuickActions } from '@/components/dashboard/QuickActions'
-import { getTodayDashboardData } from '@/lib/actions/dashboard'
-import { use } from 'react'
+export default async function DashboardPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-// Get browser timezone offset in minutes
-const getTimezoneOffset = () => {
-  if (typeof window === 'undefined') return undefined
-  return new Date().getTimezoneOffset()
-}
+  if (!user) redirect("/login");
 
-// Wrap the async call in a promise that can be used with React.use
-const dashboardDataPromise = getTodayDashboardData(getTimezoneOffset())
+  const today = new Date().toISOString().split('T')[0];
 
-export default function DashboardPage() {
-  const dashboardData = use(dashboardDataPromise)
-  const [activeFilter, setActiveFilter] = useState<string | null>(null)
+  // Fetch ONLY active appointments (Not cancelled/completed)
+  const { data: appointments, error } = await supabase
+    .from("appointments")
+    .select(`*, dog:dogs(id, name, grooming_preferences), customer:customers(id, name)`)
+    .gte('scheduled_at', `${today}T00:00:00`)
+    .lt('scheduled_at', `${today}T23:59:59`)
+    .in('status', ['pending', 'confirmed', 'in_progress']) // Only active work
+    .order('scheduled_at', { ascending: true });
 
-  // Transform appointments for TodayAppointments component with filtering
-  const appointmentsForDisplay = useMemo(() => {
-    let filteredAppointments = dashboardData.appointments.filter(a => a.status !== 'cancelled')
-    
-    // Apply filters based on activeFilter
-    if (activeFilter === 'special-handling') {
-      filteredAppointments = filteredAppointments.filter(a => {
-        const prefs = a.dog?.grooming_preferences
-        return prefs?.behavior_notes && (
-          prefs.behavior_notes.toLowerCase().includes('anxious') ||
-          prefs.behavior_notes.toLowerCase().includes('nervous') ||
-          prefs.behavior_notes.toLowerCase().includes('nail') ||
-          prefs.behavior_notes.toLowerCase().includes('paw') ||
-          prefs.behavior_notes.toLowerCase().includes('shed')
-        )
-      })
-    } else if (activeFilter === 'appointments-remaining') {
-      filteredAppointments = filteredAppointments.filter(a => a.status !== 'completed')
-    } else if (activeFilter === 'first-time-dogs') {
-      filteredAppointments = filteredAppointments.filter(a => a.is_first_visit)
-    }
-    // "last-appointment" filter not needed - it's informational only
-
-    return filteredAppointments.map(a => ({
-      id: a.id,
-      time: formatTime(a.scheduled_at),
-      dogName: a.dog?.name || 'Unknown',
-      breed: a.dog?.breed || 'Unknown breed',
-      ownerName: a.customer?.name || 'Unknown',
-      service: a.services?.join(', ') || 'Grooming',
-      status: mapStatus(a.status),
-      flags: getFlags(a),
-      dogId: a.dogId
-    }))
-  }, [dashboardData.appointments, activeFilter])
+  const remainingJobs = appointments?.length || 0;
+  const nextJob = appointments?.[0]; // The very next one
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-500">Welcome back! Here's what's happening today.</p>
-        {activeFilter && (
-          <div className="mt-2 text-sm text-blue-600">
-            Filtering by: <span className="font-medium">{activeFilter.replace('-', ' ')}</span>
-            <button 
-              onClick={() => setActiveFilter(null)}
-              className="ml-2 text-gray-500 hover:text-gray-700"
-            >
-              ✕ Clear filter
-            </button>
+    <div className="p-6 max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Salon Dashboard</h1>
+          <p className="text-gray-500">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+        </div>
+        <div className="bg-purple-100 text-purple-700 px-4 py-2 rounded-full font-bold">
+           {remainingJobs} Dogs Remaining
+        </div>
+      </div>
+
+      {/* --- NEXT UP HIGHLIGHT --- */}
+      {nextJob && (
+        <div className="mb-8 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-6 text-white shadow-xl">
+          <div className="flex items-center gap-3 mb-2 text-purple-100 uppercase text-xs font-bold tracking-wider">
+            <Clock className="h-4 w-4" /> Next Up
+          </div>
+          <div className="flex justify-between items-end">
+             <div>
+                <h2 className="text-3xl font-bold">{nextJob.dog?.name}</h2>
+                <p className="text-lg opacity-90">{nextJob.customer?.name} • {nextJob.service_type || "Full Groom"}</p>
+             </div>
+             <div className="text-right">
+                <p className="text-3xl font-bold">{new Date(nextJob.scheduled_at).toLocaleTimeString([], {hour: 'numeric', minute:'2-digit'})}</p>
+             </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- QUICK ACTIONS --- */}
+      <div className="grid grid-cols-3 gap-4 mb-8">
+        <Link href="/dogs/new" className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center hover:border-purple-300 transition-colors group">
+          <div className="bg-purple-50 p-3 rounded-full mb-2 group-hover:bg-purple-100"><Plus className="h-6 w-6 text-purple-600" /></div>
+          <span className="font-semibold text-gray-700">Add Dog</span>
+        </Link>
+        <Link href="/calendar/new" className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center hover:border-blue-300 transition-colors group">
+          <div className="bg-blue-50 p-3 rounded-full mb-2 group-hover:bg-blue-100"><Calendar className="h-6 w-6 text-blue-600" /></div>
+          <span className="font-semibold text-gray-700">Book Appt</span>
+        </Link>
+        <Link href="/messages" className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center hover:border-green-300 transition-colors group">
+          <div className="bg-green-50 p-3 rounded-full mb-2 group-hover:bg-green-100"><MessageSquare className="h-6 w-6 text-green-600" /></div>
+          <span className="font-semibold text-gray-700">Messages</span>
+        </Link>
+      </div>
+
+      {/* --- ACTIVE SCHEDULE --- */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Today&apos;s Schedule</h2>
+        {remainingJobs > 0 ? (
+          <TodayAppointments appointments={appointments || []} />
+        ) : (
+          <div className="text-center py-10 text-gray-400">
+            <p>All clear! No pending jobs for today.</p>
           </div>
         )}
       </div>
-
-      {/* MAIN LAYOUT - iPad-first 2-column grid (768px+) */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-
-        {/* LEFT COLUMN (8 cols) - Main Operations */}
-        <div className="md:col-span-8 space-y-6">
-          {/* 1. At a Glance (High Impact) */}
-          <TodayAtAGlance 
-            data={dashboardData.glance} 
-            activeFilter={activeFilter}
-            onFilterChange={setActiveFilter}
-          />
-
-          {/* 2. Today's Schedule */}
-          <TodayAppointments appointments={appointmentsForDisplay} />
-        </div>
-
-        {/* RIGHT COLUMN (4 cols) - Alerts & Quick Actions */}
-        <div className="md:col-span-4 space-y-6">
-          {/* 1. Watchlist (Critical Alerts) */}
-          <TodaysWatchlist items={dashboardData.watchlist} />
-
-          {/* 2. Quick Actions */}
-          <QuickActions />
-        </div>
-      </div>
     </div>
-  )
-}
-
-function formatTime(isoString: string): string {
-  return new Date(isoString).toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true
-  })
-}
-
-function mapStatus(status: string): 'confirmed' | 'in-progress' | 'pending' {
-  switch (status) {
-    case 'confirmed':
-      return 'confirmed'
-    case 'in_progress':
-    case 'in-progress':
-      return 'in-progress'
-    default:
-      return 'pending'
-  }
-}
-
-function getFlags(appointment: {
-  is_first_visit: boolean
-  dog: { grooming_preferences: { behavior_notes?: string; special_instructions?: string } | null } | null
-}): string[] {
-  const flags: string[] = []
-
-  if (appointment.is_first_visit) {
-    flags.push('first-visit')
-  }
-
-  const prefs = appointment.dog?.grooming_preferences
-  if (prefs?.behavior_notes) {
-    const notes = prefs.behavior_notes.toLowerCase()
-    if (notes.includes('anxious') || notes.includes('nervous')) {
-      flags.push('anxious')
-    }
-    if (notes.includes('nail') || notes.includes('paw')) {
-      flags.push('nail-sensitive')
-    }
-    if (notes.includes('shed')) {
-      flags.push('heavy-shedder')
-    }
-  }
-
-  return flags
+  );
 }

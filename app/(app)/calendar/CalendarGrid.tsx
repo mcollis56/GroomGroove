@@ -9,9 +9,10 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 interface CalendarGridProps {
   selectedDate: string | null
   datesWithAppointments: string[]
+  onDateSelect?: (date: string) => void
 }
 
-export default function CalendarGrid({ selectedDate, datesWithAppointments }: CalendarGridProps) {
+export default function CalendarGrid({ selectedDate, datesWithAppointments, onDateSelect }: CalendarGridProps) {
   const router = useRouter()
   const today = new Date()
   const [currentMonth, setCurrentMonth] = useState(today.getMonth())
@@ -40,7 +41,11 @@ export default function CalendarGrid({ selectedDate, datesWithAppointments }: Ca
 
   const handleDayClick = (day: number) => {
     const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-    router.push(`/calendar?date=${dateStr}`)
+    if (onDateSelect) {
+      onDateSelect(dateStr)
+    } else {
+      router.push(`/calendar?date=${dateStr}`)
+    }
   }
 
   const goToPreviousMonth = () => {
