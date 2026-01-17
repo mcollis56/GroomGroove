@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { format, isValid } from "date-fns";
+import { safeParseDate } from "@/lib/utils/date";
 import { Check, Clock, Play, XCircle } from "lucide-react";
 
 // --- Internal Row Component ---
@@ -14,8 +15,8 @@ function AppointmentRow({ appointment }: { appointment: any }) {
   const [isLoading, setIsLoading] = useState(false);
 
   // Safe Date Formatting
-  const dateObj = new Date(appointment.scheduled_at);
-  const timeString = isValid(dateObj) ? format(dateObj, "h:mm a") : "Time N/A";
+  const dateObj = safeParseDate(appointment.scheduled_at);
+  const timeString = dateObj && isValid(dateObj) ? format(dateObj, "h:mm a") : "Time N/A";
 
   const handleStatusUpdate = async (newStatus: string) => {
     if (isLoading) return;
