@@ -54,7 +54,7 @@ export default async function LandingPage() {
                 </Button>
               </Link>
               <Link href="#features">
-                <Button variant="outline" className="h-12 px-8 rounded-full text-lg">
+<Button className="h-12 px-8 rounded-full text-lg border border-gray-300 bg-white text-gray-900 hover:bg-gray-100">
                   See Features
                 </Button>
               </Link>
