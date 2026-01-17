@@ -18,7 +18,8 @@ export async function POST(req: Request) {
           getAll() {
             return cookieStore.getAll();
           },
-setAll(cookiesToSet: any[]) {            try {
+          setAll(cookiesToSet: any[]) {
+            try {
               cookiesToSet.forEach(({ name, value, options }) =>
                 cookieStore.set(name, value, options)
               );
@@ -37,6 +38,8 @@ setAll(cookiesToSet: any[]) {            try {
     }
 
     const { priceId } = await req.json();
+    
+    // Create Checkout Session with 14-Day Trial
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       payment_method_types: ["card"],
@@ -44,6 +47,12 @@ setAll(cookiesToSet: any[]) {            try {
       customer_email: user.email,
       metadata: { userId: user.id },
       client_reference_id: user.id,
+      
+      // THIS IS THE MAGIC PART
+      subscription_data: {
+        trial_period_days: 14,
+      },
+      
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?payment=success`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing?payment=cancelled`,
     });
