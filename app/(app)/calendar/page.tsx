@@ -70,7 +70,6 @@ export default function CalendarPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [dogs, setDogs] = useState<Dog[]>([])
   const [datesWithAppointments, setDatesWithAppointments] = useState<string[]>([])
-  const [loading, setLoading] = useState(true)
   const [isBookingMode, setIsBookingMode] = useState(false)
   const [bookingForm, setBookingForm] = useState({
     time: '09:00',
@@ -97,8 +96,6 @@ export default function CalendarPage() {
 
   useEffect(() => {
     async function loadData() {
-      setLoading(true)
-      
       // Load appointments
       const { data: appointmentsData, error: appointmentsError } = await supabase
         .from('appointments')
@@ -124,7 +121,7 @@ export default function CalendarPage() {
         
         setAppointments(allAppointments)
         
-        // Get dates that have appointments (for calendar indicators)
+        // Get dates that have appointments
         const dates = [...new Set(allAppointments.map(appt => getDateFromISO(appt.scheduled_at)))]
         setDatesWithAppointments(dates)
       }
@@ -149,16 +146,17 @@ export default function CalendarPage() {
         setDogs(dogsList)
         
         // Set default dog if available
-        if (dogsList.length > 0 && !bookingForm.dogId) {
-          setBookingForm(prev => ({ ...prev, dogId: dogsList[0].id }))
+        if (dogsList.length > 0) {
+            setBookingForm(prev => {
+                if (!prev.dogId) return { ...prev, dogId: dogsList[0].id }
+                return prev
+            })
         }
       }
-
-      setLoading(false)
     }
 
     loadData()
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Get appointments for selected date
   const selectedDateAppointments = selectedDate
@@ -168,7 +166,7 @@ export default function CalendarPage() {
   // Handle date selection from calendar
   const handleDateSelect = (date: string) => {
     router.push(`/calendar?date=${date}`)
-    setIsBookingMode(false) // Exit booking mode when selecting new date
+    setIsBookingMode(false)
   }
 
   // Handle quick booking form submission
@@ -192,7 +190,7 @@ export default function CalendarPage() {
 
       if (error) throw error
 
-      // Refresh appointments
+      // Refresh appointments manually
       const { data: newAppointments } = await supabase
         .from('appointments')
         .select(`
@@ -236,7 +234,6 @@ export default function CalendarPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Calendar</h1>
@@ -248,20 +245,16 @@ export default function CalendarPage() {
         </Button>
       </div>
 
-      {/* Main Content - Calendar and Day Manager */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Calendar Grid - Left Panel */}
         <CalendarGrid
           selectedDate={selectedDate}
           datesWithAppointments={datesWithAppointments}
           onDateSelect={handleDateSelect}
         />
 
-        {/* Day Manager - Right Panel */}
         <Card>
           {selectedDate ? (
             <div className="h-full flex flex-col">
-              {/* Day Manager Header */}
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900">
@@ -283,10 +276,8 @@ export default function CalendarPage() {
                 )}
               </div>
 
-              {/* Content Area */}
               <div className="flex-1 overflow-y-auto">
                 {isBookingMode ? (
-                  // Quick Booking Form
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <h4 className="font-medium text-gray-900">Quick Booking</h4>
@@ -300,7 +291,6 @@ export default function CalendarPage() {
                     </div>
                     
                     <div className="space-y-3">
-                      {/* Time Selector */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           <Clock className="w-4 h-4 inline mr-1" />
@@ -317,7 +307,6 @@ export default function CalendarPage() {
                         </select>
                       </div>
 
-                      {/* Dog Selector */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           <DogIcon className="w-4 h-4 inline mr-1" />
@@ -337,7 +326,6 @@ export default function CalendarPage() {
                         </select>
                       </div>
 
-                      {/* Service Selector */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           Service
@@ -353,7 +341,6 @@ export default function CalendarPage() {
                         </select>
                       </div>
 
-                      {/* Action Buttons */}
                       <div className="flex gap-2 pt-2">
                         <Button
                           onClick={() => setIsBookingMode(false)}
@@ -372,7 +359,6 @@ export default function CalendarPage() {
                     </div>
                   </div>
                 ) : (
-                  // Appointments List
                   <>
                     {selectedDateAppointments.length > 0 ? (
                       <div className="space-y-3">
@@ -408,7 +394,6 @@ export default function CalendarPage() {
                                   )}
                                 </div>
                               </div>
-                              {/* Checkout button for non-completed appointments */}
                               {appt.status !== 'completed' && appt.status !== 'cancelled' && (
                                 <a href={`/checkout/${appt.id}`}>
                                   <button className="flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors">
