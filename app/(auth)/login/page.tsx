@@ -39,8 +39,8 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
             <Image
-              src="/oh-my-dawg-logo.png"
-              alt="Oh My Dawg! Grooming"
+              src="/logo.png"
+              alt="Groom Groove"
               width={200}
               height={140}
               priority
