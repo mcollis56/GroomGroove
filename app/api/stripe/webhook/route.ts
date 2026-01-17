@@ -1,4 +1,3 @@
-cat <<EOF > app/api/stripe/webhook/route.ts
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
@@ -27,8 +26,8 @@ export async function POST(req: Request) {
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (error: any) {
-    console.error(\`Webhook Signature Error: \${error.message}\`);
-    return new NextResponse(\`Webhook Error: \${error.message}\`, { status: 400 });
+    console.error(`Webhook Signature Error: ${error.message}`);
+    return new NextResponse(`Webhook Error: ${error.message}`, { status: 400 });
   }
 
   const session = event.data.object as Stripe.Checkout.Session;
@@ -42,7 +41,7 @@ export async function POST(req: Request) {
         return new NextResponse("Error: No userId in metadata", { status: 400 });
       }
 
-      console.log(\`Payment success for user \${userId}\`);
+      console.log(`Payment success for user ${userId}`);
 
       // Update Supabase
       // 1. Try updating 'subscriptions' table if it exists
@@ -73,4 +72,3 @@ export async function POST(req: Request) {
 
   return new NextResponse(null, { status: 200 });
 }
-EOF
