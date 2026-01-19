@@ -12,6 +12,7 @@ export interface Groomer {
   color: string | null
   avatar_url: string | null
   is_active: boolean
+  on_duty: boolean
   created_at: string
   updated_at: string
 }
@@ -123,4 +124,73 @@ export async function deleteGroomer(id: string): Promise<{ success: boolean; err
 
   revalidatePath('/groomers')
   return { success: true }
+}
+
+/**
+ * Set groomer on_duty status (clock in/out)
+ */
+export async function setGroomerOnDuty(
+  id: string,
+  onDuty: boolean
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from('groomers')
+    .update({
+      on_duty: onDuty,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id)
+
+  if (error) {
+    console.error('[Groomers] Set on_duty failed:', error)
+    return { success: false, error: error.message }
+  }
+
+  revalidatePath('/dashboard')
+  revalidatePath('/groomers')
+  return { success: true }
+}
+
+/**
+ * Get groomers currently on duty
+ */
+export async function getGroomersOnDuty(): Promise<Groomer[]> {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('groomers')
+    .select('*')
+    .eq('is_active', true)
+    .eq('on_duty', true)
+    .order('name', { ascending: true })
+
+  if (error) {
+    console.error('[Groomers] Fetch on duty failed:', error)
+    return []
+  }
+
+  return data || []
+}
+
+/**
+ * Get groomers currently off duty
+ */
+export async function getGroomersOffDuty(): Promise<Groomer[]> {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('groomers')
+    .select('*')
+    .eq('is_active', true)
+    .eq('on_duty', false)
+    .order('name', { ascending: true })
+
+  if (error) {
+    console.error('[Groomers] Fetch off duty failed:', error)
+    return []
+  }
+
+  return data || []
 }

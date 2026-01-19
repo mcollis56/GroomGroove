@@ -1,9 +1,11 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import TodayAppointments from "@/components/dashboard/TodayAppointments";
+import { GroomersOnDeck } from "@/components/dashboard/GroomersOnDeck";
 import Link from "next/link";
 import { Plus, Calendar, Smile, Clock } from "lucide-react";
 import { formatTime } from "@/lib/utils/date";
+import { getGroomersOnDuty, getGroomersOffDuty } from "@/lib/actions/groomers";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -13,17 +15,22 @@ export default async function DashboardPage() {
 
   const today = new Date().toISOString().split('T')[0];
 
-  // Fetch ONLY active appointments (Not cancelled/completed)
-  const { data: appointments, error } = await supabase
-    .from("appointments")
-    .select(`*, dog:dogs(id, name, grooming_preferences), customer:customers(id, name)`)
-    .gte('scheduled_at', `${today}T00:00:00`)
-    .lt('scheduled_at', `${today}T23:59:59`)
-    .in('status', ['pending', 'confirmed', 'in_progress']) // Only active work
-    .order('scheduled_at', { ascending: true });
+  // Fetch appointments and groomers in parallel
+  const [appointmentsResult, onDutyGroomers, offDutyGroomers] = await Promise.all([
+    supabase
+      .from("appointments")
+      .select(`*, dog:dogs(id, name, grooming_preferences), customer:customers(id, name)`)
+      .gte('scheduled_at', `${today}T00:00:00`)
+      .lt('scheduled_at', `${today}T23:59:59`)
+      .in('status', ['pending', 'confirmed', 'in_progress'])
+      .order('scheduled_at', { ascending: true }),
+    getGroomersOnDuty(),
+    getGroomersOffDuty(),
+  ]);
 
+  const appointments = appointmentsResult.data;
   const remainingJobs = appointments?.length || 0;
-  const nextJob = appointments?.[0]; // The very next one
+  const nextJob = appointments?.[0];
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -70,6 +77,14 @@ export default async function DashboardPage() {
           <div className="bg-yellow-50 p-3 rounded-full mb-2 group-hover:bg-yellow-100"><Smile className="h-6 w-6 text-yellow-600" /></div>
           <span className="font-semibold text-gray-700">Groomers</span>
         </Link>
+      </div>
+
+      {/* --- GROOMERS ON DECK --- */}
+      <div className="mb-8">
+        <GroomersOnDeck
+          onDutyGroomers={onDutyGroomers}
+          offDutyGroomers={offDutyGroomers}
+        />
       </div>
 
       {/* --- ACTIVE SCHEDULE --- */}
