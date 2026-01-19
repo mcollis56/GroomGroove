@@ -37,9 +37,10 @@ export async function POST(req: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { priceId } = await req.json();
-    
-    // Create Checkout Session with 14-Day Trial
+    const { priceId, skipTrial } = await req.json();
+
+    const subscription_data = skipTrial ? {} : { trial_period_days: 14 };
+
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       payment_method_types: ["card"],
@@ -47,12 +48,7 @@ export async function POST(req: Request) {
       customer_email: user.email,
       metadata: { userId: user.id },
       client_reference_id: user.id,
-      
-      // THIS IS THE MAGIC PART
-      subscription_data: {
-        trial_period_days: 14,
-      },
-      
+      subscription_data,
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?payment=success`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing?payment=cancelled`,
     });
