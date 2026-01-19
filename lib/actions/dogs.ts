@@ -135,7 +135,10 @@ function getDemoDogDetail(demoId: string): DogDetail | null {
 
 // Grooming preferences structure
 export interface GroomingPreferences {
-  clipping_length?: string
+  blade_size?: string
+  comb_attachment?: string
+  default_service?: string
+  clipping_length?: string  // Legacy field
   clipping_notes?: string
   nail_clipper_size?: 'small' | 'medium' | 'large'
   nail_tool?: 'clipper' | 'grinder'

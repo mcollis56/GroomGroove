@@ -75,17 +75,63 @@ export function EditableGroomingPreferences({ dogId, initialPreferences, isDemo 
 
         {isEditing ? (
           <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Blade Size
+                </label>
+                <select
+                  value={preferences.blade_size || ''}
+                  onChange={(e) => setPreferences({ ...preferences, blade_size: e.target.value })}
+                  className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                >
+                  <option value="">Select blade</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5f">5f</option>
+                  <option value="7f">7f</option>
+                  <option value="10">10</option>
+                  <option value="15">15</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Comb Attachment
+                </label>
+                <select
+                  value={preferences.comb_attachment || ''}
+                  onChange={(e) => setPreferences({ ...preferences, comb_attachment: e.target.value })}
+                  className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                >
+                  <option value="">Select comb</option>
+                  <option value="3mm">3mm</option>
+                  <option value="6mm">6mm</option>
+                  <option value="10mm">10mm</option>
+                  <option value="13mm">13mm</option>
+                  <option value="16mm">16mm</option>
+                  <option value="19mm">19mm</option>
+                </select>
+              </div>
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Clipping Length
+                Default Service
               </label>
-              <input
-                type="text"
-                value={preferences.clipping_length || ''}
-                onChange={(e) => setPreferences({ ...preferences, clipping_length: e.target.value })}
-                placeholder="e.g. #4 blade all over"
-                className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent text-sm"
-              />
+              <select
+                value={preferences.default_service || ''}
+                onChange={(e) => setPreferences({ ...preferences, default_service: e.target.value })}
+                className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+              >
+                <option value="">Select service</option>
+                <option value="Full Groom">Full Groom</option>
+                <option value="Bath and tidy">Bath and tidy</option>
+                <option value="Bath and dry">Bath and dry</option>
+                <option value="Bath/tidy/de-shed">Bath/tidy/de-shed</option>
+                <option value="Nail trim">Nail trim</option>
+                <option value="Puppy Groom">Puppy Groom</option>
+              </select>
             </div>
 
             <div>
@@ -95,42 +141,9 @@ export function EditableGroomingPreferences({ dogId, initialPreferences, isDemo 
               <textarea
                 value={preferences.clipping_notes || ''}
                 onChange={(e) => setPreferences({ ...preferences, clipping_notes: e.target.value })}
-                placeholder="e.g. Shorter on belly..."
-                className="w-full h-16 p-2 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent text-sm"
+                placeholder="e.g. Shorter on belly, leave tail fluffy..."
+                className="w-full h-16 p-2 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Nail Tool
-                </label>
-                <select
-                  value={preferences.nail_tool || ''}
-                  onChange={(e) => setPreferences({ ...preferences, nail_tool: e.target.value as 'clipper' | 'grinder' })}
-                  className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent text-sm"
-                >
-                  <option value="">Select</option>
-                  <option value="clipper">Clipper</option>
-                  <option value="grinder">Grinder</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Clipper Size
-                </label>
-                <select
-                  value={preferences.nail_clipper_size || ''}
-                  onChange={(e) => setPreferences({ ...preferences, nail_clipper_size: e.target.value as 'small' | 'medium' | 'large' })}
-                  className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent text-sm"
-                >
-                  <option value="">Select</option>
-                  <option value="small">Small</option>
-                  <option value="medium">Medium</option>
-                  <option value="large">Large</option>
-                </select>
-              </div>
             </div>
 
             <div>
@@ -141,7 +154,7 @@ export function EditableGroomingPreferences({ dogId, initialPreferences, isDemo 
                 value={preferences.coat_notes || ''}
                 onChange={(e) => setPreferences({ ...preferences, coat_notes: e.target.value })}
                 placeholder="e.g. Heavy shedder..."
-                className="w-full h-16 p-2 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent text-sm"
+                className="w-full h-16 p-2 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               />
             </div>
 
@@ -153,7 +166,7 @@ export function EditableGroomingPreferences({ dogId, initialPreferences, isDemo 
                 value={preferences.behavior_notes || ''}
                 onChange={(e) => setPreferences({ ...preferences, behavior_notes: e.target.value })}
                 placeholder="e.g. Anxious around dryers..."
-                className="w-full h-16 p-2 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent text-sm"
+                className="w-full h-16 p-2 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               />
             </div>
 
@@ -165,37 +178,37 @@ export function EditableGroomingPreferences({ dogId, initialPreferences, isDemo 
                 value={preferences.special_instructions || ''}
                 onChange={(e) => setPreferences({ ...preferences, special_instructions: e.target.value })}
                 placeholder="e.g. Use calming spray..."
-                className="w-full h-16 p-2 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent text-sm"
+                className="w-full h-16 p-2 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               />
             </div>
           </div>
         ) : (
-          <div 
+          <div
             onClick={() => setIsEditing(true)}
             className="space-y-4 cursor-pointer hover:bg-gray-50 -mx-2 -mb-2 p-2 rounded-lg transition-colors"
           >
-            {preferences.clipping_length && (
+            {preferences.blade_size && (
               <div>
-                <p className="text-sm text-gray-500">Clipping Length</p>
-                <p className="text-gray-900">{preferences.clipping_length}</p>
+                <p className="text-sm text-gray-500">Blade Size</p>
+                <p className="text-gray-900">{preferences.blade_size}</p>
+              </div>
+            )}
+            {preferences.comb_attachment && (
+              <div>
+                <p className="text-sm text-gray-500">Comb Attachment</p>
+                <p className="text-gray-900">{preferences.comb_attachment}</p>
+              </div>
+            )}
+            {preferences.default_service && (
+              <div>
+                <p className="text-sm text-gray-500">Default Service</p>
+                <p className="text-gray-900">{preferences.default_service}</p>
               </div>
             )}
             {preferences.clipping_notes && (
               <div>
                 <p className="text-sm text-gray-500">Clipping Notes</p>
                 <p className="text-gray-900">{preferences.clipping_notes}</p>
-              </div>
-            )}
-            {preferences.nail_tool && (
-              <div>
-                <p className="text-sm text-gray-500">Nail Tool</p>
-                <p className="text-gray-900 capitalize">{preferences.nail_tool}</p>
-              </div>
-            )}
-            {preferences.nail_clipper_size && (
-              <div>
-                <p className="text-sm text-gray-500">Nail Clipper Size</p>
-                <p className="text-gray-900 capitalize">{preferences.nail_clipper_size}</p>
               </div>
             )}
             {preferences.coat_notes && (
@@ -687,21 +700,71 @@ export function DogQuickActions({ dogId, dogName, customerPhone, photoUrl, groom
         size="lg"
       >
         <div className="p-6 space-y-6">
-          {/* Clipping */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Clipping Length
-            </label>
-            <input
-              type="text"
-              value={preferences.clipping_length || ''}
-              onChange={(e) => setPreferences({ ...preferences, clipping_length: e.target.value })}
-              placeholder="e.g. #4 blade all over, 1/2 inch, etc."
-              className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
-              disabled={saving || saved}
-            />
+          {/* Blade & Comb */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Blade Size
+              </label>
+              <select
+                value={preferences.blade_size || ''}
+                onChange={(e) => setPreferences({ ...preferences, blade_size: e.target.value })}
+                className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled={saving || saved}
+              >
+                <option value="">Select blade</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5f">5f</option>
+                <option value="7f">7f</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Comb Attachment
+              </label>
+              <select
+                value={preferences.comb_attachment || ''}
+                onChange={(e) => setPreferences({ ...preferences, comb_attachment: e.target.value })}
+                className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled={saving || saved}
+              >
+                <option value="">Select comb</option>
+                <option value="3mm">3mm</option>
+                <option value="6mm">6mm</option>
+                <option value="10mm">10mm</option>
+                <option value="13mm">13mm</option>
+                <option value="16mm">16mm</option>
+                <option value="19mm">19mm</option>
+              </select>
+            </div>
           </div>
 
+          {/* Default Service */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Default Service
+            </label>
+            <select
+              value={preferences.default_service || ''}
+              onChange={(e) => setPreferences({ ...preferences, default_service: e.target.value })}
+              className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              disabled={saving || saved}
+            >
+              <option value="">Select service</option>
+              <option value="Full Groom">Full Groom</option>
+              <option value="Bath and tidy">Bath and tidy</option>
+              <option value="Bath and dry">Bath and dry</option>
+              <option value="Bath/tidy/de-shed">Bath/tidy/de-shed</option>
+              <option value="Nail trim">Nail trim</option>
+              <option value="Puppy Groom">Puppy Groom</option>
+            </select>
+          </div>
+
+          {/* Clipping Notes */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Clipping Notes
@@ -710,45 +773,9 @@ export function DogQuickActions({ dogId, dogName, customerPhone, photoUrl, groom
               value={preferences.clipping_notes || ''}
               onChange={(e) => setPreferences({ ...preferences, clipping_notes: e.target.value })}
               placeholder="e.g. Shorter on belly, leave tail fluffy..."
-              className="w-full h-20 p-3 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+              className="w-full h-20 p-3 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               disabled={saving || saved}
             />
-          </div>
-
-          {/* Nails */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Nail Tool
-              </label>
-              <select
-                value={preferences.nail_tool || ''}
-                onChange={(e) => setPreferences({ ...preferences, nail_tool: e.target.value as 'clipper' | 'grinder' })}
-                className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
-                disabled={saving || saved}
-              >
-                <option value="">Select tool</option>
-                <option value="clipper">Clipper</option>
-                <option value="grinder">Grinder</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Clipper Size (if applicable)
-              </label>
-              <select
-                value={preferences.nail_clipper_size || ''}
-                onChange={(e) => setPreferences({ ...preferences, nail_clipper_size: e.target.value as 'small' | 'medium' | 'large' })}
-                className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
-                disabled={saving || saved}
-              >
-                <option value="">Select size</option>
-                <option value="small">Small</option>
-                <option value="medium">Medium</option>
-                <option value="large">Large</option>
-              </select>
-            </div>
           </div>
 
           {/* Coat Notes */}
@@ -760,7 +787,7 @@ export function DogQuickActions({ dogId, dogName, customerPhone, photoUrl, groom
               value={preferences.coat_notes || ''}
               onChange={(e) => setPreferences({ ...preferences, coat_notes: e.target.value })}
               placeholder="e.g. Heavy shedder, matting behind ears, sensitive skin..."
-              className="w-full h-20 p-3 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+              className="w-full h-20 p-3 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               disabled={saving || saved}
             />
           </div>
@@ -774,7 +801,7 @@ export function DogQuickActions({ dogId, dogName, customerPhone, photoUrl, groom
               value={preferences.behavior_notes || ''}
               onChange={(e) => setPreferences({ ...preferences, behavior_notes: e.target.value })}
               placeholder="e.g. Anxious around dryers, doesn't like paws touched..."
-              className="w-full h-20 p-3 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+              className="w-full h-20 p-3 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               disabled={saving || saved}
             />
           </div>
@@ -788,7 +815,7 @@ export function DogQuickActions({ dogId, dogName, customerPhone, photoUrl, groom
               value={preferences.special_instructions || ''}
               onChange={(e) => setPreferences({ ...preferences, special_instructions: e.target.value })}
               placeholder="e.g. Use calming spray, take frequent breaks..."
-              className="w-full h-20 p-3 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+              className="w-full h-20 p-3 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               disabled={saving || saved}
             />
           </div>
