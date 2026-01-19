@@ -230,7 +230,7 @@ export function NewAppointmentForm({ customers, dogs }: NewAppointmentFormProps)
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Services</label>
                 <div className="grid grid-cols-2 gap-2">
-                {['Bath and tidy', 'Bath and dry', 'Bath/tidy/de-shed', 'Nail trim', 'Puppy Groom'].map((service) => (
+                {['Full Groom', 'Bath and tidy', 'Bath and dry', 'Bath/tidy/de-shed', 'Nail trim', 'Puppy Groom'].map((service) => (
                   <label key={service} className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
                     <input type="checkbox" name="services" value={service} className="rounded text-rose-600" />
                     <span className="text-sm">{service}</span>
