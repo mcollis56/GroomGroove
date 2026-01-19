@@ -1,101 +1,117 @@
-'use client'
+"use client"
 
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
-import { User, Bell, CreditCard, Shield } from 'lucide-react'
+import { useState, useEffect } from "react"
+import { createClient } from "@/utils/supabase/client"
+import { Button } from "@/components/ui/Button"
+import { Input } from "@/components/ui/Input"
+import { Label } from "@/components/ui/Label"
 
 export default function SettingsPage() {
+  const supabase = createClient()
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  
+  // Form State
+  const [businessName, setBusinessName] = useState("")
+  const [email, setEmail] = useState("")
+  const [phone, setPhone] = useState("")
+  const [address, setAddress] = useState("")
+
+  useEffect(() => {
+    async function loadSettings() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      const { data } = await supabase
+        .from("business_settings")
+        .select("*")
+        .eq("user_id", user.id)
+        .single()
+
+      if (data) {
+        setBusinessName(data.business_name || "")
+        setEmail(data.contact_email || "")
+        setPhone(data.phone || "")
+        setAddress(data.address || "")
+      }
+      setLoading(false)
+    }
+    loadSettings()
+  }, [])
+
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault()
+    setSaving(true)
+    
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    const { error } = await supabase
+      .from("business_settings")
+      .upsert({
+        user_id: user.id,
+        business_name: businessName,
+        contact_email: email,
+        phone: phone,
+        address: address,
+        updated_at: new Date().toISOString()
+      })
+
+    setSaving(false)
+    if (error) {
+      alert("Error saving settings: " + error.message)
+    } else {
+      alert("Settings saved!")
+    }
+  }
+
+  if (loading) return <div className="p-8">Loading settings...</div>
+
   return (
-    <div className="space-y-6 max-w-3xl">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-500">Manage your account and preferences</p>
-      </div>
+    <div className="max-w-2xl mx-auto p-6">
+      <h1 className="text-2xl font-bold mb-6">Business Settings</h1>
+      
+      <form onSubmit={handleSave} className="space-y-6 bg-white p-6 rounded-xl border border-gray-200">
+        <div className="space-y-2">
+          <Label>Business Name</Label>
+          <Input 
+            value={businessName} 
+            onChange={(e) => setBusinessName(e.target.value)} 
+            placeholder="My Grooming Salon" 
+          />
+        </div>
 
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-rose-100 rounded-lg">
-              <User className="w-5 h-5 text-rose-600" />
-            </div>
-            <CardTitle>Profile</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              type="email"
-              disabled
-              className="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-xl text-sm text-gray-500"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Business Name</label>
-            <input
-              type="text"
-              placeholder="Your grooming business name"
-              className="w-full px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-300"
-            />
-          </div>
-          <Button>Save Changes</Button>
-        </CardContent>
-      </Card>
+        <div className="space-y-2">
+          <Label>Contact Email</Label>
+          <Input 
+            value={email} 
+            onChange={(e) => setEmail(e.target.value)} 
+            placeholder="hello@salon.com" 
+          />
+        </div>
 
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Bell className="w-5 h-5 text-blue-600" />
-            </div>
-            <CardTitle>Notifications</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium text-gray-900">Email Notifications</p>
-              <p className="text-sm text-gray-500">Receive appointment reminders</p>
-            </div>
-            <input type="checkbox" defaultChecked className="w-5 h-5 accent-rose-500" />
-          </div>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium text-gray-900">SMS Reminders</p>
-              <p className="text-sm text-gray-500">Send SMS to clients</p>
-            </div>
-            <input type="checkbox" className="w-5 h-5 accent-rose-500" />
-          </div>
-        </CardContent>
-      </Card>
+        <div className="space-y-2">
+          <Label>Phone Number</Label>
+          <Input 
+            value={phone} 
+            onChange={(e) => setPhone(e.target.value)} 
+            placeholder="(555) 123-4567" 
+          />
+        </div>
 
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <CreditCard className="w-5 h-5 text-green-600" />
-            </div>
-            <CardTitle>Billing</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-gray-500">Billing integration coming soon...</p>
-        </CardContent>
-      </Card>
+        <div className="space-y-2">
+          <Label>Address</Label>
+          <Input 
+            value={address} 
+            onChange={(e) => setAddress(e.target.value)} 
+            placeholder="123 Dog St..." 
+          />
+        </div>
 
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-amber-100 rounded-lg">
-              <Shield className="w-5 h-5 text-amber-600" />
-            </div>
-            <CardTitle>Security</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Button variant="secondary">Change Password</Button>
-        </CardContent>
-      </Card>
+        <Button type="submit" disabled={saving} className="w-full bg-purple-600 hover:bg-purple-700 text-white">
+          {saving ? "Saving..." : "Save Changes"}
+        </Button>
+      </form>
     </div>
   )
 }
