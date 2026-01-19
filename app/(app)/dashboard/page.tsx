@@ -66,9 +66,9 @@ export default async function DashboardPage() {
           <div className="bg-blue-50 p-3 rounded-full mb-2 group-hover:bg-blue-100"><Calendar className="h-6 w-6 text-blue-600" /></div>
           <span className="font-semibold text-gray-700">Book Appt</span>
         </Link>
-        <Link href="/team" className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center hover:border-yellow-300 transition-colors group">
+        <Link href="/groomers" className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center hover:border-yellow-300 transition-colors group">
           <div className="bg-yellow-50 p-3 rounded-full mb-2 group-hover:bg-yellow-100"><Smile className="h-6 w-6 text-yellow-600" /></div>
-          <span className="font-semibold text-gray-700">Team</span>
+          <span className="font-semibold text-gray-700">Groomers</span>
         </Link>
       </div>
 

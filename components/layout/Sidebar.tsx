@@ -12,7 +12,7 @@ const navItems = [
   { href: '/dogs', label: 'Dogs', icon: Dog },
   { href: '/calendar', label: 'Calendar', icon: Calendar },
   { href: '/photos', label: 'Photos', icon: ImageIcon },
-  { href: '/team', label: 'Team', icon: Smile },
+  { href: '/groomers', label: 'Groomers', icon: Smile },
   { href: '/notifications', label: 'Notifications', icon: Bell },
   { href: '/history', label: 'History', icon: Clock },
   { href: '/settings', label: 'Settings', icon: Settings },
