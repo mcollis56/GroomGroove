@@ -2,7 +2,7 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import TodayAppointments from "@/components/dashboard/TodayAppointments";
 import Link from "next/link";
-import { Plus, Calendar, MessageSquare, Clock } from "lucide-react";
+import { Plus, Calendar, Smile, Clock } from "lucide-react";
 import { formatTime } from "@/lib/utils/date";
 
 export default async function DashboardPage() {
@@ -66,9 +66,9 @@ export default async function DashboardPage() {
           <div className="bg-blue-50 p-3 rounded-full mb-2 group-hover:bg-blue-100"><Calendar className="h-6 w-6 text-blue-600" /></div>
           <span className="font-semibold text-gray-700">Book Appt</span>
         </Link>
-        <Link href="/messages" className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center hover:border-green-300 transition-colors group">
-          <div className="bg-green-50 p-3 rounded-full mb-2 group-hover:bg-green-100"><MessageSquare className="h-6 w-6 text-green-600" /></div>
-          <span className="font-semibold text-gray-700">Messages</span>
+        <Link href="/team" className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center hover:border-yellow-300 transition-colors group">
+          <div className="bg-yellow-50 p-3 rounded-full mb-2 group-hover:bg-yellow-100"><Smile className="h-6 w-6 text-yellow-600" /></div>
+          <span className="font-semibold text-gray-700">Team</span>
         </Link>
       </div>
 

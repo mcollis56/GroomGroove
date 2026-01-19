@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { Home, Users, Dog, Calendar, Bell, Clock, Settings, Image as ImageIcon } from 'lucide-react'
+import { Home, Users, Dog, Calendar, Bell, Clock, Settings, Image as ImageIcon, Smile } from 'lucide-react'
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: Home },
@@ -12,6 +12,7 @@ const navItems = [
   { href: '/dogs', label: 'Dogs', icon: Dog },
   { href: '/calendar', label: 'Calendar', icon: Calendar },
   { href: '/photos', label: 'Photos', icon: ImageIcon },
+  { href: '/team', label: 'Team', icon: Smile },
   { href: '/notifications', label: 'Notifications', icon: Bell },
   { href: '/history', label: 'History', icon: Clock },
   { href: '/settings', label: 'Settings', icon: Settings },
