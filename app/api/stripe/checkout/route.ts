@@ -1,10 +1,12 @@
-import { createServerClient } from "@supabase/ssr";
+\import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
+// 1. Force Stable API Version
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2023-10-16" as any,
+  apiVersion: "2023-10-16" as any, 
+  typescript: true,
 });
 
 export async function POST(req: Request) {
@@ -17,11 +19,11 @@ export async function POST(req: Request) {
         cookies: {
           getAll() { return cookieStore.getAll() },
           setAll(cookiesToSet: any[]) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              );
-            } catch {}
+             try {
+               cookiesToSet.forEach(({ name, value, options }) =>
+                 cookieStore.set(name, value, options)
+               );
+             } catch {}
           },
         },
       }
@@ -30,14 +32,17 @@ export async function POST(req: Request) {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      console.error("User not found in session");
+      console.error("User not found");
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
     const body = await req.json();
     const { priceId, skipTrial } = body;
-    
-    // Construct the session payload dynamically
+
+    // 2. HARDCODED URLS (To rule out Env Var issues)
+    const success_url = "https://groom-groove.vercel.app/dashboard?payment=success";
+    const cancel_url = "https://groom-groove.vercel.app/pricing?payment=cancelled";
+
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: "subscription",
       payment_method_types: ["card"],
@@ -45,18 +50,17 @@ export async function POST(req: Request) {
       customer_email: user.email,
       metadata: { userId: user.id },
       client_reference_id: user.id,
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?payment=success`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing?payment=cancelled`,
+      success_url: success_url,
+      cancel_url: cancel_url,
     };
 
-    // ONLY add subscription_data if we are doing a trial
     if (!skipTrial) {
       sessionParams.subscription_data = {
         trial_period_days: 14,
       };
     }
 
-    console.log("Creating Stripe Session with params:", JSON.stringify(sessionParams));
+    console.log("Creating session...");
     const session = await stripe.checkout.sessions.create(sessionParams);
 
     return NextResponse.json({ sessionId: session.id, url: session.url });
