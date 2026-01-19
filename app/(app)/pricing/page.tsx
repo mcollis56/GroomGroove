@@ -8,7 +8,7 @@ export default function PricingPage() {
   const [loadingTrial, setLoadingTrial] = useState(false);
   const [loadingBuy, setLoadingBuy] = useState(false);
 
-  const PRICE_ID = "price_1SpjQlGzqO94XgciE9C3FjsE";
+const PRICE_ID = "price_1SpjQlGzqO94XgciE9C3FJsE"
 
    async function handleCheckout(skipTrial: boolean) {
     if (skipTrial) setLoadingBuy(true)
