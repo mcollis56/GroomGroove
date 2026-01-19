@@ -17,16 +17,17 @@ export default async function DashboardPage() {
     .from("subscriptions")
     .select("status, current_period_end")
     .eq("user_id", user.id)
-    .single();
+    .order("current_period_end", { ascending: false }) // Get the latest one
+    .limit(1)
+    .maybeSingle(); // Don't crash if 0 or multiple rows exist
 
+  // If no sub, OR sub is expired -> Redirect
   if (!subscription) {
     redirect("/pricing");
   }
 
-  const expiryDate = new Date(subscription.current_period_end);
-  const now = new Date();
-
-  if (expiryDate < now) {
+  const expiry = new Date(subscription.current_period_end);
+  if (expiry < new Date()) {
     redirect("/pricing?expired=true");
   }
 
