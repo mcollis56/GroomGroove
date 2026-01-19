@@ -13,17 +13,21 @@ export default async function DashboardPage() {
 
   if (!user) redirect("/login");
 
-  // --- FIX: Check the CORRECT table 'subscriptions' ---
   const { data: subscription } = await supabase
-    .from("subscriptions") // <--- CHANGED FROM 'user_subscriptions'
-    .select("status")
+    .from("subscriptions")
+    .select("status, current_period_end")
     .eq("user_id", user.id)
-    .in("status", ["active", "trialing"])
     .single();
 
-  // Redirect to pricing if no active subscription
   if (!subscription) {
     redirect("/pricing");
+  }
+
+  const expiryDate = new Date(subscription.current_period_end);
+  const now = new Date();
+
+  if (expiryDate < now) {
+    redirect("/pricing?expired=true");
   }
 
   const today = new Date().toISOString().split('T')[0];

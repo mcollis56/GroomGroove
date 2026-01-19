@@ -8,40 +8,34 @@ export default function PricingPage() {
   const [loadingTrial, setLoadingTrial] = useState(false);
   const [loadingBuy, setLoadingBuy] = useState(false);
 
-const PRICE_ID = "price_1SpjQlGzqO94XgciE9C3FJsE"
+  const PRICE_ID = "price_1SpjQlGzqO94XgciE9C3FJsE";
 
-   async function handleCheckout(skipTrial: boolean) {
-    if (skipTrial) setLoadingBuy(true)
-    else setLoadingTrial(true)
+  async function handleCheckout(skipTrial: boolean) {
+    if (skipTrial) setLoadingBuy(true);
+    else setLoadingTrial(true);
 
     try {
-      const res = await fetch("/api/stripe/checkout", {
+      const endpoint = skipTrial ? "/api/stripe/checkout" : "/api/trial/start";
+
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           priceId: PRICE_ID,
-          skipTrial: skipTrial 
+          skipTrial: skipTrial,
         }),
-      })
-      
-      // READ THE ERROR MESSAGE
-      const text = await res.text(); 
-      
-      if (!res.ok) {
-        // ALERT THE EXACT ERROR
-        alert("STRIPE ERROR:\n" + text); 
-        throw new Error(text);
-      }
+      });
 
+      const text = await res.text();
+      if (!res.ok) throw new Error(text);
       const data = JSON.parse(text);
-      if (data.url) {
-        window.location.href = data.url
-      }
+      if (data.url) window.location.href = data.url;
     } catch (error) {
-      console.error(error)
+      console.error(error);
+      alert("Error: " + error);
     } finally {
-      setLoadingTrial(false)
-      setLoadingBuy(false)
+      setLoadingTrial(false);
+      setLoadingBuy(false);
     }
   }
 
