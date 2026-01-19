@@ -17,6 +17,7 @@ export default function DogForm({ onSuccess }: { onSuccess?: () => void }) {
     breed: '',
     clipper_blade_size: '10',
     comb_attachment: '',
+    default_service: '',
     nail_clipper_size: '',
     grooming_notes: '',
     behavioral_notes: ''
@@ -40,6 +41,14 @@ export default function DogForm({ onSuccess }: { onSuccess?: () => void }) {
     { value: '19mm', label: '19mm' },
   ]
 
+  const DEFAULT_SERVICES = [
+    { value: 'Bath and tidy', label: 'Bath and tidy' },
+    { value: 'Bath and dry', label: 'Bath and dry' },
+    { value: 'Bath/tidy/de-shed', label: 'Bath/tidy/de-shed' },
+    { value: 'Nail trim', label: 'Nail trim' },
+    { value: 'Puppy Groom', label: 'Puppy Groom' },
+  ]
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -50,6 +59,15 @@ export default function DogForm({ onSuccess }: { onSuccess?: () => void }) {
       
       if (!user) throw new Error('Not authenticated')
 
+      // Build grooming notes with comb attachment and default service appended
+      let groomingNotes = formData.grooming_notes || ''
+      if (formData.comb_attachment) {
+        groomingNotes += `${groomingNotes ? '\n' : ''}Comb Attachment: ${formData.comb_attachment}`
+      }
+      if (formData.default_service) {
+        groomingNotes += `${groomingNotes ? '\n' : ''}Default Service: ${formData.default_service}`
+      }
+
       // Prepare data for insertion
       const dataToInsert = {
         owner_name: formData.owner_name,
@@ -57,12 +75,9 @@ export default function DogForm({ onSuccess }: { onSuccess?: () => void }) {
         owner_email: formData.owner_email,
         dog_name: formData.dog_name,
         breed: formData.breed,
-        clipper_blade_size: formData.clipper_blade_size, // This maps to clipping_length in DB
+        clipper_blade_size: formData.clipper_blade_size,
         nail_clipper_size: formData.nail_clipper_size,
-        // Append comb attachment to grooming notes if selected
-        grooming_notes: formData.comb_attachment 
-          ? `${formData.grooming_notes ? formData.grooming_notes + '\n' : ''}Comb Attachment: ${formData.comb_attachment}`
-          : formData.grooming_notes,
+        grooming_notes: groomingNotes,
         behavioral_notes: formData.behavioral_notes,
         user_id: user.id
       }
@@ -77,7 +92,7 @@ export default function DogForm({ onSuccess }: { onSuccess?: () => void }) {
       setFormData({
         owner_name: '', owner_phone: '', owner_email: '',
         dog_name: '', breed: '', clipper_blade_size: '10',
-        comb_attachment: '', nail_clipper_size: '', grooming_notes: '', behavioral_notes: ''
+        comb_attachment: '', default_service: '', nail_clipper_size: '', grooming_notes: '', behavioral_notes: ''
       })
       if (onSuccess) onSuccess()
     } catch (error) {
@@ -182,13 +197,26 @@ export default function DogForm({ onSuccess }: { onSuccess?: () => void }) {
             </div>
             <div>
               <label className={labelClass}>Comb Attachment</label>
-              <select 
+              <select
                 className={`${inputClass} bg-white`}
                 value={formData.comb_attachment}
                 onChange={e => setFormData({...formData, comb_attachment: e.target.value})}
               >
                 <option value="">Select comb attachment</option>
                 {COMB_ATTACHMENTS.map(({ value, label }) => (
+                  <option key={value} value={value}>{label}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className={labelClass}>Default Service</label>
+              <select
+                className={`${inputClass} bg-white`}
+                value={formData.default_service}
+                onChange={e => setFormData({...formData, default_service: e.target.value})}
+              >
+                <option value="">Select default service</option>
+                {DEFAULT_SERVICES.map(({ value, label }) => (
                   <option key={value} value={value}>{label}</option>
                 ))}
               </select>
