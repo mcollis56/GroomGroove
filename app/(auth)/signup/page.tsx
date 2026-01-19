@@ -25,7 +25,7 @@ export default function SignupPage() {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/`,
+        emailRedirectTo: `${window.location.origin}/pricing`,
       },
     })
 
@@ -35,9 +35,9 @@ export default function SignupPage() {
     } else {
       setSuccess(true)
       setLoading(false)
-      // Auto-login after signup
+      // Redirect to pricing page after signup
       setTimeout(() => {
-        router.push('/')
+        router.push('/pricing')
         router.refresh()
       }, 2000)
     }

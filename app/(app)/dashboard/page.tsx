@@ -13,6 +13,19 @@ export default async function DashboardPage() {
 
   if (!user) redirect("/login");
 
+  // Check if user has an active subscription
+  const { data: subscription } = await supabase
+    .from("user_subscriptions")
+    .select("status")
+    .eq("user_id", user.id)
+    .in("status", ["active", "trialing"])
+    .single();
+
+  // Redirect to pricing if no active subscription
+  if (!subscription) {
+    redirect("/pricing");
+  }
+
   const today = new Date().toISOString().split('T')[0];
 
   // Fetch appointments and groomers in parallel
