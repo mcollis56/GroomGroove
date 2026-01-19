@@ -13,9 +13,9 @@ export default async function DashboardPage() {
 
   if (!user) redirect("/login");
 
-  // Check if user has an active subscription
+  // --- FIX: Check the CORRECT table 'subscriptions' ---
   const { data: subscription } = await supabase
-    .from("user_subscriptions")
+    .from("subscriptions") // <--- CHANGED FROM 'user_subscriptions'
     .select("status")
     .eq("user_id", user.id)
     .in("status", ["active", "trialing"])
