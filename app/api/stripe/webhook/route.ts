@@ -3,72 +3,65 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 
-// Initialize Stripe (lazy init inside function is safer for builds too)
-// But we can keep it here if env var exists.
-// Let's move EVERYTHING inside to be bulletproof.
+// FORCE STABLE VERSION to prevent crashes
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: "2023-10-16" as any,
+  typescript: true,
+});
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function POST(req: Request) {
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: "2025-02-24.acacia",
-  });
-  
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
-
-  const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-
   const body = await req.text();
   const signature = (await headers()).get("Stripe-Signature") as string;
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
   let event: Stripe.Event;
 
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-  } catch (error: any) {
-    console.error(`Webhook Signature Error: ${error.message}`);
-    return new NextResponse(`Webhook Error: ${error.message}`, { status: 400 });
+  } catch (err: any) {
+    console.error(`Webhook signature verification failed: ${err.message}`);
+    return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 });
   }
-
-  const session = event.data.object as Stripe.Checkout.Session;
 
   try {
     if (event.type === "checkout.session.completed") {
-      const userId = session.metadata?.userId || session.client_reference_id;
-      const subId = session.subscription as string;
+      const session = event.data.object as Stripe.Checkout.Session;
+      const userId = session.metadata?.userId; // We attached this in checkout
+      const subscriptionId = session.subscription as string;
 
-      if (!userId) {
-        return new NextResponse("Error: No userId in metadata", { status: 400 });
+      if (!userId || !subscriptionId) {
+        throw new Error("Missing userId or subscriptionId in metadata");
       }
 
-      console.log(`Payment success for user ${userId}`);
+      console.log(`Processing subscription for User ${userId}`);
 
-      // Update Supabase
-      const { error } = await supabaseAdmin
-        .from("subscriptions")
-        .upsert({
-          user_id: userId,
-          stripe_subscription_id: subId,
-          stripe_customer_id: session.customer,
-          status: "active",
-          plan_id: "pro_monthly",
-          updated_at: new Date().toISOString(),
-        });
+      // 1. Fetch Subscription Details from Stripe
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
-      if (error) {
-        console.error("Subscription table update failed:", error);
-      }
-      
-      // Fallback metadata update
-      await supabaseAdmin.auth.admin.updateUserById(userId, {
-        user_metadata: { is_pro: true, stripe_sub_id: subId }
+      // 2. Upsert into Supabase
+      const { error } = await supabase.from("subscriptions").upsert({
+        id: subscription.id,
+        user_id: userId,
+        status: subscription.status,
+        price_id: subscription.items.data[0].price.id,
+        // Convert seconds to ISO strings
+        current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
+        current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+        cancel_at_period_end: subscription.cancel_at_period_end,
       });
-    }
-  } catch (err: any) {
-    console.error("Webhook Logic Error:", err);
-    return new NextResponse("Server Error", { status: 500 });
-  }
 
-  return new NextResponse(null, { status: 200 });
+      if (error) throw error;
+      console.log("Subscription saved to Supabase!");
+    }
+
+    return new NextResponse("Received", { status: 200 });
+  } catch (error: any) {
+    console.error("Webhook handler failed:", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
+  }
 }
