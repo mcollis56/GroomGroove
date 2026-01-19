@@ -15,9 +15,7 @@ export async function POST(req: Request) {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
-          getAll() {
-            return cookieStore.getAll();
-          },
+          getAll() { return cookieStore.getAll() },
           setAll(cookiesToSet: any[]) {
             try {
               cookiesToSet.forEach(({ name, value, options }) =>
@@ -29,29 +27,37 @@ export async function POST(req: Request) {
       }
     );
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
+      console.error("User not found in session");
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { priceId, skipTrial } = await req.json();
-
-    const subscription_data = skipTrial ? {} : { trial_period_days: 14 };
-
-    const session = await stripe.checkout.sessions.create({
+    const body = await req.json();
+    const { priceId, skipTrial } = body;
+    
+    // Construct the session payload dynamically
+    const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: "subscription",
       payment_method_types: ["card"],
       line_items: [{ price: priceId, quantity: 1 }],
       customer_email: user.email,
       metadata: { userId: user.id },
       client_reference_id: user.id,
-      subscription_data,
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?payment=success`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing?payment=cancelled`,
-    });
+    };
+
+    // ONLY add subscription_data if we are doing a trial
+    if (!skipTrial) {
+      sessionParams.subscription_data = {
+        trial_period_days: 14,
+      };
+    }
+
+    console.log("Creating Stripe Session with params:", JSON.stringify(sessionParams));
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     return NextResponse.json({ sessionId: session.id, url: session.url });
   } catch (error: any) {
