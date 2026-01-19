@@ -1,9 +1,9 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import TodayAppointments from "@/components/dashboard/TodayAppointments";
-import { GroomersOnDeck } from "@/components/dashboard/GroomersOnDeck";
+import { GroomersTodayCard } from "@/components/dashboard/GroomersTodayCard";
 import Link from "next/link";
-import { Plus, Calendar, Smile, Clock } from "lucide-react";
+import { Plus, Calendar, Clock } from "lucide-react";
 import { formatTime } from "@/lib/utils/date";
 import { getGroomersOnDuty, getGroomersOffDuty } from "@/lib/actions/groomers";
 
@@ -73,15 +73,7 @@ export default async function DashboardPage() {
           <div className="bg-blue-50 p-3 rounded-full mb-2 group-hover:bg-blue-100"><Calendar className="h-6 w-6 text-blue-600" /></div>
           <span className="font-semibold text-gray-700">Book Appt</span>
         </Link>
-        <Link href="/groomers" className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center hover:border-yellow-300 transition-colors group">
-          <div className="bg-yellow-50 p-3 rounded-full mb-2 group-hover:bg-yellow-100"><Smile className="h-6 w-6 text-yellow-600" /></div>
-          <span className="font-semibold text-gray-700">Groomers</span>
-        </Link>
-      </div>
-
-      {/* --- GROOMERS ON DECK --- */}
-      <div className="mb-8">
-        <GroomersOnDeck
+        <GroomersTodayCard
           onDutyGroomers={onDutyGroomers}
           offDutyGroomers={offDutyGroomers}
         />
