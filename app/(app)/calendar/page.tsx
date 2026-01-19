@@ -74,18 +74,16 @@ export default function CalendarPage() {
   const [bookingForm, setBookingForm] = useState({
     time: '09:00',
     dogId: '',
-    service: 'Full Groom'
+    service: 'Bath and tidy'
   })
 
   // Services options
   const serviceOptions = [
-    'Full Groom',
-    'Bath & Brush',
-    'Nail Trim',
-    'Ear Cleaning',
-    'Teeth Brushing',
-    'Deshedding',
-    'Puppy Cut'
+    'Bath and tidy',
+    'Bath and dry',
+    'Bath/tidy/de-shed',
+    'Nail trim',
+    'Puppy Groom'
   ]
 
   // Time options
@@ -221,7 +219,7 @@ export default function CalendarPage() {
       setBookingForm({
         time: '09:00',
         dogId: dogs.length > 0 ? dogs[0].id : '',
-        service: 'Full Groom'
+        service: 'Bath and tidy'
       })
       setIsBookingMode(false)
       

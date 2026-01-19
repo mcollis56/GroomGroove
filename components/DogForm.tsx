@@ -15,20 +15,29 @@ export default function DogForm({ onSuccess }: { onSuccess?: () => void }) {
     owner_email: '',
     dog_name: '',
     breed: '',
-    clipper_blade_size: '#10',
+    clipper_blade_size: '10',
+    comb_attachment: '',
     nail_clipper_size: '',
     grooming_notes: '',
     behavioral_notes: ''
   })
 
   const BLADE_SIZES = [
-    { value: '#3', label: '#3 (13mm) - Longer Body' },
-    { value: '#4', label: '#4 (10mm) - Winter Trim' },
-    { value: '#5', label: '#5 (6mm) - Short Puppy Cut' },
-    { value: '#7', label: '#7 (3mm) - Summer Cut / Matted' },
-    { value: '#10', label: '#10 (1.8mm) - Sanitary / Paws' },
-    { value: '#15', label: '#15 (1.2mm) - Pads' },
-    { value: '#30', label: '#30 (0.5mm) - Under Comb' },
+    { value: '3', label: '3' },
+    { value: '4', label: '4' },
+    { value: '5f', label: '5f' },
+    { value: '7f', label: '7f' },
+    { value: '10', label: '10' },
+    { value: '15', label: '15' },
+  ]
+
+  const COMB_ATTACHMENTS = [
+    { value: '3mm', label: '3mm' },
+    { value: '6mm', label: '6mm' },
+    { value: '10mm', label: '10mm' },
+    { value: '13mm', label: '13mm' },
+    { value: '16mm', label: '16mm' },
+    { value: '19mm', label: '19mm' },
   ]
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -41,17 +50,34 @@ export default function DogForm({ onSuccess }: { onSuccess?: () => void }) {
       
       if (!user) throw new Error('Not authenticated')
 
+      // Prepare data for insertion
+      const dataToInsert = {
+        owner_name: formData.owner_name,
+        owner_phone: formData.owner_phone,
+        owner_email: formData.owner_email,
+        dog_name: formData.dog_name,
+        breed: formData.breed,
+        clipper_blade_size: formData.clipper_blade_size, // This maps to clipping_length in DB
+        nail_clipper_size: formData.nail_clipper_size,
+        // Append comb attachment to grooming notes if selected
+        grooming_notes: formData.comb_attachment 
+          ? `${formData.grooming_notes ? formData.grooming_notes + '\n' : ''}Comb Attachment: ${formData.comb_attachment}`
+          : formData.grooming_notes,
+        behavioral_notes: formData.behavioral_notes,
+        user_id: user.id
+      }
+
       const { error } = await supabase
         .from('dogs')
-        .insert([{ ...formData, user_id: user.id }])
+        .insert([dataToInsert])
 
       if (error) throw error
 
       setMessage('✅ Dog saved successfully!')
       setFormData({
         owner_name: '', owner_phone: '', owner_email: '',
-        dog_name: '', breed: '', clipper_blade_size: '#10',
-        nail_clipper_size: '', grooming_notes: '', behavioral_notes: ''
+        dog_name: '', breed: '', clipper_blade_size: '10',
+        comb_attachment: '', nail_clipper_size: '', grooming_notes: '', behavioral_notes: ''
       })
       if (onSuccess) onSuccess()
     } catch (error) {
@@ -150,6 +176,19 @@ export default function DogForm({ onSuccess }: { onSuccess?: () => void }) {
                 onChange={e => setFormData({...formData, clipper_blade_size: e.target.value})}
               >
                 {BLADE_SIZES.map(({ value, label }) => (
+                  <option key={value} value={value}>{label}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className={labelClass}>Comb Attachment</label>
+              <select 
+                className={`${inputClass} bg-white`}
+                value={formData.comb_attachment}
+                onChange={e => setFormData({...formData, comb_attachment: e.target.value})}
+              >
+                <option value="">Select comb attachment</option>
+                {COMB_ATTACHMENTS.map(({ value, label }) => (
                   <option key={value} value={value}>{label}</option>
                 ))}
               </select>

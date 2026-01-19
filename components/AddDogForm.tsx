@@ -17,6 +17,7 @@ export default function AddDogForm({ onDogAdded }: { onDogAdded?: (dog: Dog) => 
     owner_email: '',
     breed: '',
     clipper_blade_size: '',
+    comb_attachment: '',
     nail_clipper_size: '',
     grooming_notes: '',
     behavioral_notes: '',
@@ -38,15 +39,27 @@ export default function AddDogForm({ onDogAdded }: { onDogAdded?: (dog: Dog) => 
       return
     }
 
-    // 2. Insert the data into Supabase
+    // 2. Prepare data for insertion
+    const dataToInsert = {
+      dog_name: formData.dog_name,
+      owner_name: formData.owner_name,
+      owner_phone: formData.owner_phone,
+      owner_email: formData.owner_email,
+      breed: formData.breed,
+      clipper_blade_size: formData.clipper_blade_size,
+      nail_clipper_size: formData.nail_clipper_size,
+      // Append comb attachment to grooming notes if selected
+      grooming_notes: formData.comb_attachment 
+        ? `${formData.grooming_notes ? formData.grooming_notes + '\n' : ''}Comb Attachment: ${formData.comb_attachment}`
+        : formData.grooming_notes,
+      behavioral_notes: formData.behavioral_notes,
+      user_id: user.id
+    }
+
+    // 3. Insert the data into Supabase
     const { data, error } = await supabase
       .from('dogs')
-      .insert([
-        {
-          ...formData,
-          user_id: user.id, // IMPORTANT: Associate dog with logged-in user
-        },
-      ])
+      .insert([dataToInsert])
       .select()
       .single()
 
@@ -63,6 +76,7 @@ export default function AddDogForm({ onDogAdded }: { onDogAdded?: (dog: Dog) => 
         owner_email: '',
         breed: '',
         clipper_blade_size: '',
+        comb_attachment: '',
         nail_clipper_size: '',
         grooming_notes: '',
         behavioral_notes: '',
@@ -143,15 +157,32 @@ export default function AddDogForm({ onDogAdded }: { onDogAdded?: (dog: Dog) => 
               onChange={(e) => setFormData({ ...formData, clipper_blade_size: e.target.value })}
             >
               <option value="">Select blade size</option>
-              <option value="#3">#3 (13mm) - Longer Body</option>
-              <option value="#4">#4 (10mm) - Winter Trim</option>
-              <option value="#5">#5 (6mm) - Short Puppy Cut</option>
-              <option value="#7">#7 (3mm) - Summer Cut / Matted</option>
-              <option value="#10">#10 (1.8mm) - Sanitary / Paws</option>
-              <option value="#15">#15 (1.2mm) - Pads</option>
-              <option value="#30">#30 (0.5mm) - Under Comb</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5f">5f</option>
+              <option value="7f">7f</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
             </select>
           </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Comb Attachment</label>
+            <select
+              className="mt-1 block w-full rounded-lg border-2 border-pink-200 p-3 text-gray-900 shadow-sm focus:border-pink-400 focus:ring-pink-400 min-h-[44px]"
+              value={formData.comb_attachment}
+              onChange={(e) => setFormData({ ...formData, comb_attachment: e.target.value })}
+            >
+              <option value="">Select comb attachment</option>
+              <option value="3mm">3mm</option>
+              <option value="6mm">6mm</option>
+              <option value="10mm">10mm</option>
+              <option value="13mm">13mm</option>
+              <option value="16mm">16mm</option>
+              <option value="19mm">19mm</option>
+            </select>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">Nail Clipper Size</label>
             <input
