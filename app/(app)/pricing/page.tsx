@@ -10,35 +10,41 @@ export default function PricingPage() {
 
   const PRICE_ID = "price_1SpjQlGzqO94XgciE9C3FjsE";
 
-  async function handleCheckout(skipTrial: boolean) {
-    if (skipTrial) setLoadingBuy(true);
-    else setLoadingTrial(true);
+   async function handleCheckout(skipTrial: boolean) {
+    if (skipTrial) setLoadingBuy(true)
+    else setLoadingTrial(true)
 
     try {
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+        body: JSON.stringify({ 
           priceId: PRICE_ID,
-          skipTrial: skipTrial,
+          skipTrial: skipTrial 
         }),
-      });
+      })
+      
+      // READ THE ERROR MESSAGE
+      const text = await res.text(); 
+      
+      if (!res.ok) {
+        // ALERT THE EXACT ERROR
+        alert("STRIPE ERROR:\n" + text); 
+        throw new Error(text);
+      }
 
-      const data = await res.json();
-
+      const data = JSON.parse(text);
       if (data.url) {
-        window.location.href = data.url;
-      } else {
-        alert("Error creating checkout session.");
+        window.location.href = data.url
       }
     } catch (error) {
-      console.error(error);
-      alert("Something went wrong.");
+      console.error(error)
     } finally {
-      setLoadingTrial(false);
-      setLoadingBuy(false);
+      setLoadingTrial(false)
+      setLoadingBuy(false)
     }
   }
+
 
   return (
     <div className="max-w-4xl mx-auto p-6 text-center">
