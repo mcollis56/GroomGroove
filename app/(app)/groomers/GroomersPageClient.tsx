@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Smile, UserPlus, Mail, Phone } from 'lucide-react'
+import { Smile, UserPlus, Mail, Phone, Trash2 } from 'lucide-react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
-import { type Groomer } from '@/lib/actions/groomers'
+import { deleteGroomer, type Groomer } from '@/lib/actions/groomers'
 
 interface GroomersPageClientProps {
   initialGroomers: Groomer[]
@@ -38,6 +38,29 @@ const getRoleBadgeClass = (role: string) => {
 
 export function GroomersPageClient({ initialGroomers }: GroomersPageClientProps) {
   const [groomers, setGroomers] = useState<Groomer[]>(initialGroomers)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+
+  const handleDelete = async (groomer: Groomer) => {
+    const confirmed = confirm(`Are you sure you want to delete ${groomer.name}? This action cannot be undone.`)
+    if (!confirmed) return
+
+    setDeletingId(groomer.id)
+
+    try {
+      const result = await deleteGroomer(groomer.id)
+      if (result.success) {
+        // Remove from local state immediately
+        setGroomers(prev => prev.filter(g => g.id !== groomer.id))
+      } else {
+        alert(`Failed to delete groomer: ${result.error}`)
+      }
+    } catch (error) {
+      console.error('Error deleting groomer:', error)
+      alert('An unexpected error occurred while deleting the groomer.')
+    } finally {
+      setDeletingId(null)
+    }
+  }
 
   const totalGroomers = groomers.length
   const activeGroomers = groomers.filter(m => m.role.toLowerCase().includes('groomer')).length
@@ -114,6 +137,9 @@ export function GroomersPageClient({ initialGroomers }: GroomersPageClientProps)
                 <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Calendar Color
                 </th>
+                <th className="text-right py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -174,6 +200,18 @@ export function GroomersPageClient({ initialGroomers }: GroomersPageClientProps)
                         style={{ backgroundColor: groomer.color || '#3B82F6' }}
                       />
                       <span className="text-sm text-gray-500">{groomer.color || '#3B82F6'}</span>
+                    </div>
+                  </td>
+                  <td className="py-4 px-6">
+                    <div className="flex justify-end">
+                      <button
+                        onClick={() => handleDelete(groomer)}
+                        disabled={deletingId === groomer.id}
+                        className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        title={`Delete ${groomer.name}`}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
                     </div>
                   </td>
                 </tr>
