@@ -42,6 +42,7 @@ export default function DogForm({ onSuccess }: { onSuccess?: () => void }) {
   ]
 
   const DEFAULT_SERVICES = [
+    { value: 'Full Groom', label: 'Full Groom' },
     { value: 'Bath and tidy', label: 'Bath and tidy' },
     { value: 'Bath and dry', label: 'Bath and dry' },
     { value: 'Bath/tidy/de-shed', label: 'Bath/tidy/de-shed' },
