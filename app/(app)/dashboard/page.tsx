@@ -30,9 +30,6 @@ export default async function DashboardPage() {
 
   // 2. DATA FETCHING - LOCKED TO USER_ID
   const today = new Date().toISOString().split('T')[0];
-
-  // NOTE: Your 'getGroomers' actions MUST also filter by user_id internally.
-  // We assume they use createClient() which respects RLS, but passing user.id is safer if they don't.
   
   const [appointmentsResult, onDutyGroomers, offDutyGroomers] = await Promise.all([
     supabase
@@ -43,7 +40,7 @@ export default async function DashboardPage() {
       .lt('scheduled_at', `${today}T23:59:59`)
       .in('status', ['pending', 'confirmed', 'in_progress'])
       .order('scheduled_at', { ascending: true }),
-    getGroomersOnDuty(), // Check these actions too!
+    getGroomersOnDuty(),
     getGroomersOffDuty(),
   ]);
 
@@ -59,15 +56,15 @@ export default async function DashboardPage() {
           <h1 className="text-3xl font-bold text-gray-900">Salon Dashboard</h1>
           <p className="text-gray-500">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
         </div>
-        <div className="bg-purple-100 text-purple-700 px-4 py-2 rounded-full font-bold">
+        <div className="bg-rose-100 text-rose-700 px-4 py-2 rounded-full font-bold">
            {remainingJobs} Dogs Remaining
         </div>
       </div>
 
       {/* Next Up */}
       {nextJob ? (
-        <div className="mb-8 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-6 text-white shadow-xl">
-          <div className="flex items-center gap-3 mb-2 text-purple-100 uppercase text-xs font-bold tracking-wider">
+        <div className="mb-8 bg-gradient-to-r from-rose-500 to-pink-600 rounded-2xl p-6 text-white shadow-xl">
+          <div className="flex items-center gap-3 mb-2 text-rose-100 uppercase text-xs font-bold tracking-wider">
             <Clock className="h-4 w-4" /> Next Up
           </div>
           <div className="flex justify-between items-end">
@@ -84,12 +81,13 @@ export default async function DashboardPage() {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-3 gap-4 mb-8">
-        <Link href="/dogs/new" className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center hover:border-purple-300 transition-colors group">
-          <div className="bg-purple-50 p-3 rounded-full mb-2 group-hover:bg-purple-100"><Plus className="h-6 w-6 text-purple-600" /></div>
+        {/* CHANGED LINK TO /calendar/new (The Fixed Form) */}
+        <Link href="/calendar/new" className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center hover:border-rose-300 transition-colors group">
+          <div className="bg-rose-50 p-3 rounded-full mb-2 group-hover:bg-rose-100"><Plus className="h-6 w-6 text-rose-600" /></div>
           <span className="font-semibold text-gray-700">Add Dog</span>
         </Link>
-        <Link href="/calendar/new" className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center hover:border-blue-300 transition-colors group">
-          <div className="bg-blue-50 p-3 rounded-full mb-2 group-hover:bg-blue-100"><Calendar className="h-6 w-6 text-blue-600" /></div>
+        <Link href="/calendar/new" className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center hover:border-rose-300 transition-colors group">
+          <div className="bg-rose-50 p-3 rounded-full mb-2 group-hover:bg-rose-100"><Calendar className="h-6 w-6 text-rose-600" /></div>
           <span className="font-semibold text-gray-700">Book Appt</span>
         </Link>
         <GroomersTodayCard
