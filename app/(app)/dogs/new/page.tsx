@@ -24,6 +24,7 @@ export default function NewDogPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [owners, setOwners] = useState<Owner[]>([])
   const [loadingOwners, setLoadingOwners] = useState(true)
+  const [userId, setUserId] = useState<string | null>(null)
 
   // Form data
   const [formData, setFormData] = useState({
@@ -37,15 +38,20 @@ export default function NewDogPage() {
   // New Owner Modal state
   const [showNewOwnerModal, setShowNewOwnerModal] = useState(false)
   const [newOwnerLoading, setNewOwnerLoading] = useState(false)
-  const [newOwnerData, setNewOwnerData] = useState({
-    name: '',
-    phone: '',
-    email: ''
-  })
+  const [newOwnerName, setNewOwnerName] = useState('')
+  const [newOwnerPhone, setNewOwnerPhone] = useState('')
+  const [newOwnerEmail, setNewOwnerEmail] = useState('')
 
-  // Load owners on mount
+  // Load owners and get user on mount
   useEffect(() => {
-    async function loadOwners() {
+    async function loadData() {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        setUserId(user.id)
+      }
+
+      // Load owners
       const { data, error } = await supabase
         .from('customers')
         .select('id, name, phone, email')
@@ -58,13 +64,18 @@ export default function NewDogPage() {
       }
       setLoadingOwners(false)
     }
-    loadOwners()
-  }, [])
+    loadData()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Handle creating a new owner
   const handleCreateOwner = async () => {
-    if (!newOwnerData.name.trim()) {
+    if (!newOwnerName.trim()) {
       alert('Owner name is required')
+      return
+    }
+
+    if (!userId) {
+      alert('You must be logged in')
       return
     }
 
@@ -72,15 +83,16 @@ export default function NewDogPage() {
 
     try {
       // Convert empty strings to null to avoid duplicate key violations
-      const emailValue = newOwnerData.email.trim() === '' ? null : newOwnerData.email.trim()
-      const phoneValue = newOwnerData.phone.trim() === '' ? null : newOwnerData.phone.trim()
+      const emailValue = newOwnerEmail.trim() === '' ? null : newOwnerEmail.trim()
+      const phoneValue = newOwnerPhone.trim() === '' ? null : newOwnerPhone.trim()
 
       const { data, error } = await supabase
         .from('customers')
         .insert({
-          name: newOwnerData.name.trim(),
+          name: newOwnerName.trim(),
           phone: phoneValue,
-          email: emailValue
+          email: emailValue,
+          user_id: userId
         })
         .select()
         .single()
@@ -92,7 +104,9 @@ export default function NewDogPage() {
       setFormData(prev => ({ ...prev, customer_id: data.id }))
 
       // Reset and close modal
-      setNewOwnerData({ name: '', phone: '', email: '' })
+      setNewOwnerName('')
+      setNewOwnerPhone('')
+      setNewOwnerEmail('')
       setShowNewOwnerModal(false)
     } catch (error: any) {
       alert('Failed to create owner: ' + error.message)
@@ -113,6 +127,10 @@ export default function NewDogPage() {
       alert('Please select an owner')
       return
     }
+    if (!userId) {
+      alert('You must be logged in')
+      return
+    }
 
     setIsSubmitting(true)
 
@@ -124,7 +142,8 @@ export default function NewDogPage() {
           breed: formData.breed || null,
           customer_id: formData.customer_id,
           weight: formData.weight ? parseFloat(formData.weight) : null,
-          notes: formData.notes || null
+          notes: formData.notes || null,
+          user_id: userId
         })
 
       if (error) throw error
@@ -285,8 +304,8 @@ export default function NewDogPage() {
             <input
               type="text"
               placeholder="e.g., John Smith"
-              value={newOwnerData.name}
-              onChange={(e) => setNewOwnerData({ ...newOwnerData, name: e.target.value })}
+              value={newOwnerName}
+              onChange={(e) => setNewOwnerName(e.target.value)}
               className={inputClass}
             />
           </div>
@@ -298,8 +317,8 @@ export default function NewDogPage() {
             <input
               type="tel"
               placeholder="e.g., (555) 123-4567"
-              value={newOwnerData.phone}
-              onChange={(e) => setNewOwnerData({ ...newOwnerData, phone: e.target.value })}
+              value={newOwnerPhone}
+              onChange={(e) => setNewOwnerPhone(e.target.value)}
               className={inputClass}
             />
           </div>
@@ -311,8 +330,8 @@ export default function NewDogPage() {
             <input
               type="email"
               placeholder="e.g., john@example.com"
-              value={newOwnerData.email}
-              onChange={(e) => setNewOwnerData({ ...newOwnerData, email: e.target.value })}
+              value={newOwnerEmail}
+              onChange={(e) => setNewOwnerEmail(e.target.value)}
               className={inputClass}
             />
           </div>

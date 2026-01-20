@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Calendar, FileText, Dog, User, Camera, X, Loader2, Trash2 } from 'lucide-react'
+import { Calendar, FileText, Camera, X, Loader2, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Modal } from '@/components/ui/Modal'
@@ -614,10 +614,10 @@ export function DogQuickActions({ dogId, dogName, customerPhone, photoUrl, groom
             <Button
               variant="secondary"
               className="w-full justify-start"
-              onClick={() => setShowNoteModal(true)}
+              onClick={() => setShowPreferencesModal(true)}
             >
               <FileText className="w-4 h-4 mr-2" />
-              Add Grooming Note
+              Grooming Notes & Preferences
             </Button>
             <Button
               variant="secondary"
@@ -627,14 +627,6 @@ export function DogQuickActions({ dogId, dogName, customerPhone, photoUrl, groom
             >
               <Camera className="w-4 h-4 mr-2" />
               {uploading ? 'Uploading...' : currentPhoto ? 'Change Photo' : 'Add Photo'}
-            </Button>
-            <Button 
-              variant="secondary" 
-              className="w-full justify-start"
-              onClick={() => setShowPreferencesModal(true)}
-            >
-              <Dog className="w-4 h-4 mr-2" />
-              Update Preferences
             </Button>
             <div className="pt-3 border-t border-gray-200">
               <Button 
