@@ -20,6 +20,14 @@ export async function sendConfirmationSMS({
 }: SendConfirmationParams): Promise<{ sent: boolean; reason?: string }> {
   const supabase = await createClient()
 
+  // Get the current user
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    console.error('[SMS] User not authenticated')
+    return { sent: false, reason: 'not_authenticated' }
+  }
+
   // Fetch appointment with customer and dog data
   const { data: appointment, error } = await supabase
     .from('appointments')
@@ -74,6 +82,7 @@ Questions? Call (555) 123-4567`
     appointment_id: appointmentId,
     type: 'confirmation_request',
     delivered: result.success,
+    user_id: user.id,
   })
 
   return { sent: result.success }
@@ -84,6 +93,14 @@ Questions? Call (555) 123-4567`
  */
 export async function sendReminderSMS(appointmentId: string): Promise<{ sent: boolean }> {
   const supabase = await createClient()
+
+  // Get the current user
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    console.error('[SMS] User not authenticated')
+    return { sent: false }
+  }
 
   const { data: appointment, error } = await supabase
     .from('appointments')
@@ -124,6 +141,7 @@ See you soon! Questions? Call (555) 123-4567`
     appointment_id: appointmentId,
     type: 'reminder',
     delivered: result.success,
+    user_id: user.id,
   })
 
   return { sent: result.success }
@@ -171,6 +189,14 @@ To reschedule, call us at (555) 123-4567 or book online.`,
 export async function sendRescheduleSMS(appointmentId: string): Promise<void> {
   const supabase = await createClient()
 
+  // Get the current user
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    console.error('[SMS] User not authenticated')
+    return
+  }
+
   const { data: appointment } = await supabase
     .from('appointments')
     .select(`*, customer:customers(*), dog:dogs(*)`)
@@ -197,5 +223,6 @@ Reply YES to confirm or NO to cancel.`,
   await supabase.from('sms_notifications').insert({
     appointment_id: appointmentId,
     type: 'confirmation_request',
+    user_id: user.id,
   })
 }

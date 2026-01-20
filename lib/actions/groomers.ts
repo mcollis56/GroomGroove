@@ -53,6 +53,13 @@ export async function createGroomer(
 ): Promise<{ success: boolean; error?: string; data?: Groomer }> {
   const supabase = await createClient()
 
+  // Get the current user
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { success: false, error: 'You must be logged in.' }
+  }
+
   const { data, error } = await supabase
     .from('groomers')
     .insert({
@@ -62,6 +69,7 @@ export async function createGroomer(
       role: input.role || 'Groomer',
       color: input.color || '#3B82F6',
       is_active: true,
+      user_id: user.id,
     })
     .select()
     .single()
