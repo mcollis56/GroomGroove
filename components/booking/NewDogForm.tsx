@@ -140,7 +140,7 @@ export default function NewDogForm({
       {/* Dog Details - Top Section */}
       <div className="space-y-4">
         <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-          <DogIcon className="w-5 h-5 text-blue-600" />
+          <DogIcon className="w-5 h-5 text-rose-600" />
           Dog Details
         </h3>
 
@@ -256,7 +256,7 @@ export default function NewDogForm({
               <select
                 value={selectedTime}
                 onChange={(e) => setSelectedTime(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
               >
                 {TIME_OPTIONS.map((time) => (
                   <option key={time} value={time}>
@@ -272,7 +272,7 @@ export default function NewDogForm({
               <select
                 value={selectedService}
                 onChange={(e) => setSelectedService(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
               >
                 {SERVICE_OPTIONS.map((service) => (
                   <option key={service} value={service}>
@@ -293,7 +293,7 @@ export default function NewDogForm({
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="flex-1 bg-blue-600 hover:bg-blue-700"
+          className="flex-1 bg-rose-600 hover:bg-rose-700"
         >
           {isSubmitting
             ? 'Saving...'

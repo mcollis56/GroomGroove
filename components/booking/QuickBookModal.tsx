@@ -202,11 +202,11 @@ export default function QuickBookModal({
                       <button
                         key={dog.id}
                         onClick={() => handleDogSelect(dog)}
-                        className="w-full p-3 text-left border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-blue-300 transition-colors"
+                        className="w-full p-3 text-left border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-rose-300 transition-colors"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                            <DogIcon className="w-5 h-5 text-blue-600" />
+                          <div className="w-10 h-10 bg-rose-100 rounded-full flex items-center justify-center">
+                            <DogIcon className="w-5 h-5 text-rose-600" />
                           </div>
                           <div>
                             <p className="font-medium text-gray-900">{dog.name}</p>
@@ -222,7 +222,7 @@ export default function QuickBookModal({
                 ) : (
                   <div className="py-6 text-center">
                     <p className="text-gray-500 mb-4">No dogs found matching "{searchQuery}"</p>
-                    <Button onClick={handleAddNewDog} className="bg-blue-600 hover:bg-blue-700">
+                    <Button onClick={handleAddNewDog} className="bg-rose-600 hover:bg-rose-700">
                       <Plus className="w-4 h-4 mr-2" />
                       Add New Dog
                     </Button>
@@ -283,10 +283,10 @@ export default function QuickBookModal({
             </button>
 
             {/* Selected dog */}
-            <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
+            <div className="p-4 bg-rose-50 rounded-lg border border-rose-100">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                  <DogIcon className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center">
+                  <DogIcon className="w-6 h-6 text-rose-600" />
                 </div>
                 <div>
                   <p className="font-semibold text-gray-900">{selectedDog.name}</p>
@@ -307,7 +307,7 @@ export default function QuickBookModal({
               <select
                 value={selectedTime}
                 onChange={(e) => setSelectedTime(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
               >
                 {TIME_OPTIONS.map((time) => (
                   <option key={time} value={time}>
@@ -329,7 +329,7 @@ export default function QuickBookModal({
                     onClick={() => setSelectedService(service)}
                     className={`p-3 text-sm rounded-lg border transition-colors ${
                       selectedService === service
-                        ? 'bg-blue-50 border-blue-500 text-blue-700'
+                        ? 'bg-rose-50 border-rose-500 text-rose-700'
                         : 'border-gray-200 text-gray-700 hover:bg-gray-50'
                     }`}
                   >
@@ -347,7 +347,7 @@ export default function QuickBookModal({
               <Button
                 onClick={handleBookAppointment}
                 disabled={isSubmitting}
-                className="flex-1 bg-blue-600 hover:bg-blue-700"
+                className="flex-1 bg-rose-600 hover:bg-rose-700"
               >
                 {isSubmitting ? 'Booking...' : 'Confirm Booking'}
               </Button>

@@ -123,7 +123,7 @@ export default function CalendarPage() {
           <h1 className="text-2xl font-bold text-gray-900">Calendar</h1>
           <p className="text-gray-500">Schedule and manage appointments</p>
         </div>
-        <Button href="/calendar/new" className="bg-blue-600 hover:bg-blue-700">
+        <Button href="/calendar/new" className="bg-rose-500 hover:bg-rose-600">
           <Plus className="w-4 h-4 mr-2" />
           New Appointment
         </Button>
@@ -151,7 +151,7 @@ export default function CalendarPage() {
                 <Button
                   onClick={() => setIsBookingModalOpen(true)}
                   size="sm"
-                  className="bg-blue-600 hover:bg-blue-700"
+                  className="bg-rose-500 hover:bg-rose-600"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Book Appointment
@@ -212,7 +212,7 @@ export default function CalendarPage() {
                     <p className="text-sm mb-4">Click &quot;Book Appointment&quot; to add one</p>
                     <Button
                       onClick={() => setIsBookingModalOpen(true)}
-                      className="bg-blue-600 hover:bg-blue-700"
+                      className="bg-rose-500 hover:bg-rose-600"
                     >
                       <Plus className="w-4 h-4 mr-2" />
                       Book Appointment

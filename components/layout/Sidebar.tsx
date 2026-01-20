@@ -21,9 +21,10 @@ export function Sidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 min-h-screen flex flex-col">
+    <aside className="w-64 bg-white border-r border-gray-100 min-h-screen flex flex-col shadow-sm">
+      {/* Logo */}
       <div className="p-6 border-b border-gray-100">
-        <Link href="/" className="flex items-center justify-center">
+        <Link href="/dashboard" className="flex items-center justify-center">
           <Image
             src="/oh-my-dawg-logo.png"
             alt="Oh My Dawg! Grooming"
@@ -35,10 +36,11 @@ export function Sidebar() {
         </Link>
       </div>
 
+      {/* Navigation */}
       <nav className="flex-1 p-4">
         <ul className="space-y-1">
           {navItems.map((item) => {
-            const isActive = pathname === item.href
+            const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
             const Icon = item.icon
             return (
               <li key={item.href}>
@@ -47,11 +49,11 @@ export function Sidebar() {
                   className={cn(
                     'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200',
                     isActive
-                      ? 'bg-rose-50 text-rose-600'
+                      ? 'bg-rose-500 text-white shadow-sm'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   )}
                 >
-                  <Icon className="w-5 h-5" />
+                  <Icon className={cn('w-5 h-5', isActive ? 'text-white' : 'text-gray-400')} />
                   {item.label}
                 </Link>
               </li>
@@ -60,10 +62,11 @@ export function Sidebar() {
         </ul>
       </nav>
 
+      {/* Pro Tip Footer */}
       <div className="p-4 border-t border-gray-100">
         <div className="bg-gradient-to-r from-rose-50 to-pink-50 rounded-xl p-4">
-          <p className="text-xs text-gray-500 mb-1">Pro Tip</p>
-          <p className="text-sm text-gray-700">
+          <p className="text-xs font-medium text-rose-600 mb-1">Pro Tip</p>
+          <p className="text-sm text-gray-600">
             Use keyboard shortcuts for faster navigation!
           </p>
         </div>

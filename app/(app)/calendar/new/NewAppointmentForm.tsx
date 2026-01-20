@@ -306,8 +306,8 @@ export function NewAppointmentForm() {
                               className="w-full p-4 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 transition-colors"
                             >
                               <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                  <DogIcon className="w-5 h-5 text-blue-600" />
+                                <div className="w-10 h-10 bg-rose-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                  <DogIcon className="w-5 h-5 text-rose-600" />
                                 </div>
                                 <div>
                                   <p className="font-medium text-gray-900">
@@ -328,7 +328,7 @@ export function NewAppointmentForm() {
                           <button
                             type="button"
                             onClick={handleCreateNewDog}
-                            className="w-full p-4 text-left hover:bg-blue-50 bg-gray-50 transition-colors"
+                            className="w-full p-4 text-left hover:bg-rose-50 bg-gray-50 transition-colors"
                           >
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -374,7 +374,7 @@ export function NewAppointmentForm() {
               {/* Dog Details */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                  <DogIcon className="w-4 h-4 text-blue-600" />
+                  <DogIcon className="w-4 h-4 text-rose-600" />
                   Dog Details
                 </div>
 
@@ -489,10 +489,10 @@ export function NewAppointmentForm() {
                     ← Change dog
                   </button>
                 </div>
-                <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
+                <div className="p-4 bg-rose-50 rounded-xl border border-rose-100">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                      <DogIcon className="w-6 h-6 text-blue-600" />
+                    <div className="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center">
+                      <DogIcon className="w-6 h-6 text-rose-600" />
                     </div>
                     <div>
                       <p className="font-semibold text-gray-900 text-lg">
@@ -527,7 +527,7 @@ export function NewAppointmentForm() {
                     type="date"
                     value={appointmentDate}
                     onChange={(e) => setAppointmentDate(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-300"
                   />
                 </div>
                 <div>
@@ -538,7 +538,7 @@ export function NewAppointmentForm() {
                   <select
                     value={appointmentTime}
                     onChange={(e) => setAppointmentTime(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-300"
                   >
                     <option value="">Select time...</option>
                     {TIME_OPTIONS.map((opt) => (
@@ -561,7 +561,7 @@ export function NewAppointmentForm() {
                       onClick={() => handleToggleService(service)}
                       className={`p-3 text-sm rounded-lg border text-left transition-colors ${
                         selectedServices.includes(service)
-                          ? 'bg-blue-50 border-blue-500 text-blue-700'
+                          ? 'bg-rose-50 border-rose-500 text-rose-700'
                           : 'border-gray-200 text-gray-700 hover:bg-gray-50'
                       }`}
                     >
