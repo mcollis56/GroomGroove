@@ -6,7 +6,7 @@ import { CalendarPlus, UserPlus, Bell, BarChart3 } from 'lucide-react'
 
 const actions = [
   { id: 'new-appointment', label: 'New Appointment', icon: CalendarPlus, color: 'bg-blue-600', href: '/calendar/new' },
-  { id: 'add-client', label: 'Add Human', icon: UserPlus, color: 'bg-blue-500', href: '/clients/new' },
+  { id: 'add-client', label: 'New Client', icon: UserPlus, color: 'bg-blue-500', href: '/clients/new' },
   { id: 'send-reminder', label: 'Send Reminders', icon: Bell, color: 'bg-amber-500', href: '/notifications' },
   { id: 'view-reports', label: 'View Reports', icon: BarChart3, color: 'bg-green-500', href: '/reports' },
 ]

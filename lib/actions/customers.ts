@@ -17,12 +17,21 @@ export async function createCustomer(
 ): Promise<{ success: boolean; error?: string; customerId?: string }> {
   const supabase = await createClient()
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
   const { data: customer, error } = await supabase
     .from('customers')
     .insert({
       name: customerData.name.trim(),
       email: customerData.email?.trim() || null,
       phone: customerData.phone?.trim() || null,
+      user_id: user.id,
     })
     .select('id')
     .single()

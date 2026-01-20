@@ -13,36 +13,37 @@ export default async function DashboardPage() {
 
   if (!user) redirect("/login");
 
+  // 1. Subscription Check (Latest Active)
   const { data: subscription } = await supabase
     .from("subscriptions")
     .select("status, current_period_end")
     .eq("user_id", user.id)
-    .order("current_period_end", { ascending: false }) // Get the latest one
+    .order('current_period_end', { ascending: false })
     .limit(1)
-    .maybeSingle(); // Don't crash if 0 or multiple rows exist
+    .maybeSingle();
 
-  // If no sub, OR sub is expired -> Redirect
-  if (!subscription) {
-    redirect("/pricing");
-  }
-
+  if (!subscription) redirect("/pricing");
+  
   const expiry = new Date(subscription.current_period_end);
-  if (expiry < new Date()) {
-    redirect("/pricing?expired=true");
-  }
+  if (expiry < new Date()) redirect("/pricing?expired=true");
 
+
+  // 2. DATA FETCHING - LOCKED TO USER_ID
   const today = new Date().toISOString().split('T')[0];
 
-  // Fetch appointments and groomers in parallel
+  // NOTE: Your 'getGroomers' actions MUST also filter by user_id internally.
+  // We assume they use createClient() which respects RLS, but passing user.id is safer if they don't.
+  
   const [appointmentsResult, onDutyGroomers, offDutyGroomers] = await Promise.all([
     supabase
       .from("appointments")
       .select(`*, dog:dogs(id, name, grooming_preferences), customer:customers(id, name)`)
+      .eq("user_id", user.id) // <--- CRITICAL SECURITY LOCK
       .gte('scheduled_at', `${today}T00:00:00`)
       .lt('scheduled_at', `${today}T23:59:59`)
       .in('status', ['pending', 'confirmed', 'in_progress'])
       .order('scheduled_at', { ascending: true }),
-    getGroomersOnDuty(),
+    getGroomersOnDuty(), // Check these actions too!
     getGroomersOffDuty(),
   ]);
 
@@ -63,8 +64,8 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* --- NEXT UP HIGHLIGHT --- */}
-      {nextJob && (
+      {/* Next Up */}
+      {nextJob ? (
         <div className="mb-8 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-6 text-white shadow-xl">
           <div className="flex items-center gap-3 mb-2 text-purple-100 uppercase text-xs font-bold tracking-wider">
             <Clock className="h-4 w-4" /> Next Up
@@ -79,9 +80,9 @@ export default async function DashboardPage() {
              </div>
           </div>
         </div>
-      )}
+      ) : null}
 
-      {/* --- QUICK ACTIONS --- */}
+      {/* Quick Actions */}
       <div className="grid grid-cols-3 gap-4 mb-8">
         <Link href="/dogs/new" className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center hover:border-purple-300 transition-colors group">
           <div className="bg-purple-50 p-3 rounded-full mb-2 group-hover:bg-purple-100"><Plus className="h-6 w-6 text-purple-600" /></div>
@@ -97,7 +98,7 @@ export default async function DashboardPage() {
         />
       </div>
 
-      {/* --- ACTIVE SCHEDULE --- */}
+      {/* Schedule */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h2 className="text-xl font-bold text-gray-900 mb-4">Today&apos;s Schedule</h2>
         {remainingJobs > 0 ? (

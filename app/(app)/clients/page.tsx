@@ -20,7 +20,7 @@ export default async function ClientsPage() {
         </div>
         <Button href="/clients/new">
           <Plus className="w-4 h-4 mr-2" />
-          Add New Human
+          New Client
         </Button>
       </div>
 
@@ -47,10 +47,10 @@ export default async function ClientsPage() {
         <Card className="p-12 text-center">
           <Users className="w-12 h-12 mx-auto mb-4 text-gray-300" />
           <h3 className="font-medium text-gray-900 mb-2">No humans yet</h3>
-          <p className="text-gray-500 mb-4">Add your first human to get started.</p>
+          <p className="text-gray-500 mb-4">Add your first client to get started.</p>
           <Button href="/clients/new">
             <Plus className="w-4 h-4 mr-2" />
-            Add New Human
+            New Client
           </Button>
         </Card>
       )}
