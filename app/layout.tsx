@@ -1,17 +1,37 @@
 import type { Metadata } from "next";
-import { Montserrat } from "next/font/google";
+import { Cormorant_Garamond, Crimson_Text } from "next/font/google";
+import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
-const montserrat = Montserrat({
+const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
-  weight: ["400", "600", "700", "800", "900"],
-  variable: "--font-montserrat",
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-cormorant",
+});
+
+const crimson = Crimson_Text({
+  subsets: ["latin"],
+  weight: ["400", "600", "700"],
+  variable: "--font-crimson",
+});
+
+// Placeholder for Musetta script font - will be replaced with actual font files
+const musetta = localFont({
+  src: [
+    {
+      path: "../public/fonts/musetta.woff2",
+      weight: "400",
+      style: "normal",
+    },
+  ],
+  variable: "--font-musetta",
+  fallback: ["cursive"],
 });
 
 export const metadata: Metadata = {
-  title: "Groom Groove",
-  description: "The modern app for dog groomers.",
+  title: "Musetta - Curating Exceptional Living",
+  description: "Art, interiors, and objects that tell compelling stories across eras and movements.",
 };
 
 export default function RootLayout({
@@ -21,7 +41,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${montserrat.className} antialiased`}>
+      <body className={`${cormorant.variable} ${crimson.variable} ${musetta.variable} antialiased`}>
         {children}
         <Analytics />
       </body>
