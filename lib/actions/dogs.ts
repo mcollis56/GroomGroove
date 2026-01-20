@@ -323,6 +323,62 @@ export async function deleteDog(dogId: string): Promise<{ success: boolean; erro
 }
 
 /**
+ * Create a new dog with owner information
+ */
+export async function createDog(dogData: {
+  dog_name: string
+  owner_name: string
+  owner_phone: string
+  owner_email: string
+  breed?: string
+  clipper_blade_size?: string
+  comb_attachment?: string
+  nail_clipper_size?: string
+  grooming_notes?: string
+  behavioral_notes?: string
+}): Promise<{ success: boolean; data?: any; error?: string }> {
+  const supabase = await createClient()
+
+  // Get the current user
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { success: false, error: 'You must be logged in.' }
+  }
+
+  // Prepare data for insertion
+  const dataToInsert = {
+    dog_name: dogData.dog_name,
+    owner_name: dogData.owner_name,
+    owner_phone: dogData.owner_phone,
+    owner_email: dogData.owner_email,
+    breed: dogData.breed || null,
+    clipper_blade_size: dogData.clipper_blade_size || null,
+    nail_clipper_size: dogData.nail_clipper_size || null,
+    // Append comb attachment to grooming notes if provided
+    grooming_notes: dogData.comb_attachment
+      ? `${dogData.grooming_notes ? dogData.grooming_notes + '\n' : ''}Comb Attachment: ${dogData.comb_attachment}`
+      : dogData.grooming_notes || null,
+    behavioral_notes: dogData.behavioral_notes || null,
+    user_id: user.id
+  }
+
+  // Insert the dog into the database
+  const { data, error } = await supabase
+    .from('dogs')
+    .insert([dataToInsert])
+    .select()
+    .single()
+
+  if (error) {
+    console.error('[Dogs] Create failed:', error)
+    return { success: false, error: error.message }
+  }
+
+  return { success: true, data }
+}
+
+/**
  * Get all dogs for the dogs list page (server component)
  */
 export async function getAllDogs() {

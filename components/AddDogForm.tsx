@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/utils/supabase/client'
+import { createDog } from '@/lib/actions/dogs'
 // We import the Dog type we just made
 import { Dog } from '@/app/types' 
 
@@ -28,44 +28,23 @@ export default function AddDogForm({ onDogAdded }: { onDogAdded?: (dog: Dog) => 
     setLoading(true)
     setMessage('')
 
-    const supabase = createClient()
-    
-    // 1. Get the current user
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) {
-      setMessage('Error: You must be logged in.')
-      setLoading(false)
-      return
-    }
-
-    // 2. Prepare data for insertion
-    const dataToInsert = {
+    // Call the createDog server action
+    const result = await createDog({
       dog_name: formData.dog_name,
       owner_name: formData.owner_name,
       owner_phone: formData.owner_phone,
       owner_email: formData.owner_email,
       breed: formData.breed,
       clipper_blade_size: formData.clipper_blade_size,
+      comb_attachment: formData.comb_attachment,
       nail_clipper_size: formData.nail_clipper_size,
-      // Append comb attachment to grooming notes if selected
-      grooming_notes: formData.comb_attachment 
-        ? `${formData.grooming_notes ? formData.grooming_notes + '\n' : ''}Comb Attachment: ${formData.comb_attachment}`
-        : formData.grooming_notes,
+      grooming_notes: formData.grooming_notes,
       behavioral_notes: formData.behavioral_notes,
-      user_id: user.id
-    }
+    })
 
-    // 3. Insert the data into Supabase
-    const { data, error } = await supabase
-      .from('dogs')
-      .insert([dataToInsert])
-      .select()
-      .single()
-
-    if (error) {
-      console.error('Error adding dog:', error)
-      setMessage('Error adding dog. Check console.')
+    if (!result.success) {
+      console.error('Error adding dog:', result.error)
+      setMessage(`Error: ${result.error || 'Failed to add dog'}`)
     } else {
       setMessage('Success! Dog added.')
       // Clear the form
@@ -82,7 +61,7 @@ export default function AddDogForm({ onDogAdded }: { onDogAdded?: (dog: Dog) => 
         behavioral_notes: '',
       })
       // Notify parent component if needed
-      if (onDogAdded && data) onDogAdded(data)
+      if (onDogAdded && result.data) onDogAdded(result.data)
     }
     setLoading(false)
   }
