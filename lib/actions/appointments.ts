@@ -20,6 +20,14 @@ interface CreateAppointmentInput {
 export async function createAppointment(input: CreateAppointmentInput) {
   const supabase = await createClient()
 
+  // Get the current user
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+  if (authError || !user) {
+    console.error('[Appointments] Authentication failed:', authError)
+    return { success: false, error: 'You must be logged in to create an appointment' }
+  }
+
   const { data: appointment, error } = await supabase
     .from('appointments')
     .insert({
@@ -29,6 +37,7 @@ export async function createAppointment(input: CreateAppointmentInput) {
       services: input.services,
       notes: input.notes,
       status: 'pending_confirmation',
+      user_id: user.id,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     })

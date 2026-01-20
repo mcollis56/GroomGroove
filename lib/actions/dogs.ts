@@ -303,6 +303,57 @@ export async function addGroomingNote(
 }
 
 /**
+ * Create a new dog
+ */
+export interface CreateDogInput {
+  name: string
+  breed?: string
+  weight?: number
+  notes?: string
+  photo_url?: string
+  customer_id: string
+  grooming_preferences?: GroomingPreferences
+}
+
+export async function createDog(
+  input: CreateDogInput
+): Promise<{ success: boolean; error?: string; dogId?: string }> {
+  const supabase = await createClient()
+
+  // Get the current user
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+  if (authError || !user) {
+    console.error('[Dogs] Authentication failed:', authError)
+    return { success: false, error: 'You must be logged in to create a dog' }
+  }
+
+  const { data: dog, error } = await supabase
+    .from('dogs')
+    .insert({
+      name: input.name,
+      breed: input.breed || null,
+      weight: input.weight || null,
+      notes: input.notes || null,
+      photo_url: input.photo_url || null,
+      customer_id: input.customer_id,
+      grooming_preferences: input.grooming_preferences || {},
+      user_id: user.id,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .select('id')
+    .single()
+
+  if (error) {
+    console.error('[Dogs] Create failed:', error)
+    return { success: false, error: error.message }
+  }
+
+  return { success: true, dogId: dog.id }
+}
+
+/**
  * Delete a dog (and optionally their appointments)
  */
 export async function deleteDog(dogId: string): Promise<{ success: boolean; error?: string }> {

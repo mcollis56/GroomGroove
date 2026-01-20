@@ -17,12 +17,21 @@ export async function createCustomer(
 ): Promise<{ success: boolean; error?: string; customerId?: string }> {
   const supabase = await createClient()
 
+  // Get the current user
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+  if (authError || !user) {
+    console.error('[Customers] Authentication failed:', authError)
+    return { success: false, error: 'You must be logged in to create a customer' }
+  }
+
   const { data: customer, error } = await supabase
     .from('customers')
     .insert({
       name: customerData.name.trim(),
       email: customerData.email?.trim() || null,
       phone: customerData.phone?.trim() || null,
+      user_id: user.id,
     })
     .select('id')
     .single()
