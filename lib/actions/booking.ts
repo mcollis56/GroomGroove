@@ -142,6 +142,7 @@ export async function createBooking(
       services: input.services,
       notes: input.notes || null,
       status: 'confirmed',
+      user_id: user.id,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     })
