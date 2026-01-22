@@ -48,41 +48,30 @@ export async function getGroomers(): Promise<Groomer[]> {
 /**
  * Create a new groomer
  */
-export async function createGroomer(
-  input: CreateGroomerInput
-): Promise<{ success: boolean; error?: string; data?: Groomer }> {
-  const supabase = await createClient()
+export async function createGroomer(prevState: any, formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  // Get the current user
-  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { message: "User not authenticated" };
 
-  if (!user) {
-    return { success: false, error: 'You must be logged in.' }
-  }
+  const name = formData.get("name") as string;
+  const role = formData.get("role") as string;
 
-  const { data, error } = await supabase
-    .from('groomers')
-    .insert({
-      name: input.name,
-      email: input.email || null,
-      phone: input.phone || null,
-      role: input.role || 'Groomer',
-      color: input.color || '#3B82F6',
-      is_active: true,
-      user_id: user.id,
-    })
-    .select()
-    .single()
+  // FIX: Include user_id in the insert
+  const { error } = await supabase.from("groomers").insert({
+    name,
+    role,
+    user_id: user.id, // <--- CRITICAL FIX
+    status: "active",
+  });
 
   if (error) {
-    console.error('[Groomers] Create failed:', error)
-    return { success: false, error: error.message }
+    console.error("Groomer Error:", error);
+    return { message: error.message }; // Return actual error
   }
 
-  // Revalidate the groomers page to show the new groomer
-  revalidatePath('/groomers')
-
-  return { success: true, data }
+  revalidatePath("/groomers");
+  return { message: "success" };
 }
 
 /**

@@ -211,7 +211,10 @@ export function NewAppointmentForm() {
     setIsSubmitting(true)
     setError(null)
 
-    const scheduledAt = `${appointmentDate}T${appointmentTime}:00`
+    // Fix Timezone: Create a Date object in the user's local time
+    const localDate = new Date(`${appointmentDate}T${appointmentTime}`);
+    // Convert to UTC string (e.g. 2026-01-24T23:00:00.000Z)
+    const scheduledAt = localDate.toISOString();
 
     const result = await createBooking({
       dogId: selectedDog.id,
