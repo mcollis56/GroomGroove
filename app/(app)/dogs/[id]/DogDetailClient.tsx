@@ -86,8 +86,8 @@ export function EditableGroomingPreferences({ dogId, initialPreferences, isDemo 
                   className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                 >
                   <option value="">Select blade</option>
-                  <option value="3F">3F</option>
-                  <option value="4F">4F</option>
+                  <option value="3f">3f</option>
+                  <option value="4f">4f</option>
                   <option value="5f">5f</option>
                   <option value="7f">7f</option>
                   <option value="10">10</option>
@@ -705,8 +705,8 @@ export function DogQuickActions({ dogId, dogName, customerPhone, photoUrl, groom
                 disabled={saving || saved}
               >
                 <option value="">Select blade</option>
-                <option value="3F">3F</option>
-                <option value="4F">4F</option>
+                <option value="3f">3f</option>
+                <option value="4f">4f</option>
                 <option value="5f">5f</option>
                 <option value="7f">7f</option>
                 <option value="10">10</option>

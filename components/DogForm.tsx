@@ -24,8 +24,8 @@ export default function DogForm({ onSuccess }: { onSuccess?: () => void }) {
   })
 
   const BLADE_SIZES = [
-    { value: '3F', label: '3F' },
-    { value: '4F', label: '4F' },
+    { value: '3f', label: '3f' },
+    { value: '4f', label: '4f' },
     { value: '5f', label: '5f' },
     { value: '7f', label: '7f' },
     { value: '10', label: '10' },
