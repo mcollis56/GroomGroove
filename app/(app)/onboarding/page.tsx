@@ -4,15 +4,25 @@ import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { setupBusiness } from "@/lib/actions/onboarding";
-import { Rocket } from "lucide-react";
+import { Rocket, AlertCircle } from "lucide-react";
 
 export default function OnboardingPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (formData: FormData) => {
     setIsLoading(true);
-    await setupBusiness(formData);
-    // Redirect happens server-side
+    setError(null);
+
+    // Call the server
+    const result = await setupBusiness(formData);
+
+    // If server sent back an error, show it!
+    if (result?.error) {
+      setError(result.error);
+      setIsLoading(false);
+    }
+    // If success, the server will redirect us.
   };
 
   return (
@@ -25,6 +35,14 @@ export default function OnboardingPage() {
           <h1 className="text-2xl font-bold text-gray-900">Welcome to GroomGroove!</h1>
           <p className="text-gray-500 mt-2">Let's get your salon set up in 30 seconds.</p>
         </div>
+
+        {/* ERROR MESSAGE DISPLAY */}
+        {error && (
+          <div className="mb-6 bg-red-50 text-red-600 p-3 rounded-lg flex items-center gap-2 text-sm">
+            <AlertCircle className="w-4 h-4" />
+            {error}
+          </div>
+        )}
 
         <form action={handleSubmit} className="space-y-6">
           <div>
