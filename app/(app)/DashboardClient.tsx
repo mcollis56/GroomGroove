@@ -45,11 +45,28 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
     }))
   }, [initialData.appointments, activeFilter])
 
+  // Handle missing settings or user gracefully
+  if (!initialData.settings || !initialData.user) {
+    return (
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-gray-500">Welcome back! Here's what's happening today.</p>
+        {/* Main dashboard content */}
+        <TodayAtAGlance
+          data={initialData.glance}
+          activeFilter={activeFilter}
+          onFilterChange={setActiveFilter}
+        />
+        <TodayAppointments appointments={appointmentsForDisplay} />
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-500">Welcome back! Here&apos;s what&apos;s happening today.</p>
+        <p className="text-gray-500">Welcome back! Here's what's happening today.</p>
         {activeFilter && (
           <div className="mt-2 text-sm text-blue-600">
             Filtering by: <span className="font-medium">{activeFilter.replace(/-/g, ' ')}</span>
