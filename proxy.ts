@@ -1,8 +1,5 @@
-import { createProxyMiddleware } from 'next/proxy';
+import { updateSession } from '../utils/supabase/middleware'
 
-const matcher = (req) => {
-  if (req.nextUrl.pathname === '/logo.png') return false;
-  return true;
-};
-
-export default createProxyMiddleware(matcher);
+export default function proxy(req) {
+  return updateSession(req)
+}
