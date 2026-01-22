@@ -136,8 +136,8 @@ export default function AddDogForm({ onDogAdded }: { onDogAdded?: (dog: Dog) => 
               onChange={(e) => setFormData({ ...formData, clipper_blade_size: e.target.value })}
             >
               <option value="">Select blade size</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
+              <option value="3F">3F</option>
+              <option value="4F">4F</option>
               <option value="5f">5f</option>
               <option value="7f">7f</option>
               <option value="10">10</option>
