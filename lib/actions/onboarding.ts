@@ -30,7 +30,7 @@ export async function setupBusiness(formData: FormData) {
 
   if (error) {
     console.error("Onboarding Error:", error);
-    return { error: "Failed to save settings. Try again." };
+    return { error: error.message };
   }
 
   revalidatePath("/dashboard");
