@@ -80,6 +80,8 @@ export default function AddDogForm({ onDogAdded }: { onDogAdded?: (dog: Dog) => 
           <input
             type="text"
             required
+            name="dog_name"
+            id="dog_name"
             className="mt-1 block w-full rounded-lg border-2 border-pink-200 p-3 text-gray-900 shadow-sm focus:border-pink-400 focus:ring-pink-400 min-h-[44px]"
             value={formData.dog_name}
             onChange={(e) => setFormData({ ...formData, dog_name: e.target.value })}
@@ -91,6 +93,8 @@ export default function AddDogForm({ onDogAdded }: { onDogAdded?: (dog: Dog) => 
           <input
             type="text"
             required
+            name="owner_name"
+            id="owner_name"
             className="mt-1 block w-full rounded-lg border-2 border-pink-200 p-3 text-gray-900 shadow-sm focus:border-pink-400 focus:ring-pink-400 min-h-[44px]"
             value={formData.owner_name}
             onChange={(e) => setFormData({ ...formData, owner_name: e.target.value })}
@@ -102,6 +106,9 @@ export default function AddDogForm({ onDogAdded }: { onDogAdded?: (dog: Dog) => 
             <label className="block text-sm font-medium text-gray-700">Phone</label>
             <input
               type="tel"
+              required
+              name="owner_phone"
+              id="owner_phone"
               className="mt-1 block w-full rounded-lg border-2 border-pink-200 p-3 text-gray-900 shadow-sm focus:border-pink-400 focus:ring-pink-400 min-h-[44px]"
               value={formData.owner_phone}
               onChange={(e) => setFormData({ ...formData, owner_phone: e.target.value })}
@@ -111,6 +118,9 @@ export default function AddDogForm({ onDogAdded }: { onDogAdded?: (dog: Dog) => 
             <label className="block text-sm font-medium text-gray-700">Email</label>
             <input
               type="email"
+              required
+              name="owner_email"
+              id="owner_email"
               className="mt-1 block w-full rounded-lg border-2 border-pink-200 p-3 text-gray-900 shadow-sm focus:border-pink-400 focus:ring-pink-400 min-h-[44px]"
               value={formData.owner_email}
               onChange={(e) => setFormData({ ...formData, owner_email: e.target.value })}
@@ -122,6 +132,9 @@ export default function AddDogForm({ onDogAdded }: { onDogAdded?: (dog: Dog) => 
           <label className="block text-sm font-medium text-gray-700">Breed</label>
           <input
             type="text"
+            required
+            name="breed"
+            id="breed"
             className="mt-1 block w-full rounded-lg border-2 border-pink-200 p-3 text-gray-900 shadow-sm focus:border-pink-400 focus:ring-pink-400 min-h-[44px]"
             value={formData.breed}
             onChange={(e) => setFormData({ ...formData, breed: e.target.value })}
@@ -132,6 +145,8 @@ export default function AddDogForm({ onDogAdded }: { onDogAdded?: (dog: Dog) => 
           <div>
             <label className="block text-sm font-medium text-gray-700">Blade Size</label>
             <select
+              name="clipper_blade_size"
+              id="clipper_blade_size"
               className="mt-1 block w-full rounded-lg border-2 border-pink-200 p-3 text-gray-900 shadow-sm focus:border-pink-400 focus:ring-pink-400 min-h-[44px]"
               value={formData.clipper_blade_size}
               onChange={(e) => setFormData({ ...formData, clipper_blade_size: e.target.value })}
@@ -147,6 +162,8 @@ export default function AddDogForm({ onDogAdded }: { onDogAdded?: (dog: Dog) => 
           <div>
             <label className="block text-sm font-medium text-gray-700">Comb Attachment</label>
             <select
+              name="comb_attachment"
+              id="comb_attachment"
               className="mt-1 block w-full rounded-lg border-2 border-pink-200 p-3 text-gray-900 shadow-sm focus:border-pink-400 focus:ring-pink-400 min-h-[44px]"
               value={formData.comb_attachment}
               onChange={(e) => setFormData({ ...formData, comb_attachment: e.target.value })}
@@ -166,6 +183,8 @@ export default function AddDogForm({ onDogAdded }: { onDogAdded?: (dog: Dog) => 
             <label className="block text-sm font-medium text-gray-700">Nail Clipper Size</label>
             <input
               type="text"
+              name="nail_clipper_size"
+              id="nail_clipper_size"
               className="mt-1 block w-full rounded-lg border-2 border-pink-200 p-3 text-gray-900 shadow-sm focus:border-pink-400 focus:ring-pink-400 min-h-[44px]"
               value={formData.nail_clipper_size}
               onChange={(e) => setFormData({ ...formData, nail_clipper_size: e.target.value })}
@@ -176,6 +195,8 @@ export default function AddDogForm({ onDogAdded }: { onDogAdded?: (dog: Dog) => 
         <div>
           <label className="block text-sm font-medium text-gray-700">Grooming Notes</label>
           <textarea
+            name="grooming_notes"
+            id="grooming_notes"
             className="mt-1 block w-full rounded-lg border-2 border-pink-200 p-3 text-gray-900 shadow-sm focus:border-pink-400 focus:ring-pink-400"
             rows={3}
             placeholder="Coat preferences, style notes, etc."
@@ -187,6 +208,8 @@ export default function AddDogForm({ onDogAdded }: { onDogAdded?: (dog: Dog) => 
         <div>
           <label className="block text-sm font-medium text-gray-700">Behavioral Notes</label>
           <textarea
+            name="behavioral_notes"
+            id="behavioral_notes"
             className="mt-1 block w-full rounded-lg border-2 border-pink-200 p-3 text-gray-900 shadow-sm focus:border-pink-400 focus:ring-pink-400"
             rows={3}
             placeholder="Temperament, handling requirements, etc."
