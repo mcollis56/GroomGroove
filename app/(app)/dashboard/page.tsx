@@ -23,12 +23,20 @@ export default async function DashboardPage() {
     .maybeSingle();
 
   if (!subscription) redirect("/pricing");
-  
+
   const expiry = new Date(subscription.current_period_end);
   if (expiry < new Date()) redirect("/pricing?expired=true");
 
+  // 2. Onboarding Check
+  const { data: settings } = await supabase
+    .from("business_settings")
+    .select("id")
+    .eq("user_id", user.id)
+    .maybeSingle();
 
-  // 2. DATA FETCHING - LOCKED TO USER_ID
+  if (!settings) redirect("/onboarding");
+
+  // 3. DATA FETCHING - LOCKED TO USER_ID
   const today = new Date().toISOString().split('T')[0];
   
   const [appointmentsResult, onDutyGroomers, offDutyGroomers] = await Promise.all([
