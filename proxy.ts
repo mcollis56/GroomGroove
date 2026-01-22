@@ -1,5 +1,13 @@
-import { updateSession } from '../utils/supabase/middleware'
+import { NextRequest } from 'next/server'
 
-export default function proxy(req) {
-  return updateSession(req)
+export const config = {
+  matcher: [
+    '/_next',
+    '/static',
+    '/logo.png',
+  ],
+}
+
+export async function proxy(request: NextRequest) {
+  return updateSession(request)
 }
