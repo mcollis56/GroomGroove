@@ -24,6 +24,14 @@ export default function AddDogForm({ onDogAdded }: { onDogAdded?: (dog: Dog) => 
     behavioral_notes: '',
   })
 
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, dog_name: e.target.value })
+  }
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, owner_phone: e.target.value })
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -84,7 +92,7 @@ export default function AddDogForm({ onDogAdded }: { onDogAdded?: (dog: Dog) => 
             id="dog_name"
             className="mt-1 block w-full rounded-lg border-2 border-pink-200 p-3 text-gray-900 shadow-sm focus:border-pink-400 focus:ring-pink-400 min-h-[44px]"
             value={formData.dog_name}
-            onChange={(e) => setFormData({ ...formData, dog_name: e.target.value })}
+            onChange={handleNameChange}
           />
         </div>
 
@@ -111,7 +119,7 @@ export default function AddDogForm({ onDogAdded }: { onDogAdded?: (dog: Dog) => 
               id="owner_phone"
               className="mt-1 block w-full rounded-lg border-2 border-pink-200 p-3 text-gray-900 shadow-sm focus:border-pink-400 focus:ring-pink-400 min-h-[44px]"
               value={formData.owner_phone}
-              onChange={(e) => setFormData({ ...formData, owner_phone: e.target.value })}
+              onChange={handlePhoneChange}
             />
           </div>
           <div>
