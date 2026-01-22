@@ -28,13 +28,24 @@ export default async function DashboardPage() {
   if (expiry < new Date()) redirect("/pricing?expired=true");
 
   // 2. Onboarding Check
-  const { data: settings } = await supabase
+  const { data: settings, error } = await supabase
     .from("business_settings")
-    .select("id")
+    .select("*")
     .eq("user_id", user.id)
     .maybeSingle();
 
-  if (!settings) redirect("/onboarding");
+  // DEBUGGING MODE: Don't redirect. Just show me what you see.
+  if (!settings) {
+    return (
+      <div className="p-10 text-red-600 font-bold space-y-4">
+        <h1>🚨 DEBUGGING MODE 🚨</h1>
+        <p>I cannot find your settings.</p>
+        <p>My User ID is: <span className="font-mono bg-gray-200 p-1">{user.id}</span></p>
+        <p>Database Error: {error ? JSON.stringify(error) : "None"}</p>
+        <p>Please check Supabase: Does a row exist with this EXACT User ID?</p>
+      </div>
+    );
+  }
 
   // 3. DATA FETCHING - LOCKED TO USER_ID
   const today = new Date().toISOString().split('T')[0];
