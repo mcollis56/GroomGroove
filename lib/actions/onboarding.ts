@@ -21,11 +21,13 @@ export async function setupBusiness(formData: FormData) {
   // Insert settings
   const { error } = await supabase
     .from("business_settings")
-    .insert({
+    .upsert({
       user_id: user.id,
       business_name: businessName,
       phone: phone,
       currency: currency,
+    }, {
+      onConflict: 'user_id'
     });
 
   if (error) {
