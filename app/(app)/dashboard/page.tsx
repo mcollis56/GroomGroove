@@ -34,7 +34,21 @@ export default async function DashboardPage() {
     .eq("user_id", user.id)
     .maybeSingle();
 
-  if (!settings) redirect("/onboarding");
+  if (!settings) {
+    return (
+      <div className="p-6 max-w-7xl mx-auto">
+        <div className="min-h-[60vh] flex items-center justify-center">
+          <div className="text-center max-w-md">
+            <h1 className="text-3xl font-bold mb-4">Welcome to GroomGroove!</h1>
+            <p className="mb-8 text-gray-600">Let's get your salon set up.</p>
+            <Link href="/onboarding" className="bg-rose-600 text-white px-6 py-3 rounded-lg hover:bg-rose-700">
+              Set Up My Salon →
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // 3. DATA FETCHING - LOCKED TO USER_ID
   const today = new Date().toISOString().split('T')[0];
