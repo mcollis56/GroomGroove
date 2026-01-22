@@ -10,6 +10,7 @@ import { Modal } from '@/components/ui/Modal'
 import { addGroomingNote, updateGroomingPreferences, deleteDog, type GroomingPreferences } from '@/lib/actions/dogs'
 import { uploadDogPhoto, deleteDogPhoto } from '@/lib/actions/photos'
 import { useRouter } from 'next/navigation'
+import { BLADE_SIZES } from '@/lib/constants/grooming'
 
 interface DogQuickActionsProps {
   dogId: string
@@ -86,12 +87,11 @@ export function EditableGroomingPreferences({ dogId, initialPreferences, isDemo 
                   className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                 >
                   <option value="">Select blade</option>
-                  <option value="3f">3f</option>
-                  <option value="4f">4f</option>
-                  <option value="5f">5f</option>
-                  <option value="7f">7f</option>
-                  <option value="10">10</option>
-                  <option value="15">15</option>
+                  {BLADE_SIZES.map((size) => (
+                    <option key={size.value} value={size.value}>
+                      {size.label}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -705,12 +705,11 @@ export function DogQuickActions({ dogId, dogName, customerPhone, photoUrl, groom
                 disabled={saving || saved}
               >
                 <option value="">Select blade</option>
-                <option value="3f">3f</option>
-                <option value="4f">4f</option>
-                <option value="5f">5f</option>
-                <option value="7f">7f</option>
-                <option value="10">10</option>
-                <option value="15">15</option>
+                {BLADE_SIZES.map((size) => (
+                  <option key={size.value} value={size.value}>
+                    {size.label}
+                  </option>
+                ))}
               </select>
             </div>
 

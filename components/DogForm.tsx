@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { createClient } from '@/utils/supabase/client' // Ensure you have this utility
 import { Loader2, Save } from 'lucide-react'
+import { BLADE_SIZES } from '@/lib/constants/grooming'
 
 export default function DogForm({ onSuccess }: { onSuccess?: () => void }) {
   const supabase = createClient()
@@ -22,15 +23,6 @@ export default function DogForm({ onSuccess }: { onSuccess?: () => void }) {
     grooming_notes: '',
     behavioral_notes: ''
   })
-
-  const BLADE_SIZES = [
-    { value: '3f', label: '3f' },
-    { value: '4f', label: '4f' },
-    { value: '5f', label: '5f' },
-    { value: '7f', label: '7f' },
-    { value: '10', label: '10' },
-    { value: '15', label: '15' },
-  ]
 
   const COMB_ATTACHMENTS = [
     { value: '3mm', label: '3mm' },

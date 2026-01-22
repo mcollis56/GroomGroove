@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { createDog } from '@/lib/actions/dogs'
 // We import the Dog type we just made
 import { Dog } from '@/app/types' 
+import { BLADE_SIZES } from '@/lib/constants/grooming'
 
 export default function AddDogForm({ onDogAdded }: { onDogAdded?: (dog: Dog) => void }) {
   const [loading, setLoading] = useState(false)
@@ -136,12 +137,11 @@ export default function AddDogForm({ onDogAdded }: { onDogAdded?: (dog: Dog) => 
               onChange={(e) => setFormData({ ...formData, clipper_blade_size: e.target.value })}
             >
               <option value="">Select blade size</option>
-              <option value="3f">3f</option>
-              <option value="4f">4f</option>
-              <option value="5f">5f</option>
-              <option value="7f">7f</option>
-              <option value="10">10</option>
-              <option value="15">15</option>
+              {BLADE_SIZES.map((size) => (
+                <option key={size.value} value={size.value}>
+                  {size.label}
+                </option>
+              ))}
             </select>
           </div>
           <div>

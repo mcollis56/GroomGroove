@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button'
 import { Dog, User, Calendar, Scissors, AlertCircle, Save, Clock, CheckCircle } from 'lucide-react'
 import { getDogDetail, updateGroomingPreferences, type DogDetail, type GroomingPreferences } from '@/lib/actions/dogs'
 import { safeParseDate } from '@/lib/utils/date'
+import { BLADE_SIZES } from '@/lib/constants/grooming'
 
 interface DogDetailModalProps {
   dogId: string | null
@@ -212,19 +213,16 @@ export function DogDetailModal({ dogId, isOpen, onClose }: DogDetailModalProps) 
                   Clipper Blade Size
                 </label>
                 <select
-                  value={preferences.clipping_length || ''}
-                  onChange={(e) => updatePreference('clipping_length', e.target.value)}
+                  value={preferences.blade_size || ''}
+                  onChange={(e) => updatePreference('blade_size', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300"
                 >
                   <option value="">Not specified</option>
-                  <option value="#3f (13mm) - Longer Body">#3f (13mm) - Longer Body</option>
-                  <option value="#4f (10mm) - Winter Trim">#4f (10mm) - Winter Trim</option>
-                  <option value="#5 (6mm) - Short Puppy Cut">#5 (6mm) - Short Puppy Cut</option>
-                  <option value="#7 (3mm) - Summer Cut / Matted">#7 (3mm) - Summer Cut / Matted</option>
-                  <option value="#10 (1.8mm) - Sanitary / Paws">#10 (1.8mm) - Sanitary / Paws</option>
-                  <option value="#15 (1.2mm) - Pads">#15 (1.2mm) - Pads</option>
-                  <option value="#30 (0.5mm) - Under Comb">#30 (0.5mm) - Under Comb</option>
-                  <option value="custom">Custom (see notes)</option>
+                  {BLADE_SIZES.map((size) => (
+                    <option key={size.value} value={size.value}>
+                      {size.label}
+                    </option>
+                  ))}
                 </select>
               </div>
 
