@@ -51,3 +51,51 @@ export async function createInvoiceFromAppointment(appointmentId: string) {
 
   return { id: invoice.id }
 }
+
+export async function updateInvoiceItem(itemId: string, price: number) {
+  const supabase = await createClient()
+
+  const { data: item, error: updateError } = await supabase
+    .from('invoice_items')
+    .update({
+      unit_price: price,
+      amount: price
+    })
+    .eq('id', itemId)
+    .select('id, invoice_id')
+    .single()
+
+  if (updateError || !item) {
+    throw new Error('Failed to update invoice item: ' + updateError?.message)
+  }
+
+  const { data: items, error: itemsError } = await supabase
+    .from('invoice_items')
+    .select('amount')
+    .eq('invoice_id', item.invoice_id)
+
+  if (!itemsError && items) {
+    const totalAmount = items.reduce((sum, line) => sum + (line.amount || 0), 0)
+    await supabase
+      .from('invoices')
+      .update({ total_amount: totalAmount })
+      .eq('id', item.invoice_id)
+  }
+
+  return { success: true, invoiceId: item.invoice_id }
+}
+
+export async function updateInvoiceStatus(invoiceId: string, status: string) {
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from('invoices')
+    .update({ status })
+    .eq('id', invoiceId)
+
+  if (error) {
+    throw new Error('Failed to update invoice status: ' + error.message)
+  }
+
+  return { success: true }
+}
