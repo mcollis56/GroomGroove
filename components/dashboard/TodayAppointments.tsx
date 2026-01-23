@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
+import { createInvoiceFromAppointment } from "@/lib/actions/invoices";
 import { format, isValid } from "date-fns";
 import { safeParseDate } from "@/lib/utils/date";
 import { Check, Clock, Play, XCircle } from "lucide-react";
@@ -21,7 +22,7 @@ function AppointmentRow({ appointment }: { appointment: any }) {
   const handleStatusUpdate = async (newStatus: string) => {
     if (isLoading) return;
     setIsLoading(true);
-    
+
     // Optimistic Update
     setStatus(newStatus);
 
@@ -32,7 +33,13 @@ function AppointmentRow({ appointment }: { appointment: any }) {
         .eq("id", appointment.id);
 
       if (error) throw error;
-      
+
+      if (newStatus === "completed") {
+        const invoice = await createInvoiceFromAppointment(appointment.id);
+        router.push(`/invoices/${invoice.id}`);
+        return;
+      }
+
       router.refresh(); // Refresh to update the "Next Up" banner
     } catch (error) {
       console.error(error);

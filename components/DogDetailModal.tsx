@@ -163,7 +163,7 @@ export function DogDetailModal({ dogId, isOpen, onClose }: DogDetailModalProps) 
                 )}
               </div>
               <p className="text-gray-600">{dog.breed || 'Unknown breed'}</p>
-              {dog.weight && <p className="text-sm text-gray-500">{dog.weight} lbs</p>}
+              {dog.weight && <p className="text-sm text-gray-500">{dog.weight} kg</p>}
 
               <div className="mt-3 pt-3 border-t border-gray-200 grid grid-cols-2 gap-4">
                 <div className="flex items-center gap-2">

@@ -503,7 +503,7 @@ export function NotificationsPageClient({
                   <h3 className="text-lg font-semibold text-gray-900">{selectedDog.name}</h3>
                   <p className="text-gray-500">{selectedDog.breed || 'Mixed Breed'}</p>
                   {selectedDog.weight && (
-                    <p className="text-sm text-gray-500">{selectedDog.weight} lbs</p>
+                    <p className="text-sm text-gray-500">{selectedDog.weight} kg</p>
                   )}
                 </div>
               </div>

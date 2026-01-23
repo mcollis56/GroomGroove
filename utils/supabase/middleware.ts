@@ -16,15 +16,16 @@ export async function updateSession(request: NextRequest) {
         getAll() {
           return request.cookies.getAll()
         },
-        setAll(cookiesToSet: any[]) {
-          cookiesToSet.forEach(({ name, value, options }) =>
+        // We explicitly type the argument here to silence the "red" errors
+        setAll(cookiesToSet: { name: string; value: string; options?: any }[]) {
+          cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           )
+          
           response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
+            request,
           })
+          
           cookiesToSet.forEach(({ name, value, options }) =>
             response.cookies.set(name, value, options)
           )
@@ -33,19 +34,8 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    return NextResponse.redirect(url)
-  }
-
-  response.cookies.getAll().forEach((cookie) => {
-    request.cookies.set(cookie.name, cookie.value)
-  })
+  // This refreshes the session
+  await supabase.auth.getUser()
 
   return response
 }

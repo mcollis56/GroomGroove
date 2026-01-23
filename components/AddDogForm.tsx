@@ -25,11 +25,11 @@ export default function AddDogForm({ onDogAdded }: { onDogAdded?: (dog: Dog) => 
   })
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, dog_name: e.target.value })
+    setFormData(prev => ({ ...prev, dog_name: e.target.value }))
   }
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, owner_phone: e.target.value })
+    setFormData(prev => ({ ...prev, owner_phone: e.target.value }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {

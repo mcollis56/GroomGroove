@@ -382,10 +382,13 @@ export function NewAppointmentForm() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="create-dog-name" className="block text-sm font-medium text-gray-700 mb-1">
                     Dog Name <span className="text-red-500">*</span>
                   </label>
                   <Input
+                    id="create-dog-name"
+                    name="create-dog-name"
+                    autoComplete="off"
                     value={newDogName}
                     onChange={(e) => setNewDogName(e.target.value)}
                     placeholder="e.g. Max"
@@ -394,17 +397,23 @@ export function NewAppointmentForm() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Breed</label>
+                    <label htmlFor="create-dog-breed" className="block text-sm font-medium text-gray-700 mb-1">Breed</label>
                     <Input
+                      id="create-dog-breed"
+                      name="create-dog-breed"
+                      autoComplete="off"
                       value={newDogBreed}
                       onChange={(e) => setNewDogBreed(e.target.value)}
                       placeholder="e.g. Golden Retriever"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Weight (kg)</label>
+                    <label htmlFor="create-dog-weight" className="block text-sm font-medium text-gray-700 mb-1">Weight (kg)</label>
                     <Input
+                      id="create-dog-weight"
+                      name="create-dog-weight"
                       type="number"
+                      autoComplete="off"
                       value={newDogWeight}
                       onChange={(e) => setNewDogWeight(e.target.value)}
                       placeholder="e.g. 25"
@@ -424,10 +433,13 @@ export function NewAppointmentForm() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="create-owner-name" className="block text-sm font-medium text-gray-700 mb-1">
                     Owner Name <span className="text-red-500">*</span>
                   </label>
                   <Input
+                    id="create-owner-name"
+                    name="create-owner-name"
+                    autoComplete="off"
                     value={ownerName}
                     onChange={(e) => setOwnerName(e.target.value)}
                     placeholder="e.g. John Smith"
@@ -436,17 +448,24 @@ export function NewAppointmentForm() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                    <label htmlFor="create-owner-phone" className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
                     <Input
+                      id="create-owner-phone"
+                      name="create-owner-phone"
+                      type="tel"
+                      autoComplete="off"
                       value={ownerPhone}
                       onChange={(e) => setOwnerPhone(e.target.value)}
                       placeholder="e.g. 0400 000 000"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <label htmlFor="create-owner-email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                     <Input
+                      id="create-owner-email"
+                      name="create-owner-email"
                       type="email"
+                      autoComplete="off"
                       value={ownerEmail}
                       onChange={(e) => setOwnerEmail(e.target.value)}
                       placeholder="e.g. john@email.com"

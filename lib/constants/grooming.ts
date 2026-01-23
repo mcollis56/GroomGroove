@@ -1,6 +1,6 @@
 export const BLADE_SIZES = [
-  { value: '3f', label: '3f (13mm) - Longer Body' },
-  { value: '4f', label: '4f (10mm) - Winter Trim' },
+  { value: '3F', label: '3F (13mm) - Longer Body' },
+  { value: '4F', label: '4F (10mm) - Winter Trim' },
   { value: '5f', label: '5f (6mm) - Short Puppy Cut' },
   { value: '7f', label: '7f (3mm) - Summer Cut / Matted' },
   { value: '10', label: '10 (1.8mm) - Sanitary / Paws' },

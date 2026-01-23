@@ -86,7 +86,7 @@ export default async function DogDetailPage({ params }: DogDetailPageProps) {
                     {dog.weight && (
                       <div>
                         <p className="text-sm text-gray-500">Weight</p>
-                        <p className="font-medium text-gray-900">{dog.weight} lbs</p>
+                        <p className="font-medium text-gray-900">{dog.weight} kg</p>
                       </div>
                     )}
                     {dog.customer?.phone && (

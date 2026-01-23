@@ -10,19 +10,21 @@ export default function OnboardingPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (formData: FormData) => {
+  // This wrapper function handles the submission
+  const clientAction = async (formData: FormData) => {
     setIsLoading(true);
     setError(null);
 
-    // Call the server
+    // We call the server action. 
+    // If it succeeds and redirects, the browser will navigate away immediately.
+    // If it fails, it returns an object with { error: ... }
     const result = await setupBusiness(formData);
 
-    // If server sent back an error, show it!
     if (result?.error) {
       setError(result.error);
       setIsLoading(false);
     }
-    // If success, the server will redirect us.
+    // If success (redirect), we do nothing here because the page is already unloading.
   };
 
   return (
@@ -44,7 +46,8 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        <form action={handleSubmit} className="space-y-6">
+        {/* CHANGED: Use action={clientAction} instead of onSubmit */}
+        <form action={clientAction} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Business Name *</label>
             <Input name="businessName" placeholder="e.g. Paws & Claws" required className="text-lg" />
