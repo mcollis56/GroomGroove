@@ -1,22 +1,23 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers"; // Import cookies
+import { cookies } from "next/headers";
+import Link from "next/link";
+// Make sure these match your actual icon imports and paths!
+import { Plus, Calendar, Clock, Scissors } from "lucide-react";
 import TodayAppointments from "@/components/dashboard/TodayAppointments";
 import { GroomersTodayCard } from "@/components/dashboard/GroomersTodayCard";
-import Link from "next/link";
-import { Plus, Calendar, Clock } from "lucide-react";
 import { formatTime } from "@/lib/utils/date";
 import { getGroomersOnDuty, getGroomersOffDuty } from "@/lib/actions/groomers";
 
 export default async function DashboardPage(props: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
   const searchParams = await props.searchParams; 
   const supabase = await createClient();
-  const cookieStore = await cookies(); // Get cookies
+  const cookieStore = await cookies();
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  // Subscription check (keep this)
+  // --- SUBSCRIPTION CHECK ---
   const { data: subscription } = await supabase
     .from("subscriptions")
     .select("status, current_period_end")
@@ -28,14 +29,11 @@ export default async function DashboardPage(props: { searchParams: Promise<{ [ke
   if (!subscription) redirect("/pricing");
   if (new Date(subscription.current_period_end) < new Date()) redirect("/pricing?expired=true");
 
-  // --- THE FIX ---
-  // 1. Check if we have the "safety cookie" from the onboarding action.
+  // --- THE LOGIN FIX (Cookie Bypass) ---
   const hasOnboardingCookie = cookieStore.get("onboarding_complete")?.value === "true";
 
   let settings = null;
 
-  // 2. Only query the DB if we DON'T have the cookie.
-  // If we have the cookie, we assume we are onboarded and skip the check.
   if (!hasOnboardingCookie) {
     const { data } = await supabase
       .from("business_settings")
@@ -44,39 +42,25 @@ export default async function DashboardPage(props: { searchParams: Promise<{ [ke
       .maybeSingle();
     settings = data;
   } else {
-    // Fake the settings object so we don't block render
+    // Cookie says we are good -> Bypass DB check
     settings = { id: "cookie-bypass" };
   }
 
-  // 3. If NO cookie AND NO settings, show the Welcome UI
+  // Fallback if really no settings
   if (!settings) {
-    return (
-      <div className="p-6 max-w-7xl mx-auto">
-        <div className="min-h-[60vh] flex items-center justify-center">
-          <div className="text-center max-w-md">
-            <h1 className="text-3xl font-bold mb-4">Welcome to GroomGroove!</h1>
-            <p className="mb-8 text-gray-600">Let&apos;s get your salon set up properly.</p>
-            <a 
-              href="/onboarding" 
-              className="inline-block bg-rose-600 text-white px-6 py-3 rounded-lg hover:bg-rose-700 transition-colors shadow-md"
-            >
-              Set Up My Salon →
-            </a>
-          </div>
-        </div>
-      </div>
-    );
+    return redirect("/onboarding");
   }
 
-  // ... (Rest of your dashboard code: Data Fetching, Appointments, etc.)
-  // Copy the rest of your existing return statement here.
-  // For brevity, I am not repeating the whole bottom half, but you MUST keep it!
-  
-  // (Paste the rest of the file from "const today = ..." downwards here)
-  
+  // --- DATA FETCHING ---
   const today = new Date().toISOString().split('T')[0];
   const [appointmentsResult, onDutyGroomers, offDutyGroomers] = await Promise.all([
-    supabase.from("appointments").select(`*, dog:dogs(id, name, grooming_preferences), customer:customers(id, name)`).eq("user_id", user.id).gte('scheduled_at', `${today}T00:00:00`).lt('scheduled_at', `${today}T23:59:59`).in('status', ['pending', 'confirmed', 'in_progress']).order('scheduled_at', { ascending: true }),
+    supabase.from("appointments")
+      .select(`*, dog:dogs(id, name, grooming_preferences), customer:customers(id, name)`)
+      .eq("user_id", user.id)
+      .gte('scheduled_at', `${today}T00:00:00`)
+      .lt('scheduled_at', `${today}T23:59:59`)
+      .in('status', ['pending', 'confirmed', 'in_progress'])
+      .order('scheduled_at', { ascending: true }),
     getGroomersOnDuty(),
     getGroomersOffDuty(),
   ]);
@@ -85,51 +69,75 @@ export default async function DashboardPage(props: { searchParams: Promise<{ [ke
   const remainingJobs = appointments.length;
   const nextJob = appointments[0];
 
+  // --- RENDER DASHBOARD UI ---
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-6 max-w-7xl mx-auto min-h-screen bg-[#FFFBF5]"> 
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Salon Dashboard</h1>
-          <p className="text-gray-500">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight">Salon Dashboard</h1>
+          <p className="text-slate-500 font-bold mt-1 uppercase tracking-wide text-sm">
+            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+          </p>
         </div>
-        <div className="bg-rose-100 text-rose-700 px-4 py-2 rounded-full font-bold">
-          {remainingJobs} Dogs Remaining
+        <div className="bg-orange-100 text-orange-800 border-2 border-orange-200 px-5 py-2 rounded-full font-black text-sm shadow-sm transform -rotate-2">
+          {remainingJobs} {remainingJobs === 1 ? 'DOG' : 'DOGS'} LEFT 🐾
         </div>
       </div>
+
       {nextJob ? (
-        <div className="mb-8 bg-gradient-to-r from-rose-500 to-pink-600 rounded-2xl p-6 text-white shadow-xl">
-          <div className="flex items-center gap-3 mb-2 text-rose-100 uppercase text-xs font-bold tracking-wider">
+        <div className="mb-8 bg-gradient-to-r from-indigo-700 via-purple-600 to-orange-500 rounded-3xl p-8 text-white shadow-xl shadow-purple-200 border-b-8 border-indigo-900 transform transition-all hover:scale-[1.01]">
+          <div className="flex items-center gap-3 mb-4 text-purple-100 uppercase text-xs font-black tracking-widest">
             <Clock className="h-4 w-4" /> Next Up
           </div>
           <div className="flex justify-between items-end">
             <div>
-              <h2 className="text-3xl font-bold">{nextJob.dog?.name || "Unknown Dog"}</h2>
-              <p className="text-lg opacity-90">{nextJob.customer?.name || "Unknown Customer"} • {nextJob.service_type || "Full Groom"}</p>
+              <h2 className="text-4xl md:text-5xl font-black tracking-tighter mb-2">{nextJob.dog?.name || "Unknown Dog"}</h2>
+              <p className="text-xl font-medium opacity-90 flex items-center gap-2">
+                 {nextJob.service_type || "Full Groom"} <span className="opacity-50">•</span> {nextJob.customer?.name}
+              </p>
             </div>
-            <div className="text-right">
-              <p className="text-3xl font-bold">{formatTime(nextJob.scheduled_at)}</p>
+            <div className="text-right bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/20">
+              <p className="text-3xl font-black tracking-tight">{formatTime(nextJob.scheduled_at)}</p>
             </div>
           </div>
         </div>
-      ) : null}
-      <div className="grid grid-cols-3 gap-4 mb-8">
-        <Link href="/calendar/new" className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center hover:border-rose-300 transition-colors group">
-          <div className="bg-rose-50 p-3 rounded-full mb-2 group-hover:bg-rose-100"><Plus className="h-6 w-6 text-rose-600" /></div>
-          <span className="font-semibold text-gray-700">Add Dog</span>
+      ) : (
+        <div className="mb-8 bg-slate-100 rounded-3xl p-8 border-2 border-dashed border-slate-300 text-center">
+           <p className="text-slate-400 font-bold text-lg">No upcoming jobs right now. Time for coffee? ☕️</p>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <Link href="/calendar/new" className="bg-white p-6 rounded-2xl shadow-sm border-2 border-slate-100 flex flex-col items-center justify-center hover:border-orange-400 hover:shadow-md transition-all group">
+          <div className="bg-orange-50 p-4 rounded-full mb-3 group-hover:bg-orange-100 transition-colors">
+            <Plus className="h-8 w-8 text-orange-600" />
+          </div>
+          <span className="font-black text-slate-700 text-lg group-hover:text-orange-600">Add Dog</span>
         </Link>
-        <Link href="/calendar/new" className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center hover:border-rose-300 transition-colors group">
-          <div className="bg-rose-50 p-3 rounded-full mb-2 group-hover:bg-rose-100"><Calendar className="h-6 w-6 text-rose-600" /></div>
-          <span className="font-semibold text-gray-700">Book Appt</span>
+        
+        <Link href="/calendar/new" className="bg-white p-6 rounded-2xl shadow-sm border-2 border-slate-100 flex flex-col items-center justify-center hover:border-purple-400 hover:shadow-md transition-all group">
+          <div className="bg-purple-50 p-4 rounded-full mb-3 group-hover:bg-purple-100 transition-colors">
+            <Calendar className="h-8 w-8 text-purple-600" />
+          </div>
+          <span className="font-black text-slate-700 text-lg group-hover:text-purple-600">Book Appt</span>
         </Link>
-        <GroomersTodayCard onDutyGroomers={onDutyGroomers} offDutyGroomers={offDutyGroomers} />
+        
+        <div className="bg-white p-6 rounded-2xl shadow-sm border-2 border-slate-100 hover:border-indigo-400 transition-all h-full">
+             <GroomersTodayCard onDutyGroomers={onDutyGroomers} offDutyGroomers={offDutyGroomers} />
+        </div>
       </div>
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Today&apos;s Schedule</h2>
+
+      <div className="bg-white rounded-3xl shadow-xl shadow-slate-100 border border-slate-100 p-8">
+        <div className="flex items-center gap-3 mb-6">
+            <Scissors className="h-6 w-6 text-slate-400" />
+            <h2 className="text-2xl font-black text-slate-900">Today&apos;s Run Sheet</h2>
+        </div>
+        
         {remainingJobs > 0 ? (
           <TodayAppointments appointments={appointments} />
         ) : (
-          <div className="text-center py-10 text-gray-400">
-            <p>All clear! No pending jobs for today.</p>
+          <div className="text-center py-12 text-slate-300">
+            <p className="font-bold text-xl">All clear! No pending jobs for today.</p>
           </div>
         )}
       </div>

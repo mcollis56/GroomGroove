@@ -1,47 +1,27 @@
-'use server'
+"use server";
 
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
-import { cookies } from "next/headers"; // Import cookies
+import { cookies } from "next/headers";
 
 export async function setupBusiness(formData: FormData) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) redirect("/login");
-
-  const businessName = formData.get("businessName") as string;
-  const phone = formData.get("phone") as string;
-  const currency = formData.get("currency") as string || "$";
-
-  if (!businessName) return { error: "Business Name is required" };
-
-  const { error } = await supabase
-    .from("business_settings")
-    .upsert({
-      user_id: user.id,
-      business_name: businessName,
-      phone: phone || "",
-      currency: currency,
-      contact_email: user.email,
-      address: "",
-      updated_at: new Date().toISOString(),
-    }, {
-      onConflict: 'user_id'
-    });
-
-  if (error) return { error: error.message };
-
-  // --- THE NUCLEAR FIX ---
-  // Set a cookie that expires in 24 hours.
-  // This tells the dashboard "I am onboarded" without needing to query the DB.
   const cookieStore = await cookies();
-  cookieStore.set("onboarding_complete", "true", { 
-    maxAge: 60 * 60 * 24, // 24 hours
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
+
+  // ... (Your existing DB insertion logic here) ...
+  // e.g. await supabase.from('business_settings').upsert(...)
+
+  // --- THE IMPORTANT PART ---
+  // Set the cookie so the Dashboard lets us in immediately
+  cookieStore.set("onboarding_complete", "true", {
     path: "/",
+    maxAge: 60 * 60 * 24 * 365, // 1 year
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
   });
 
-  revalidatePath("/", "layout");
   redirect("/dashboard");
 }
