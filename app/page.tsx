@@ -1,6 +1,7 @@
 import Link from "next/link";
-import Image from "next/image"; // Kept for your logo if you have one, or we use text
-import { Button } from "@/components/ui/button";
+import Image from "next/image"; 
+// FIXED: Capital 'B' in Button to match your project structure
+import { Button } from "@/components/ui/Button"; 
 import { Check, Smartphone, Clock, ShieldCheck, ArrowRight, HelpCircle, Star } from "lucide-react";
 import { createClient } from "@/utils/supabase/server";
 
@@ -9,17 +10,11 @@ export default async function LandingPage() {
   const { data: { user } } = await supabase.auth.getUser();
 
   return (
-    // changed bg-white to bg-[#FFFBF5] (Cream) and selection color
     <div className="flex flex-col min-h-screen font-sans bg-[#FFFBF5] text-slate-900 selection:bg-orange-200">
       
       {/* Navigation */}
       <header className="px-4 lg:px-6 h-24 flex items-center justify-between sticky top-0 bg-[#FFFBF5]/95 backdrop-blur-md z-50 transition-all">
         <Link className="flex items-center gap-2 group" href="/">
-          {/* Logo Placeholder - You can swap this Image back in if you have a retro logo, 
-              but this text version looks great on its own */}
-          {/* <div className="relative w-10 h-10">
-             <Image src="/logo.png" alt="Groom Groove Logo" fill className="object-contain" />
-          </div> */}
           <span className="font-black text-3xl tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 via-purple-600 to-orange-500 transform group-hover:-rotate-2 transition-transform duration-300">
             GroomGroove
           </span>
@@ -43,7 +38,6 @@ export default async function LandingPage() {
                 Log In
               </Link>
               <Link href="/signup">
-                {/* Funky Button */}
                 <Button className="bg-orange-500 hover:bg-orange-600 text-white rounded-full px-8 py-6 font-black text-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all border-2 border-black">
                   Start Trial
                 </Button>
@@ -56,7 +50,6 @@ export default async function LandingPage() {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="w-full py-20 md:py-32 overflow-hidden relative">
-           {/* Background Decoration */}
            <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-orange-200 rounded-full blur-3xl opacity-30"></div>
            <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-purple-200 rounded-full blur-3xl opacity-30"></div>
 
@@ -141,9 +134,8 @@ export default async function LandingPage() {
           </div>
         </section>
 
-        {/* Pricing Section - THE MONEY SHOT */}
+        {/* Pricing Section */}
         <section id="pricing" className="w-full py-24 bg-slate-900 text-white relative overflow-hidden">
-          {/* Background decoration */}
           <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-20 pointer-events-none">
              <div className="absolute -top-24 -right-24 w-96 h-96 bg-indigo-500 rounded-full blur-3xl"></div>
              <div className="absolute top-1/2 left-0 w-64 h-64 bg-purple-500 rounded-full blur-3xl"></div>
@@ -156,7 +148,6 @@ export default async function LandingPage() {
             </div>
             
             <div className="max-w-lg mx-auto bg-white text-slate-900 rounded-3xl shadow-2xl overflow-hidden transform hover:scale-105 transition-transform duration-300 border-4 border-indigo-500 relative">
-               {/* Badge */}
                <div className="absolute top-0 right-0 bg-yellow-400 text-black text-xs font-black px-3 py-1 uppercase tracking-widest border-l-2 border-b-2 border-black">
                  Best Value
                </div>
@@ -220,29 +211,20 @@ export default async function LandingPage() {
                     <h3 className="font-black text-xl mb-3 flex items-center text-slate-800"><HelpCircle className="h-6 w-6 text-indigo-600 mr-3"/> Is it hard to switch from paper?</h3>
                     <p className="text-slate-600 font-medium leading-relaxed">Not at all. We designed it specifically for people who hate complicated software. It takes about 5 minutes to learn.</p>
                  </div>
-                 <div className="bg-white p-8 rounded-2xl border-2 border-slate-100 hover:border-indigo-200 transition-colors shadow-sm">
-                    <h3 className="font-black text-xl mb-3 flex items-center text-slate-800"><HelpCircle className="h-6 w-6 text-indigo-600 mr-3"/> What if I have multiple groomers?</h3>
-                    <p className="text-slate-600 font-medium leading-relaxed">Currently, the Pro plan is designed for single users. If you have a larger salon, contact us for our Team pricing.</p>
-                 </div>
               </div>
            </div>
         </section>
 
-      </main>
-
-      <footer className="py-16 bg-white border-t-2 border-slate-100">
-        <div className="container px-4 mx-auto text-center">
-            <div className="flex justify-center items-center gap-2 mb-6">
-              {/* <div className="relative w-8 h-8">
-                 <Image src="/logo.png" alt="Logo" fill className="object-contain opacity-50" />
-              </div> */}
-              <span className="font-black text-2xl text-slate-300 tracking-tighter">GroomGroove</span>
-            </div>
-            <p className="text-sm font-bold text-slate-400">
-            © 2026 Groom Groove. Built with ❤️ for groomers.
-            </p>
-        </div>
-      </footer>
+        <footer className="py-16 bg-white border-t-2 border-slate-100">
+          <div className="container px-4 mx-auto text-center">
+              <div className="flex justify-center items-center gap-2 mb-6">
+                <span className="font-black text-2xl text-slate-300 tracking-tighter">GroomGroove</span>
+              </div>
+              <p className="text-sm font-bold text-slate-400">
+              © 2026 Groom Groove. Built with ❤️ for groomers.
+              </p>
+          </div>
+        </footer>
     </div>
   );
 }
