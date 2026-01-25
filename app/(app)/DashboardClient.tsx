@@ -45,18 +45,12 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
     }))
   }, [initialData.appointments, activeFilter])
 
-  // Handle missing settings or user gracefully
-  if (!initialData.settings || !initialData.user) {
+  // Handle missing data gracefully
+  if (!initialData.glance) {
     return (
       <div className="space-y-6">
         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
         <p className="text-gray-500">Welcome back! Here's what's happening today.</p>
-        {/* Main dashboard content */}
-        <TodayAtAGlance
-          data={initialData.glance}
-          activeFilter={activeFilter}
-          onFilterChange={setActiveFilter}
-        />
         <TodayAppointments appointments={appointmentsForDisplay} />
       </div>
     )

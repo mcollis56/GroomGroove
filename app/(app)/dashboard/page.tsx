@@ -3,17 +3,17 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import Link from "next/link";
 // Make sure these match your actual icon imports and paths!
-import { Plus, Calendar, Clock, Scissors } from "lucide-react";
+import { Plus, Calendar, Clock, Scissors, Sparkles } from "lucide-react";
 import TodayAppointments from "@/components/dashboard/TodayAppointments";
 import { GroomersTodayCard } from "@/components/dashboard/GroomersTodayCard";
 import { formatTime } from "@/lib/utils/date";
 import { getGroomersOnDuty, getGroomersOffDuty } from "@/lib/actions/groomers";
 
 export default async function DashboardPage(props: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
-  const searchParams = await props.searchParams; 
+  const searchParams = await props.searchParams;
   const supabase = await createClient();
   const cookieStore = await cookies();
-  
+
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
@@ -71,75 +71,95 @@ export default async function DashboardPage(props: { searchParams: Promise<{ [ke
 
   // --- RENDER DASHBOARD UI ---
   return (
-    <div className="p-6 max-w-7xl mx-auto min-h-screen bg-[#FFFBF5]"> 
-      <div className="flex items-center justify-between mb-8">
+    <div className="p-8 max-w-6xl mx-auto min-h-screen bg-[#FEFDFB]">
+      {/* Header */}
+      <div className="flex items-start justify-between mb-8">
         <div>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight">Salon Dashboard</h1>
-          <p className="text-slate-500 font-bold mt-1 uppercase tracking-wide text-sm">
+          <h1 className="text-3xl font-extrabold text-stone-900 tracking-tight">Dashboard</h1>
+          <p className="text-stone-500 mt-1">
             {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
           </p>
         </div>
-        <div className="bg-orange-100 text-orange-800 border-2 border-orange-200 px-5 py-2 rounded-full font-black text-sm shadow-sm transform -rotate-2">
-          {remainingJobs} {remainingJobs === 1 ? 'DOG' : 'DOGS'} LEFT 🐾
+        <div className="flex items-center gap-2 bg-teal-50 text-teal-700 border border-teal-200 px-4 py-2 rounded-full text-sm font-semibold">
+          <Sparkles className="h-4 w-4" />
+          {remainingJobs} {remainingJobs === 1 ? 'pup' : 'pups'} left today
         </div>
       </div>
 
+      {/* Next Up Banner */}
       {nextJob ? (
-        <div className="mb-8 bg-gradient-to-r from-indigo-700 via-purple-600 to-orange-500 rounded-3xl p-8 text-white shadow-xl shadow-purple-200 border-b-8 border-indigo-900 transform transition-all hover:scale-[1.01]">
-          <div className="flex items-center gap-3 mb-4 text-purple-100 uppercase text-xs font-black tracking-widest">
-            <Clock className="h-4 w-4" /> Next Up
+        <div className="mb-8 bg-gradient-to-r from-teal-600 to-teal-700 rounded-2xl p-6 text-white shadow-lg">
+          <div className="flex items-center gap-2 mb-3 text-teal-100 text-sm font-medium">
+            <Clock className="h-4 w-4" />
+            Next Up
           </div>
           <div className="flex justify-between items-end">
             <div>
-              <h2 className="text-4xl md:text-5xl font-black tracking-tighter mb-2">{nextJob.dog?.name || "Unknown Dog"}</h2>
-              <p className="text-xl font-medium opacity-90 flex items-center gap-2">
-                 {nextJob.service_type || "Full Groom"} <span className="opacity-50">•</span> {nextJob.customer?.name}
+              <h2 className="text-3xl font-extrabold tracking-tight mb-1">{nextJob.dog?.name || "Unknown Dog"}</h2>
+              <p className="text-teal-100 flex items-center gap-2">
+                {nextJob.service_type || "Full Groom"} <span className="opacity-50">·</span> {nextJob.customer?.name}
               </p>
             </div>
-            <div className="text-right bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/20">
-              <p className="text-3xl font-black tracking-tight">{formatTime(nextJob.scheduled_at)}</p>
+            <div className="bg-white/15 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/20">
+              <p className="text-2xl font-bold tracking-tight">{formatTime(nextJob.scheduled_at)}</p>
             </div>
           </div>
         </div>
       ) : (
-        <div className="mb-8 bg-slate-100 rounded-3xl p-8 border-2 border-dashed border-slate-300 text-center">
-           <p className="text-slate-400 font-bold text-lg">No upcoming jobs right now. Time for coffee? ☕️</p>
+        <div className="mb-8 bg-stone-50 rounded-2xl p-6 border border-stone-200 text-center">
+          <p className="text-stone-400 font-medium">All clear! No upcoming appointments. Time for a coffee break?</p>
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Link href="/calendar/new" className="bg-white p-6 rounded-2xl shadow-sm border-2 border-slate-100 flex flex-col items-center justify-center hover:border-orange-400 hover:shadow-md transition-all group">
-          <div className="bg-orange-50 p-4 rounded-full mb-3 group-hover:bg-orange-100 transition-colors">
-            <Plus className="h-8 w-8 text-orange-600" />
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <Link
+          href="/calendar/new"
+          className="group bg-white p-5 rounded-xl border border-stone-200 flex items-center gap-4 hover:border-teal-300 hover:shadow-md transition-all"
+        >
+          <div className="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center group-hover:bg-teal-100 transition-colors">
+            <Plus className="h-6 w-6 text-teal-600" />
           </div>
-          <span className="font-black text-slate-700 text-lg group-hover:text-orange-600">Add Dog</span>
-        </Link>
-        
-        <Link href="/calendar/new" className="bg-white p-6 rounded-2xl shadow-sm border-2 border-slate-100 flex flex-col items-center justify-center hover:border-purple-400 hover:shadow-md transition-all group">
-          <div className="bg-purple-50 p-4 rounded-full mb-3 group-hover:bg-purple-100 transition-colors">
-            <Calendar className="h-8 w-8 text-purple-600" />
+          <div>
+            <span className="font-semibold text-stone-900 group-hover:text-teal-700 transition-colors">Add Dog</span>
+            <p className="text-sm text-stone-500">Register a new pup</p>
           </div>
-          <span className="font-black text-slate-700 text-lg group-hover:text-purple-600">Book Appt</span>
         </Link>
-        
-        <div className="bg-white p-6 rounded-2xl shadow-sm border-2 border-slate-100 hover:border-indigo-400 transition-all h-full">
-             <GroomersTodayCard onDutyGroomers={onDutyGroomers} offDutyGroomers={offDutyGroomers} />
+
+        <Link
+          href="/calendar/new"
+          className="group bg-white p-5 rounded-xl border border-stone-200 flex items-center gap-4 hover:border-orange-300 hover:shadow-md transition-all"
+        >
+          <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center group-hover:bg-orange-100 transition-colors">
+            <Calendar className="h-6 w-6 text-orange-500" />
+          </div>
+          <div>
+            <span className="font-semibold text-stone-900 group-hover:text-orange-600 transition-colors">Book Appointment</span>
+            <p className="text-sm text-stone-500">Schedule a groom</p>
+          </div>
+        </Link>
+
+        <div className="bg-white p-5 rounded-xl border border-stone-200">
+          <GroomersTodayCard onDutyGroomers={onDutyGroomers} offDutyGroomers={offDutyGroomers} />
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-xl shadow-slate-100 border border-slate-100 p-8">
-        <div className="flex items-center gap-3 mb-6">
-            <Scissors className="h-6 w-6 text-slate-400" />
-            <h2 className="text-2xl font-black text-slate-900">Today&apos;s Run Sheet</h2>
+      {/* Today's Run Sheet */}
+      <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden">
+        <div className="flex items-center gap-3 px-6 py-4 border-b border-stone-100 bg-stone-50">
+          <Scissors className="h-5 w-5 text-stone-400" />
+          <h2 className="text-lg font-bold text-stone-900">Today&apos;s Run Sheet</h2>
         </div>
-        
-        {remainingJobs > 0 ? (
-          <TodayAppointments appointments={appointments} />
-        ) : (
-          <div className="text-center py-12 text-slate-300">
-            <p className="font-bold text-xl">All clear! No pending jobs for today.</p>
-          </div>
-        )}
+
+        <div className="p-6">
+          {remainingJobs > 0 ? (
+            <TodayAppointments appointments={appointments} />
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-stone-400 font-medium">No pending appointments for today.</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

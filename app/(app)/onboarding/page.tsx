@@ -18,13 +18,14 @@ export default function OnboardingPage() {
     // We call the server action. 
     // If it succeeds and redirects, the browser will navigate away immediately.
     // If it fails, it returns an object with { error: ... }
-    const result = await setupBusiness(formData);
-
-    if (result?.error) {
-      setError(result.error);
+    try {
+      await setupBusiness(formData);
+      // If success, the server action redirects and we never reach here
+    } catch (err) {
+      // Handle any errors that occur during setup
+      setError(err instanceof Error ? err.message : 'Something went wrong');
       setIsLoading(false);
     }
-    // If success (redirect), we do nothing here because the page is already unloading.
   };
 
   return (

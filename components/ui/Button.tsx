@@ -10,13 +10,13 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode
 }
 
-const baseStyles = 'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed'
+const baseStyles = 'inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed'
 
 const variantStyles = {
-  primary: 'bg-rose-500 text-white hover:bg-rose-600 shadow-sm hover:shadow active:bg-rose-700',
-  secondary: 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-300',
-  ghost: 'text-gray-600 hover:text-gray-900 hover:bg-gray-100',
-  outline: 'bg-transparent border border-rose-500 text-rose-500 hover:bg-rose-50',
+  primary: 'bg-teal-600 text-white hover:bg-teal-700 shadow-sm hover:shadow active:bg-teal-800',
+  secondary: 'bg-white text-stone-700 border border-stone-200 hover:bg-stone-50 hover:border-stone-300',
+  ghost: 'text-stone-600 hover:text-stone-900 hover:bg-stone-100',
+  outline: 'bg-transparent border border-teal-500 text-teal-600 hover:bg-teal-50',
 }
 
 const sizeStyles = {
