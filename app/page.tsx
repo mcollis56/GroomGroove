@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image"; 
-// FIXED: Capital 'B' in Button to match your project structure
+// Checked: Using Capital 'B' to match your project structure
 import { Button } from "@/components/ui/Button"; 
 import { Check, Smartphone, Clock, ShieldCheck, ArrowRight, HelpCircle, Star } from "lucide-react";
 import { createClient } from "@/utils/supabase/server";
@@ -225,6 +225,7 @@ export default async function LandingPage() {
               </p>
           </div>
         </footer>
+      </main>
     </div>
   );
 }
