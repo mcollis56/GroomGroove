@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { StatCard } from '@/components/dashboard/StatCard'
 import { Card } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/Badge'
 import { mockCustomerStats, mockCustomers, type Customer } from '@/lib/mock/customers'
 import { Users, UserCheck, DollarSign, Mail, Phone, Calendar, Dog, MessageSquare, History, X, Plus } from 'lucide-react'

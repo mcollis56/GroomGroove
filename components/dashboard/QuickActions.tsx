@@ -1,7 +1,7 @@
 'use client'
 
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { CalendarPlus, UserPlus, Bell, BarChart3 } from 'lucide-react'
 
 const actions = [

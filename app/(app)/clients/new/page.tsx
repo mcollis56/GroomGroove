@@ -2,7 +2,7 @@
 
 import NewClientForm from '@/components/clients/NewClientForm'
 import Link from 'next/link'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
 
 export default function CreateClientPage() {

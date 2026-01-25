@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Modal } from '@/components/ui/Modal'
 import { Badge } from '@/components/ui/Badge'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { Dog, User, Calendar, Scissors, AlertCircle, Save, Clock, CheckCircle } from 'lucide-react'
 import { getDogDetail, updateGroomingPreferences, type DogDetail, type GroomingPreferences } from '@/lib/actions/dogs'
 import { safeParseDate } from '@/lib/utils/date'

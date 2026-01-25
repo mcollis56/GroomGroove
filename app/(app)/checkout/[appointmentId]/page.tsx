@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { Card } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { ArrowLeft, Check, Printer, Mail, Calendar, MessageSquare, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 import { completeCheckout } from '@/lib/actions/checkout'

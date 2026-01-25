@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Card } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/Badge'
 import { Plus, Dog } from 'lucide-react'
 import type { GroomingPreferences } from '@/lib/actions/dogs'

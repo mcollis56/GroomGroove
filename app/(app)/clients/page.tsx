@@ -1,6 +1,6 @@
 import { StatCard } from '@/components/dashboard/StatCard'
 import { Card } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { Users, UserCheck, Plus } from 'lucide-react'
 import { getAllClients } from '@/lib/actions/clients'
 import { ClientsTable } from './ClientsTable'

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { Modal } from '@/components/ui/Modal'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/Input'
 import { Search, Dog as DogIcon, Clock, ArrowLeft, Plus } from 'lucide-react'
 import { searchDogs, createBooking } from '@/lib/actions/booking'

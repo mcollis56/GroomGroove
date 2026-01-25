@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Smile, UserPlus, Mail, Phone, Trash2 } from 'lucide-react'
 import Image from 'next/image'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { deleteGroomer, type Groomer } from '@/lib/actions/groomers'
 
 interface GroomersPageClientProps {
