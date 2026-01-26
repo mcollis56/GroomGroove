@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image"; 
-// Checked: Using Capital 'B' to match your project structure
+// FIXED: Changed to lowercase 'button' to match standard file naming and fix Vercel build
 import { Button } from "@/components/ui/button"; 
 import { Check, Smartphone, Clock, ShieldCheck, ArrowRight, HelpCircle, Star } from "lucide-react";
 import { createClient } from "@/utils/supabase/server";
