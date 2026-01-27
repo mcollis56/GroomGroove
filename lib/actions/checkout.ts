@@ -1,8 +1,5 @@
 'use server'
 
-// Checkout Action
-// Creates payment record and optional next appointment
-
 import { createClient } from '@/utils/supabase/server'
 import { generateReceiptNumber } from '@/lib/utils/receipt'
 import { sendConfirmationSMS } from '@/lib/sms/send'
@@ -10,14 +7,14 @@ import { sendConfirmationSMS } from '@/lib/sms/send'
 interface CheckoutInput {
   customerId: string
   dogId: string
-  completedAppointmentId?: string // The appointment just finished (optional)
+  completedAppointmentId?: string
   services: string[]
   amountCents: number
   nextAppointment?: {
-    scheduledAt: string // ISO datetime
+    scheduledAt: string
     services: string[]
   }
-  reminderDate?: string // YYYY-MM-DD format for SMS reminder
+  reminderDate?: string
 }
 
 interface CheckoutResult {
@@ -28,15 +25,14 @@ interface CheckoutResult {
   error?: string
 }
 
-/**
- * Complete checkout process:
- * 1. Mark current appointment as completed
- * 2. Create payment record
- * 3. Optionally create next appointment with reminder date
- * 4. Send confirmation SMS if next appointment created
- */
 export async function completeCheckout(input: CheckoutInput): Promise<CheckoutResult> {
   const supabase = await createClient()
+
+  // --- FIX: GET CURRENT USER ID ---
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return { success: false, error: 'Unauthorized: No user found' }
+  }
 
   let nextAppointmentId: string | null = null
 
@@ -46,10 +42,11 @@ export async function completeCheckout(input: CheckoutInput): Promise<CheckoutRe
       const { data: appointment, error: apptError } = await supabase
         .from('appointments')
         .insert({
+          user_id: user.id, // <--- THIS WAS MISSING
           customer_id: input.customerId,
           dog_id: input.dogId,
           scheduled_at: input.nextAppointment.scheduledAt,
-          status: 'pending_confirmation',
+          status: 'pending_confirmation', // Or 'confirmed' if you prefer
           services: input.nextAppointment.services,
           reminder_date: input.reminderDate || null,
           reminder_sent: false,
@@ -61,7 +58,7 @@ export async function completeCheckout(input: CheckoutInput): Promise<CheckoutRe
 
       if (apptError) {
         console.error('[Checkout] Failed to create appointment:', apptError)
-        return { success: false, error: 'Failed to create next appointment' }
+        return { success: false, error: 'Failed to create next appointment: ' + apptError.message }
       }
 
       nextAppointmentId = appointment.id
@@ -74,6 +71,7 @@ export async function completeCheckout(input: CheckoutInput): Promise<CheckoutRe
     const { data: payment, error: paymentError } = await supabase
       .from('payments')
       .insert({
+        user_id: user.id, // <--- ALSO ADD HERE FOR SAFETY
         customer_id: input.customerId,
         appointment_id: input.completedAppointmentId || null,
         next_appointment_id: nextAppointmentId,
@@ -88,14 +86,14 @@ export async function completeCheckout(input: CheckoutInput): Promise<CheckoutRe
 
     if (paymentError) {
       console.error('[Checkout] Failed to create payment:', paymentError)
-      // Rollback: delete appointment if payment failed
+      // Rollback
       if (nextAppointmentId) {
         await supabase.from('appointments').delete().eq('id', nextAppointmentId)
       }
-      return { success: false, error: 'Failed to create payment' }
+      return { success: false, error: 'Failed to create payment: ' + paymentError.message }
     }
 
-    // STEP 4: Mark completed appointment as done (if provided)
+    // STEP 4: Mark completed appointment as done
     if (input.completedAppointmentId) {
       await supabase
         .from('appointments')
@@ -106,15 +104,12 @@ export async function completeCheckout(input: CheckoutInput): Promise<CheckoutRe
         .eq('id', input.completedAppointmentId)
     }
 
-    // STEP 5: Send confirmation SMS for next appointment
+    // STEP 5: SMS
     if (nextAppointmentId) {
-      // Fire and forget - don't block checkout on SMS
       sendConfirmationSMS({
         appointmentId: nextAppointmentId,
         customerId: input.customerId,
-      }).catch(err => {
-        console.error('[Checkout] SMS send failed:', err)
-      })
+      }).catch(err => console.error('[Checkout] SMS send failed:', err))
     }
 
     return {
@@ -129,44 +124,4 @@ export async function completeCheckout(input: CheckoutInput): Promise<CheckoutRe
   }
 }
 
-/**
- * Get receipt data for display/printing
- */
-export async function getReceiptData(paymentId: string) {
-  const supabase = await createClient()
-
-  const { data: payment, error } = await supabase
-    .from('payments')
-    .select(`
-      *,
-      customer:customers(*),
-      next_appointment:appointments!next_appointment_id(
-        *,
-        dog:dogs(*)
-      )
-    `)
-    .eq('id', paymentId)
-    .single()
-
-  if (error || !payment) {
-    return null
-  }
-
-  const customer = Array.isArray(payment.customer) ? payment.customer[0] : payment.customer
-  const nextAppt = Array.isArray(payment.next_appointment) ? payment.next_appointment[0] : payment.next_appointment
-
-  return {
-    receiptNumber: payment.receipt_number,
-    customerName: customer?.name,
-    services: payment.services,
-    amountCents: payment.amount_cents,
-    paidAt: payment.paid_at,
-    nextAppointment: nextAppt ? {
-      scheduledAt: nextAppt.scheduled_at,
-      dogName: nextAppt.dog?.name,
-      services: nextAppt.services,
-      status: nextAppt.status,
-      reminderDate: nextAppt.reminder_date,
-    } : null,
-  }
-}
+// Keep your getReceiptData function below as is, or I can paste it if needed.

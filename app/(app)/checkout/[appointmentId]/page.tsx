@@ -174,18 +174,25 @@ export default function CheckoutPage() {
       let nextAppointment: { scheduledAt: string; services: string[] } | undefined
 
       if (scheduleNext && nextDate && nextTime) {
-        const parsedNextDate = safeParseDate(`${nextDate}T${nextTime}:00`)
-        if (parsedNextDate) {
+        // Create date in local time manually to avoid timezone weirdness
+        const [year, month, day] = nextDate.split('-').map(Number);
+        const [hour, minute] = nextTime.split(':').map(Number);
+        const localDate = new Date(year, month - 1, day, hour, minute);
+        
+        if (!isNaN(localDate.getTime())) {
           nextAppointment = {
-            scheduledAt: parsedNextDate.toISOString(),
+            scheduledAt: localDate.toISOString(), 
             services: appointment.services || [],
           }
+          
           // Reminder 1 week before
-          const reminder = new Date(parsedNextDate)
-          reminder.setDate(reminder.getDate() - 7)
-          reminderDate = reminder.toISOString().split('T')[0]
+          const reminder = new Date(localDate);
+          reminder.setDate(reminder.getDate() - 7);
+          reminderDate = reminder.toISOString().split('T')[0];
         }
       }
+
+      console.log("Submitting checkout:", { totalCents, nextAppointment });
 
       const result = await completeCheckout({
         customerId: appointment.customer.id,
@@ -201,6 +208,7 @@ export default function CheckoutPage() {
         setReceiptNumber(result.receiptNumber || `GG-${Date.now()}`)
         setStep('receipt')
       } else {
+        console.error("Checkout failed:", result.error);
         setError(result.error || 'Payment processing failed')
       }
     } catch (err) {
@@ -210,6 +218,7 @@ export default function CheckoutPage() {
       setIsProcessing(false)
     }
   }
+
 
   const handlePrint = () => {
     window.print()

@@ -3,9 +3,10 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import Link from "next/link";
 // Make sure these match your actual icon imports and paths!
-import { Plus, Calendar, Clock, Scissors } from "lucide-react";
+import { Calendar, Clock, Scissors } from "lucide-react";
 import TodayAppointments from "@/components/dashboard/TodayAppointments";
 import { GroomersTodayCard } from "@/components/dashboard/GroomersTodayCard";
+import { LiveClock } from "@/components/dashboard/LiveClock";
 import { formatTime } from "@/lib/utils/date";
 import { getGroomersOnDuty, getGroomersOffDuty } from "@/lib/actions/groomers";
 
@@ -108,12 +109,7 @@ export default async function DashboardPage(props: { searchParams: Promise<{ [ke
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Link href="/calendar/new" className="bg-white p-6 rounded-2xl shadow-sm border-2 border-slate-100 flex flex-col items-center justify-center hover:border-orange-400 hover:shadow-md transition-all group">
-          <div className="bg-orange-50 p-4 rounded-full mb-3 group-hover:bg-orange-100 transition-colors">
-            <Plus className="h-8 w-8 text-orange-600" />
-          </div>
-          <span className="font-black text-slate-700 text-lg group-hover:text-orange-600">Add Dog</span>
-        </Link>
+        <LiveClock />
         
         <Link href="/calendar/new" className="bg-white p-6 rounded-2xl shadow-sm border-2 border-slate-100 flex flex-col items-center justify-center hover:border-purple-400 hover:shadow-md transition-all group">
           <div className="bg-purple-50 p-4 rounded-full mb-3 group-hover:bg-purple-100 transition-colors">

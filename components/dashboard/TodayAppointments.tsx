@@ -1,125 +1,143 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/utils/supabase/client";
-import { createInvoiceFromAppointment } from "@/lib/actions/invoices";
-import { format, isValid } from "date-fns";
-import { safeParseDate } from "@/lib/utils/date";
-import { Check, Clock, Play, XCircle } from "lucide-react";
+import { createClient } from '@/utils/supabase/client';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import Link from 'next/link';
 
-// --- Internal Row Component ---
-function AppointmentRow({ appointment }: { appointment: any }) {
-  const router = useRouter();
-  const supabase = createClient();
-  const [status, setStatus] = useState(appointment.status);
-  const [isLoading, setIsLoading] = useState(false);
+// --- SYDNEY TIME HELPER (Inline for safety) ---
+function isSydneyToday(dateString: string) {
+  if (!dateString) return false;
+  const date = new Date(dateString);
+  
+  // Get current Sydney date string "MM/DD/YYYY"
+  const now = new Date();
+  const sydneyString = now.toLocaleDateString("en-US", {
+    timeZone: "Australia/Sydney",
+    year: "numeric",
+    month: "numeric",
+    day: "numeric"
+  });
+  
+  // Create boundaries for Sydney "Today"
+  const sydneyMidnight = new Date(sydneyString);
+  const sydneyEnd = new Date(sydneyMidnight.getTime() + 86400000); // +24 hours
 
-  // Safe Date Formatting
-  const dateObj = safeParseDate(appointment.scheduled_at);
-  const timeString = dateObj && isValid(dateObj) ? format(dateObj, "h:mm a") : "Time N/A";
-
-  const handleStatusUpdate = async (newStatus: string) => {
-    if (isLoading) return;
-    setIsLoading(true);
-
-    // Optimistic Update
-    setStatus(newStatus);
-
-    try {
-      const { error } = await supabase
-        .from("appointments")
-        .update({ status: newStatus })
-        .eq("id", appointment.id);
-
-      if (error) throw error;
-
-      if (newStatus === "completed") {
-        const invoice = await createInvoiceFromAppointment(appointment.id);
-        router.push(`/invoices/${invoice.id}`);
-        return;
-      }
-
-      router.refresh(); // Refresh to update the "Next Up" banner
-    } catch (error) {
-      console.error(error);
-      alert("Update failed.");
-      setStatus(appointment.status); // Revert on error
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Status Colors & Icons
-  const getStatusColor = (s: string) => {
-    switch(s) {
-      case 'confirmed': return 'bg-blue-100 text-blue-700 border-blue-200';
-      case 'in_progress': return 'bg-orange-100 text-orange-700 border-orange-200';
-      case 'completed': return 'bg-green-100 text-green-700 border-green-200';
-      case 'cancelled': return 'bg-red-50 text-red-500 border-red-100';
-      default: return 'bg-gray-100 text-gray-600 border-gray-200';
-    }
-  };
-
-  return (
-    <div className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-xl mb-3 shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex items-center gap-6">
-        {/* TIME */}
-        <div className="text-gray-900 font-bold text-lg w-20 text-center bg-gray-50 p-2 rounded-lg border border-gray-200">
-          {timeString}
-        </div>
-
-        {/* DETAILS */}
-        <div>
-          <h3 className="font-bold text-gray-900 text-lg">{appointment.dog?.name || "Unknown Dog"}</h3>
-          <p className="text-sm text-gray-500">{appointment.customer?.name || "Unknown Owner"} • {appointment.service_type || "Grooming"}</p>
-          
-          {/* BEHAVIOR TAGS */}
-          <div className="flex gap-2 mt-1">
-             {appointment.dog?.grooming_preferences?.behavior_notes && (
-               <span className="text-xs px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded-full font-medium">
-                 ⚠️ {appointment.dog.grooming_preferences.behavior_notes}
-               </span>
-             )}
-          </div>
-        </div>
-      </div>
-
-      {/* STATUS DROPDOWN */}
-      <div className="relative">
-        <select
-          value={status}
-          onChange={(e) => handleStatusUpdate(e.target.value)}
-          disabled={isLoading}
-          className={`appearance-none pl-4 pr-10 py-2 rounded-lg font-bold text-sm border-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-purple-500 ${getStatusColor(status)}`}
-        >
-          <option value="pending">Pending</option>
-          <option value="confirmed">Confirmed</option>
-          <option value="in_progress">✂️ Grooming</option>
-          <option value="completed">✅ Done</option>
-          <option value="cancelled">❌ Cancel</option>
-        </select>
-        
-        {/* Chevron Icon Override */}
-        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-current opacity-50">
-          <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
-        </div>
-      </div>
-    </div>
-  );
+  return date >= sydneyMidnight && date < sydneyEnd;
 }
 
-// --- Main List ---
 export default function TodayAppointments({ appointments }: { appointments: any[] }) {
-  if (!appointments || appointments.length === 0) {
-    return <div className="text-gray-500 italic">No active appointments.</div>;
+  const router = useRouter();
+  const supabase = createClient();
+  const [loadingId, setLoadingId] = useState<string | null>(null);
+
+  // 1. FILTER: Only show appointments for TODAY in Sydney
+  const todaysAppointments = appointments.filter(app => 
+    isSydneyToday(app.start_time)
+  ).sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
+
+  // 2. UPDATE STATUS
+  const handleStatusChange = async (appointmentId: string, newStatus: string) => {
+    setLoadingId(appointmentId);
+    
+    // Optimistic UI update could go here, but for now we trust the refresh
+    await supabase
+      .from('appointments')
+      .update({ status: newStatus })
+      .eq('id', appointmentId);
+
+    if (newStatus === 'completed') {
+      // Redirect to invoice page
+      router.push(`/invoices/${appointmentId}`);
+    } else {
+      router.refresh();
+      setLoadingId(null);
+    }
+  };
+
+  if (todaysAppointments.length === 0) {
+    return (
+      <div className="bg-white rounded-xl border border-gray-100 p-6 text-center shadow-sm">
+        <p className="text-gray-500">No appointments scheduled for today.</p>
+        <Link href="/calendar/new" className="text-blue-600 text-sm font-medium mt-2 inline-block hover:underline">
+          Book an appointment
+        </Link>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-1">
-      {appointments.map((appt) => (
-        <AppointmentRow key={appt.id} appointment={appt} />
-      ))}
+    <div className="space-y-3">
+      {todaysAppointments.map((app) => {
+        const isCompleted = app.status === 'completed';
+        const isGrooming = app.status === 'in_progress';
+        
+        return (
+          <div key={app.id} className="group bg-white rounded-xl border border-gray-100 p-4 hover:shadow-md transition-all duration-200 flex items-center justify-between">
+            {/* LEFT: Time & Dog Info */}
+            <div className="flex items-center gap-4">
+              <div className="w-16 text-center">
+                <span className="block text-lg font-bold text-gray-900">
+                  {new Date(app.start_time).toLocaleTimeString('en-US', { 
+                    timeZone: 'Australia/Sydney',
+                    hour: 'numeric', 
+                    minute: '2-digit', 
+                    hour12: true 
+                  })}
+                </span>
+                <span className="text-xs text-gray-400 font-medium uppercase tracking-wide">
+                  {app.service_type || 'Groom'}
+                </span>
+              </div>
+              
+              <div className="h-10 w-px bg-gray-100 mx-2"></div>
+
+              <div>
+                <Link href={`/dogs/${app.dog_id}`} className="text-lg font-bold text-gray-900 hover:text-blue-600 transition-colors">
+                  {app.dog?.name || 'Unknown Dog'}
+                </Link>
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <span>{app.dog?.breed || 'Mixed Breed'}</span>
+                  {app.dog?.is_new_dog && (
+                    <span className="bg-blue-50 text-blue-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                      New
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT: Status Dropdown */}
+            <div className="relative">
+              <select
+                disabled={loadingId === app.id}
+                value={app.status}
+                onChange={(e) => handleStatusChange(app.id, e.target.value)}
+                className={`
+                  appearance-none cursor-pointer pl-4 pr-8 py-2 rounded-full text-sm font-bold border-0 transition-all focus:ring-2 focus:ring-offset-1
+                  ${isCompleted ? 'bg-green-100 text-green-700 hover:bg-green-200' : ''}
+                  ${isGrooming ? 'bg-orange-100 text-orange-700 hover:bg-orange-200 animate-pulse' : ''}
+                  ${!isCompleted && !isGrooming ? 'bg-gray-100 text-gray-600 hover:bg-gray-200' : ''}
+                `}
+              >
+                <option value="pending">Pending</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="in_progress">Grooming</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+              
+              {/* Custom Arrow Icon */}
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-current opacity-60">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
+

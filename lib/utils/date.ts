@@ -109,3 +109,15 @@ export function parseDateString(dateStr: string | null | undefined): Date | null
 export function isValidDate(value: string | Date | null | undefined): boolean {
   return safeParseDate(value) !== null
 }
+
+/**
+ * Returns today's date in YYYY-MM-DD format based on LOCAL time, not UTC.
+ * Fixes the "showing yesterday" bug in Australia/NZ.
+ */
+export function getLocalTodayDate(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
