@@ -6,30 +6,10 @@ import { ArrowLeft, Calendar, Clock, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 import { getDogDetail } from '@/lib/actions/dogs'
 import { DogQuickActions, DogPhoto, EditableGroomingPreferences, EditableGeneralNotes } from './DogDetailClient'
-import { safeParseDate } from '@/lib/utils/date'
+import { LocalDateTime } from '@/components/date/LocalDateTime'
 
 interface DogDetailPageProps {
   params: Promise<{ id: string }>
-}
-
-function formatDate(isoString: string): string {
-  const date = safeParseDate(isoString)
-  if (!date) return 'N/A'
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  })
-}
-
-function formatTime(isoString: string): string {
-  const date = safeParseDate(isoString)
-  if (!date) return 'N/A'
-  return date.toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true
-  })
 }
 
 export default async function DogDetailPage({ params }: DogDetailPageProps) {
@@ -108,7 +88,13 @@ export default async function DogDetailPage({ params }: DogDetailPageProps) {
                     {dog.history.length > 0 && (
                       <div>
                         <p className="text-sm text-gray-500">Last Visit</p>
-                        <p className="font-medium text-gray-900">{formatDate(dog.history[0].scheduled_at)}</p>
+                        <p className="font-medium text-gray-900">
+                          <LocalDateTime
+                            value={dog.history[0].scheduled_at}
+                            kind="date"
+                            options={{ month: 'short', day: 'numeric', year: 'numeric' }}
+                          />
+                        </p>
                       </div>
                     )}
                   </div>
@@ -158,7 +144,17 @@ export default async function DogDetailPage({ params }: DogDetailPageProps) {
                             {appt.services?.join(', ') || 'Grooming'}
                           </p>
                           <p className="text-sm text-gray-500">
-                            {formatDate(appt.scheduled_at)} at {formatTime(appt.scheduled_at)}
+                            <LocalDateTime
+                              value={appt.scheduled_at}
+                              kind="date"
+                              options={{ month: 'short', day: 'numeric', year: 'numeric' }}
+                            />{' '}
+                            at{' '}
+                            <LocalDateTime
+                              value={appt.scheduled_at}
+                              kind="time"
+                              options={{ hour: 'numeric', minute: '2-digit', hour12: true }}
+                            />
                           </p>
                           {appt.notes && (
                             <p className="text-xs text-gray-400 mt-1">{appt.notes}</p>

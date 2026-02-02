@@ -7,7 +7,7 @@ import { Calendar, Clock, Scissors } from "lucide-react";
 import TodayAppointments from "@/components/dashboard/TodayAppointments";
 import { GroomersTodayCard } from "@/components/dashboard/GroomersTodayCard";
 import { LiveClock } from "@/components/dashboard/LiveClock";
-import { formatTime } from "@/lib/utils/date";
+import { LocalDateTime } from "@/components/date/LocalDateTime";
 import { getGroomersOnDuty, getGroomersOffDuty } from "@/lib/actions/groomers";
 
 export default async function DashboardPage(props: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
@@ -53,13 +53,15 @@ export default async function DashboardPage(props: { searchParams: Promise<{ [ke
   }
 
   // --- DATA FETCHING ---
-  const today = new Date().toISOString().split('T')[0];
+  const now = new Date();
+  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - 1, 0, 0, 0));
+  const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 23, 59, 59, 999));
   const [appointmentsResult, onDutyGroomers, offDutyGroomers] = await Promise.all([
     supabase.from("appointments")
       .select(`*, dog:dogs(id, name, grooming_preferences), customer:customers(id, name)`)
       .eq("user_id", user.id)
-      .gte('scheduled_at', `${today}T00:00:00`)
-      .lt('scheduled_at', `${today}T23:59:59`)
+      .gte('scheduled_at', start.toISOString())
+      .lt('scheduled_at', end.toISOString())
       .in('status', ['pending', 'confirmed', 'in_progress'])
       .order('scheduled_at', { ascending: true }),
     getGroomersOnDuty(),
@@ -77,7 +79,11 @@ export default async function DashboardPage(props: { searchParams: Promise<{ [ke
         <div>
           <h1 className="text-4xl font-black text-slate-900 tracking-tight">Salon Dashboard</h1>
           <p className="text-slate-500 font-bold mt-1 uppercase tracking-wide text-sm">
-            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+            <LocalDateTime
+              value={new Date().toISOString()}
+              kind="date"
+              options={{ weekday: 'long', month: 'long', day: 'numeric' }}
+            />
           </p>
         </div>
         <div className="bg-orange-100 text-orange-800 border-2 border-orange-200 px-5 py-2 rounded-full font-black text-sm shadow-sm transform -rotate-2">
@@ -98,7 +104,13 @@ export default async function DashboardPage(props: { searchParams: Promise<{ [ke
               </p>
             </div>
             <div className="text-right bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/20">
-              <p className="text-3xl font-black tracking-tight">{formatTime(nextJob.scheduled_at)}</p>
+              <p className="text-3xl font-black tracking-tight">
+                <LocalDateTime
+                  value={nextJob.scheduled_at || nextJob.start_time}
+                  kind="time"
+                  options={{ hour: 'numeric', minute: '2-digit', hour12: true }}
+                />
+              </p>
             </div>
           </div>
         </div>

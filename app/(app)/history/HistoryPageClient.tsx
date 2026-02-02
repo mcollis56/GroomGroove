@@ -1,8 +1,11 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { CheckCircle, Clock, XCircle } from 'lucide-react'
+import { LocalDateTime } from '@/components/date/LocalDateTime'
 
 interface HistoryAppointment {
   id: string
@@ -14,8 +17,7 @@ interface HistoryAppointment {
   services: string[]
   notes: string | null
   status: string
-  time: string
-  date: string
+  scheduledAt: string
 }
 
 interface HistoryPageClientProps {
@@ -116,8 +118,20 @@ export function HistoryPageClient({ appointments }: HistoryPageClientProps) {
                 )}
               </div>
               <div className="text-right">
-                <p className="font-medium text-gray-900">{appt.time}</p>
-                <p className="text-xs text-gray-500">{appt.date}</p>
+                <p className="font-medium text-gray-900">
+                  <LocalDateTime
+                    value={appt.scheduledAt}
+                    kind="time"
+                    options={{ hour: 'numeric', minute: '2-digit', hour12: true }}
+                  />
+                </p>
+                <p className="text-xs text-gray-500">
+                  <LocalDateTime
+                    value={appt.scheduledAt}
+                    kind="date"
+                    options={{ weekday: 'short', month: 'short', day: 'numeric' }}
+                  />
+                </p>
               </div>
             </div>
           ))}

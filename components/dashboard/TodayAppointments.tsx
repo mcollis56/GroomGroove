@@ -1,29 +1,16 @@
 'use client';
 
 import { createClient } from '@/utils/supabase/client';
+import { formatTime, getLocalDateKey, getLocalTodayDate } from '@/lib/utils/date';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import Link from 'next/link';
 
 // --- SYDNEY TIME HELPER (Inline for safety) ---
-function isSydneyToday(dateString: string) {
+function isLocalToday(dateString: string) {
   if (!dateString) return false;
-  const date = new Date(dateString);
-  
-  // Get current Sydney date string "MM/DD/YYYY"
-  const now = new Date();
-  const sydneyString = now.toLocaleDateString("en-US", {
-    timeZone: "Australia/Sydney",
-    year: "numeric",
-    month: "numeric",
-    day: "numeric"
-  });
-  
-  // Create boundaries for Sydney "Today"
-  const sydneyMidnight = new Date(sydneyString);
-  const sydneyEnd = new Date(sydneyMidnight.getTime() + 86400000); // +24 hours
-
-  return date >= sydneyMidnight && date < sydneyEnd;
+  const dateKey = getLocalDateKey(dateString)
+  return dateKey === getLocalTodayDate()
 }
 
 export default function TodayAppointments({ appointments }: { appointments: any[] }) {
@@ -32,9 +19,14 @@ export default function TodayAppointments({ appointments }: { appointments: any[
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
   // 1. FILTER: Only show appointments for TODAY in Sydney
-  const todaysAppointments = appointments.filter(app => 
-    isSydneyToday(app.start_time)
-  ).sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
+  const todaysAppointments = appointments.filter(app => {
+    const scheduledAt = app.scheduled_at || app.start_time
+    return isLocalToday(scheduledAt)
+  }).sort((a, b) => {
+    const aTime = new Date(a.scheduled_at || a.start_time).getTime()
+    const bTime = new Date(b.scheduled_at || b.start_time).getTime()
+    return aTime - bTime
+  });
 
   // 2. UPDATE STATUS
   const handleStatusChange = async (appointmentId: string, newStatus: string) => {
@@ -78,12 +70,7 @@ export default function TodayAppointments({ appointments }: { appointments: any[
             <div className="flex items-center gap-4">
               <div className="w-16 text-center">
                 <span className="block text-lg font-bold text-gray-900">
-                  {new Date(app.start_time).toLocaleTimeString('en-US', { 
-                    timeZone: 'Australia/Sydney',
-                    hour: 'numeric', 
-                    minute: '2-digit', 
-                    hour12: true 
-                  })}
+                  {formatTime(app.scheduled_at || app.start_time)}
                 </span>
                 <span className="text-xs text-gray-400 font-medium uppercase tracking-wide">
                   {app.service_type || 'Groom'}
@@ -140,4 +127,3 @@ export default function TodayAppointments({ appointments }: { appointments: any[
     </div>
   );
 }
-

@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/Badge'
 import { Plus, Check, Dog as DogIcon, User, Calendar as CalendarIcon } from 'lucide-react'
 import CalendarGrid from './CalendarGrid'
 import QuickBookModal from '@/components/booking/QuickBookModal'
-import { formatTime as safeFormatTime, safeParseDate } from '@/lib/utils/date'
+import { formatTime as safeFormatTime, parseDateString, getLocalDateKey } from '@/lib/utils/date'
 
 interface Appointment {
   id: string
@@ -26,7 +26,7 @@ function formatTime(isoString: string): string {
 }
 
 function formatDateForDisplay(dateStr: string): string {
-  const date = safeParseDate(dateStr + 'T12:00:00')
+  const date = parseDateString(dateStr)
   if (!date) return 'Invalid Date'
   return date.toLocaleDateString('en-US', {
     weekday: 'long',
@@ -37,7 +37,7 @@ function formatDateForDisplay(dateStr: string): string {
 }
 
 function getDateFromISO(isoString: string): string {
-  return isoString.split('T')[0]
+  return getLocalDateKey(isoString) || ''
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -92,7 +92,7 @@ export default function CalendarPage() {
       setAppointments(allAppointments)
 
       // Get dates that have appointments
-      const dates = [...new Set(allAppointments.map(appt => getDateFromISO(appt.scheduled_at)))]
+      const dates = [...new Set(allAppointments.map(appt => getDateFromISO(appt.scheduled_at)).filter(Boolean))]
       setDatesWithAppointments(dates)
     }
   }

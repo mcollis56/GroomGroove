@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
 import { Dog as DogIcon, User, Clock } from 'lucide-react'
 import { createDogWithOwner, createDogWithOwnerAndBook } from '@/lib/actions/booking'
+import { buildLocalDateTimeISO } from '@/lib/utils/date'
 
 interface NewDogFormProps {
   // For booking flow
@@ -78,7 +79,12 @@ export default function NewDogForm({
 
     if (bookImmediately && selectedDate) {
       // Create dog with owner AND book appointment
-      const scheduledAt = `${selectedDate}T${selectedTime}:00`
+      const scheduledAt = buildLocalDateTimeISO(selectedDate, selectedTime)
+      if (!scheduledAt) {
+        setError('Invalid date or time')
+        setIsSubmitting(false)
+        return
+      }
 
       const result = await createDogWithOwnerAndBook({
         dog: {

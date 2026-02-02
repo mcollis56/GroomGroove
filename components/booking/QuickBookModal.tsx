@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/Input'
 import { Search, Dog as DogIcon, Clock, ArrowLeft, Plus } from 'lucide-react'
 import { searchDogs, createBooking } from '@/lib/actions/booking'
+import { buildLocalDateTimeISO } from '@/lib/utils/date'
 import NewDogForm from './NewDogForm'
 
 interface Dog {
@@ -119,7 +120,12 @@ export default function QuickBookModal({
     setIsSubmitting(true)
     setError(null)
 
-    const scheduledAt = `${selectedDate}T${selectedTime}:00`
+    const scheduledAt = buildLocalDateTimeISO(selectedDate, selectedTime)
+    if (!scheduledAt) {
+      setError('Invalid date or time')
+      setIsSubmitting(false)
+      return
+    }
 
     const result = await createBooking({
       dogId: selectedDog.id,

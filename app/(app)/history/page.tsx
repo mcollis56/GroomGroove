@@ -1,7 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { Card } from '@/components/ui/Card'
 import { HistoryPageClient } from './HistoryPageClient'
-import { formatTime as safeFormatTime, formatDate as safeFormatDate } from '@/lib/utils/date'
 
 interface AppointmentHistory {
   id: string
@@ -13,13 +12,6 @@ interface AppointmentHistory {
   dog: { id: string; name: string; breed: string; photo_url: string | null } | null
 }
 
-function formatDate(isoString: string): string {
-  return safeFormatDate(isoString)
-}
-
-function formatTime(isoString: string): string {
-  return safeFormatTime(isoString)
-}
 
 export default async function HistoryPage() {
   const supabase = await createClient()
@@ -67,8 +59,7 @@ export default async function HistoryPage() {
     services: appt.services || [],
     notes: appt.notes,
     status: appt.status,
-    time: formatTime(appt.scheduled_at),
-    date: formatDate(appt.scheduled_at)
+    scheduledAt: appt.scheduled_at
   }))
 
   return (

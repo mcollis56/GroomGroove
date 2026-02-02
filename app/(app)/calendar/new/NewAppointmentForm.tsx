@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/Textarea'
 import { ArrowLeft, Calendar, Clock, User, Dog as DogIcon, Search, Plus, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 import { searchDogs, createDogWithOwner, createBooking } from '@/lib/actions/booking'
+import { buildLocalDateTimeISO } from '@/lib/utils/date'
 
 interface DogResult {
   id: string
@@ -211,9 +212,13 @@ export function NewAppointmentForm() {
     setIsSubmitting(true)
     setError(null)
 
-    // Store the datetime as-is (Sydney time) - don't convert to UTC
-    // Format: YYYY-MM-DDTHH:MM:SS (without Z suffix, so it's treated as local time)
-    const scheduledAt = `${appointmentDate}T${appointmentTime}:00`;
+    // Build a UTC ISO string from the user's local date/time selection
+    const scheduledAt = buildLocalDateTimeISO(appointmentDate, appointmentTime)
+    if (!scheduledAt) {
+      setError('Invalid date or time')
+      setIsSubmitting(false)
+      return
+    }
 
     const result = await createBooking({
       dogId: selectedDog.id,
