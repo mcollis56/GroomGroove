@@ -1,4 +1,6 @@
 'use client'
+import { isSydneyToday } from '@/lib/utils/date';
+
 import { useState, useMemo } from 'react'
 import TodayAppointments from '@/components/dashboard/TodayAppointments'
 import { TodayAtAGlance } from '@/components/dashboard/TodayAtAGlance'
