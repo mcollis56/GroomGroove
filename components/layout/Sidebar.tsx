@@ -26,8 +26,8 @@ export function Sidebar() {
       <div className="p-6 border-b border-gray-100">
         <Link href="/dashboard" className="flex items-center justify-center">
           <Image
-            src="/oh-my-dawg-logo.png"
-            alt="Oh My Dawg! Grooming"
+            src="/logo.png"
+            alt="Groom Groove"
             width={180}
             height={120}
             priority
