@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
 import { ArrowLeft, Calendar, Clock, User, Dog as DogIcon, Search, Plus, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
-import { searchDogs, createDogWithOwner, createBooking } from '@/lib/actions/booking'
+import { searchDogs, createDogWithOwner, createBooking, getDogById } from '@/lib/actions/booking'
 import { buildLocalDateTimeISO } from '@/lib/utils/date'
 
 interface DogResult {
@@ -59,10 +59,12 @@ export function NewAppointmentForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const prefilledDate = searchParams.get('date') || ''
+  const prefilledDogId = searchParams.get('dogId') || ''
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const isPrefillFlow = !!prefilledDogId
 
   // Flow state
-  const [step, setStep] = useState<FlowStep>('search')
+  const [step, setStep] = useState<FlowStep>(isPrefillFlow ? 'booking' : 'search')
   const [error, setError] = useState<string | null>(null)
 
   // Search state
@@ -92,6 +94,7 @@ export function NewAppointmentForm() {
 
   // Debounced search
   useEffect(() => {
+    if (step !== 'search') return
     if (searchQuery.length < 2) {
       setSearchResults([])
       return
@@ -107,6 +110,31 @@ export function NewAppointmentForm() {
 
     return () => clearTimeout(timer)
   }, [searchQuery])
+
+  // Prefill booking flow if a dogId is provided
+  useEffect(() => {
+    if (!prefilledDogId) return
+    let active = true
+
+    const prefill = async () => {
+      const dog = await getDogById(prefilledDogId)
+      if (!active) return
+
+      if (dog && dog.customer) {
+        setSelectedDog(dog)
+        setSearchQuery(dog.name)
+        setStep('booking')
+        setError(null)
+      } else {
+        setError('Dog not found')
+        setStep('search')
+      }
+
+    }
+
+    prefill()
+    return () => { active = false }
+  }, [prefilledDogId])
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -277,7 +305,7 @@ export function NewAppointmentForm() {
       <Card>
         <div className="p-6 space-y-6">
           {/* STEP 1: Dog Search (Always visible at top when in search mode) */}
-          {step === 'search' && (
+          {step === 'search' && (!isPrefillFlow || !!error) && (
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -501,6 +529,12 @@ export function NewAppointmentForm() {
           )}
 
           {/* STEP 3: Booking Form (for existing or newly created dog) */}
+          {isPrefillFlow && step === 'booking' && !selectedDog && !error && (
+            <div className="text-center py-8 text-gray-500">
+              Loading dog details...
+            </div>
+          )}
+
           {step === 'booking' && selectedDog && (
             <div className="space-y-6">
               {/* Selected Dog Display */}

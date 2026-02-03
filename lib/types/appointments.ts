@@ -1,7 +1,7 @@
 // Database types for appointment confirmation system
 // These match the approved schema from STEP 1
 
-export type AppointmentStatus = 'pending_confirmation' | 'confirmed' | 'cancelled'
+export type AppointmentStatus = 'pending_confirmation' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled'
 
 export interface Appointment {
   id: string

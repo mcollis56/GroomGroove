@@ -96,6 +96,7 @@ function mapStatus(status: string): 'confirmed' | 'in-progress' | 'pending' {
   switch (status) {
     case 'confirmed': return 'confirmed'
     case 'in_progress': case 'in-progress': return 'in-progress'
+    case 'pending_confirmation': case 'pending': return 'pending'
     default: return 'pending'
   }
 }

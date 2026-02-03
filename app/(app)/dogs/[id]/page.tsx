@@ -36,7 +36,7 @@ export default async function DogDetailPage({ params }: DogDetailPageProps) {
           </div>
         </div>
         <div className="flex gap-3">
-          <Link href="/calendar/new">
+          <Link href={`/calendar/new?dogId=${dog.id}`}>
             <Button variant="secondary">
               <Calendar className="w-4 h-4 mr-2" />
               Book Appointment
@@ -171,7 +171,7 @@ export default async function DogDetailPage({ params }: DogDetailPageProps) {
                 <div className="text-center py-8">
                   <Clock className="w-12 h-12 mx-auto mb-3 text-gray-300" />
                   <p className="text-gray-500">No grooming history yet</p>
-                  <Link href="/calendar/new" className="inline-block mt-3">
+                  <Link href={`/calendar/new?dogId=${dog.id}`} className="inline-block mt-3">
                     <Button variant="secondary" size="sm">
                       <Calendar className="w-4 h-4 mr-2" />
                       Book First Appointment

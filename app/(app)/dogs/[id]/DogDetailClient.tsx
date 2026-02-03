@@ -605,7 +605,7 @@ export function DogQuickActions({ dogId, dogName, customerPhone, photoUrl, groom
         <div className="p-6">
           <h3 className="font-semibold text-gray-900 mb-4">Quick Actions</h3>
           <div className="space-y-3">
-            <Link href="/calendar/new" className="block">
+            <Link href={`/calendar/new?dogId=${dogId}`} className="block">
               <Button variant="secondary" className="w-full justify-start">
                 <Calendar className="w-4 h-4 mr-2" />
                 Schedule Grooming

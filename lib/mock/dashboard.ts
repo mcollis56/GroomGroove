@@ -55,7 +55,7 @@ export const mockTodayAppointments = [
     ownerName: 'Emma Wilson',
     service: 'Full Groom + Nail Trim',
     flags: [],
-    status: 'in-progress' as const,
+    status: 'in_progress' as const,
   },
   {
     id: '4',
@@ -65,7 +65,7 @@ export const mockTodayAppointments = [
     ownerName: 'James Brown',
     service: 'Nail Trim Only',
     flags: ['nail-sensitive'],
-    status: 'pending' as const,
+    status: 'pending_confirmation' as const,
   },
   {
     id: '5',
@@ -75,7 +75,7 @@ export const mockTodayAppointments = [
     ownerName: 'Lisa Park',
     service: 'De-shedding Treatment',
     flags: ['heavy-shedder'],
-    status: 'pending' as const,
+    status: 'pending_confirmation' as const,
   },
 ]
 

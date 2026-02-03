@@ -58,11 +58,11 @@ export default async function DashboardPage(props: { searchParams: Promise<{ [ke
   const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 23, 59, 59, 999));
   const [appointmentsResult, onDutyGroomers, offDutyGroomers] = await Promise.all([
     supabase.from("appointments")
-      .select(`*, dog:dogs(id, name, grooming_preferences), customer:customers(id, name)`)
+      .select(`*, dog:dogs(id, name, breed, grooming_preferences), customer:customers(id, name)`)
       .eq("user_id", user.id)
       .gte('scheduled_at', start.toISOString())
       .lt('scheduled_at', end.toISOString())
-      .in('status', ['pending', 'confirmed', 'in_progress'])
+      .in('status', ['pending_confirmation', 'confirmed', 'in_progress'])
       .order('scheduled_at', { ascending: true }),
     getGroomersOnDuty(),
     getGroomersOffDuty(),

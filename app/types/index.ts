@@ -19,7 +19,7 @@ export type Appointment = {
   dog_id: string
   start_time: string
   service_type: string
-  status: 'scheduled' | 'in-progress' | 'completed' | 'cancelled'
+  status: 'pending_confirmation' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled'
   notes: string | null
   user_id: string
   dogs?: Dog // For joining data

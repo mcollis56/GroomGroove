@@ -59,6 +59,46 @@ export async function searchDogs(query: string) {
 }
 
 /**
+ * Fetch a single dog by ID with owner info
+ */
+export async function getDogById(dogId: string) {
+  if (!dogId) return null
+
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return null
+  }
+
+  const { data: dog, error } = await supabase
+    .from('dogs')
+    .select(`
+      id,
+      name,
+      breed,
+      customer:customers(id, name, phone)
+    `)
+    .eq('id', dogId)
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  if (error || !dog) {
+    if (error) {
+      console.error('[Booking] Get dog by id failed:', error)
+    }
+    return null
+  }
+
+  return {
+    ...dog,
+    customer: Array.isArray(dog.customer) ? dog.customer[0] : dog.customer
+  }
+}
+
+/**
  * Create a new dog with owner information
  * Dog-first approach: creates owner first, then dog
  */

@@ -5,6 +5,7 @@ import { formatTime, getLocalDateKey, getLocalTodayDate } from '@/lib/utils/date
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import Link from 'next/link';
+import { createInvoiceFromAppointment } from '@/lib/actions/invoices';
 
 // --- SYDNEY TIME HELPER (Inline for safety) ---
 function isLocalToday(dateString: string) {
@@ -39,12 +40,18 @@ export default function TodayAppointments({ appointments }: { appointments: any[
       .eq('id', appointmentId);
 
     if (newStatus === 'completed') {
-      // Redirect to invoice page
-      router.push(`/invoices/${appointmentId}`);
-    } else {
-      router.refresh();
-      setLoadingId(null);
+      try {
+        const { id } = await createInvoiceFromAppointment(appointmentId);
+        router.push(`/invoices/${id}`);
+      } catch {
+        router.refresh();
+        setLoadingId(null);
+      }
+      return;
     }
+
+    router.refresh();
+    setLoadingId(null);
   };
 
   if (todaysAppointments.length === 0) {
@@ -61,6 +68,7 @@ export default function TodayAppointments({ appointments }: { appointments: any[
   return (
     <div className="space-y-3">
       {todaysAppointments.map((app) => {
+        const normalizedStatus = app.status === 'pending' ? 'pending_confirmation' : app.status;
         const isCompleted = app.status === 'completed';
         const isGrooming = app.status === 'in_progress';
         
@@ -98,7 +106,7 @@ export default function TodayAppointments({ appointments }: { appointments: any[
             <div className="relative">
               <select
                 disabled={loadingId === app.id}
-                value={app.status}
+                value={normalizedStatus}
                 onChange={(e) => handleStatusChange(app.id, e.target.value)}
                 className={`
                   appearance-none cursor-pointer pl-4 pr-8 py-2 rounded-full text-sm font-bold border-0 transition-all focus:ring-2 focus:ring-offset-1
@@ -107,7 +115,7 @@ export default function TodayAppointments({ appointments }: { appointments: any[
                   ${!isCompleted && !isGrooming ? 'bg-gray-100 text-gray-600 hover:bg-gray-200' : ''}
                 `}
               >
-                <option value="pending">Pending</option>
+                <option value="pending_confirmation">Pending</option>
                 <option value="confirmed">Confirmed</option>
                 <option value="in_progress">Grooming</option>
                 <option value="completed">Completed</option>
